@@ -1,0 +1,55 @@
+# Site settings
+title: Ahmad Alhour | What does Software Engineering, Leadership and Martial Arts have in common?
+author: Ahmad Alhour
+url: http://aalhour.com
+email: a.z.alhour@gmail.com
+description: Ahmad Alhour's personal website. Projects, articles and essays on Software Engineering, Leadership and Book-worming!
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://aalhour.com" # the base hostname & protocol for your site
+logo: http://aalhour.com/favicon.ico
+
+# Social Links
+twitter: ahmad_alhour
+github: aalhour
+linkedin: aalhour
+
+# Build settings
+# permalink: /blog/:title
+permalink: /blog/:year/:month/:day/:title
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Site's Gems
+plugins:
+  - jekyll-seo-tag
+  - jekyll-gzip
+
+# Jekyll::Gzip Configuration
+gzip:
+  extensions:
+    - '.html'
+    - '.css'
+    - '.js'
+    - '.txt'
+    - '.ttf'
+    - '.atom'
+    - '.stl'
+    - '.xml'
+    - '.svg'
+    - '.eot'
+    - '.png'
+    - '.jpg'
+    - '.jpeg'
+    - '.woff2'
+
+# Site's themes
+theme: minimal-mistakes-jekyll
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - _site
+  - CNAME
