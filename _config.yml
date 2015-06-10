@@ -9,4 +9,5 @@ twitter_username: ahmad_alhour
 github_username:  aalhour
 
 # Build settings
+permalink: /blog/:year/:month/:day/:title
 markdown: kramdown
