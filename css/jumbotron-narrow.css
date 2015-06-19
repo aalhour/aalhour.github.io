@@ -34,7 +34,15 @@ body {
 /* Customize container */
 @media (min-width: 768px) {
   .container {
-    max-width: 750px;
+    max-width: 800px;
+  }
+
+  .dl-horizontal dd {
+    margin-left: 200px;
+  }
+
+  .dl-horizontal dt {
+    width: 190px;
   }
 }
 .container-narrow > hr {
