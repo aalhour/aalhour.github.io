@@ -1,0 +1,17 @@
+- title: "C# Algorithms"
+  subtitle: ""
+  linktitle: "@GitHub"
+  link: "https://github.com/aalhour/c-sharp-algorithms"
+  description: "A class-library project of standard Data Structures and Algorithms implementations, written in C#."
+
+- title: "iBill"
+  subtitle: "co-creator"
+  linktitle: "@GitHub"
+  link: "https://github.com/rnd-projects/ibill"
+  description: "A multi-featured billing, invoicing and reporting app, written in C# and ASP.NET. Supports various telephony providers, such as: MS Lync, and Asterisk."
+
+- title: "C# ORM"
+  subtitle: "co-creator"
+  linktitle: "@GitHub"
+  link: "https://github.com/rnd-projects/orm"
+  description: "A lightweight object-relational mapper, written in C#. Supports processing table-relations, and SQL queries construction."

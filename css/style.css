@@ -36,8 +36,10 @@ ul.listnotes { margin: 0 auto; }
 ul.listnotes li {line-height: 30px; } 
 
 /* Note */
-.note, .contact, .about, .error, .swatches { width: 85%; margin: 0 auto; line-height: 26px; }
+.note, .contact, .projects, .about, .error, .swatches { width: 85%; margin: 0 auto; line-height: 26px; }
 .note h2.date, .swatch-log h2.date { font-size: 24.5px; font-weight: 300; font-style: italic; }
+.projects p.title, p.project-title { font-family: 'Montserrat', Helvetica, sans-serif; text-transform: uppercase; }
+.projects p.description, p.project-description { margin-left: 20px; }
 
 /* Swatches */
 .swatch-log h2.date { margin-bottom: 30px; }
@@ -92,4 +94,4 @@ pre.prettyprint { padding: 10px !important; margin: 40px; font-size: 12px;}
 	margin: 5px 15px 0px 0px;
 	font-family: 'Montserrat', Helvetica, sans-serif; }
 
-
+.ml20 { margin-left: 20px; }

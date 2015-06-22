@@ -121,24 +121,10 @@ description: Current CV for Ahmad Alhour, a Software Engineer living and working
 	<!-- OPEN SOURCE -->
 	<h2>Open-Source Projects, and Contributions</h2>
 	
-	<p><strong>C# Algorithms, <a target="_blank" href="https://github.com/aalhour/C-Sharp-Algorithms">@Github</a>.</strong></p>
-	<ul>
-		<li>
-			<p>A class-library project of standard Data Structures and Algorithms implementations, written in C#.</p>
-		</li>
-	</ul>
-
-	<p><strong>iBill, co-creator, <a target="_blank" href="https://github.com/Software-Repos/iBill">@Github</a>.</strong></p>
-	<ul>
-		<li>
-			<p>A multi-featured billing, invoicing and reporting app, written in C# and ASP.NET. Supports various telephony providers, such as: MS Lync, and Asterisk.</p>
-		</li>
-	</ul>
-	
-	<p><strong>C# ORM, co-creator, <a target="_blank" href="https://github.com/Software-Repos/ORM">@Github</a>.</strong></p>
-	<ul>
-		<li>
-			<p>A lightweight object-relational mapper, written in C#. Supports processing table-relations, and SQL queries construction.</p>
-		</li>
-	</ul>
+	{% for item in site.data.projects %}
+		<p class=""><strong><span>{{ item.title }}{% if item.subtitle != null and item.subtitle != "" %},&nbsp;{{ item.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ item.link }}">{{ item.linktitle }}</a>.</strong></p>
+		<p class="ml20">{{ item.description }}</p>
+		
+		<br/>
+	{% endfor %}
 </div>

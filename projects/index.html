@@ -9,21 +9,15 @@ projects: active
 description: Projects of Ahmad Alhour, a Software Engineer living and working in Athens, Greece.
 ---
 
-<div class="contact">
-	<p>Open-source projects and contributions:</p>
-
-	<p><strong><a target="_blank" href="https://github.com/aalhour/C-Sharp-Algorithms">C# Algorithms.</a></strong></p>
-	<ul>
-		<li>A class-library project of standard Data Structures and Algorithms implementations, written in C#.</li>
-	</ul>
-
-	<p><strong><a target="_blank" href="https://github.com/Software-Repos/iBill">iBill</a>, co-creator.</strong><p>
-	<ul>
-		<li>A multi-featured billing, invoicing and reporting app, written in C# and ASP.NET. Supports various telephony providers, such as: MS Lync, and Asterisk.</li>
-	</ul>
-
-	<p><strong><a target="_blank" href="https://github.com/Software-Repos/ORM">C# ORM</a>, co-creator.</strong></p>
-	<ul>
-		<li>A lightweight object-relational mapper, written in C#. Supports processing table-relations, and SQL queries construction.</li>
-	</ul>
+<div class="projects">
+	<h4>Open-source projects and contributions:</h4>
+	
+	<br />
+	
+	{% for item in site.data.projects %}
+		<p class=""><strong><span>{{ item.title }}{% if item.subtitle != null and item.subtitle != "" %},&nbsp;{{ item.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ item.link }}">{{ item.linktitle }}</a>.</strong></p>
+		<p class="ml20">{{ item.description }}</p>
+		
+		<br/>
+	{% endfor %}
 </div>

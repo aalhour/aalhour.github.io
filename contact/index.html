@@ -9,15 +9,15 @@ projects: passive
 description: Contact information for Ahmad Alhour, a Software Engineer living and working in Athens, Greece.
 ---
 <div class="contact">
-
 	<p>You can get in touch with me:</p>
 	
 	<ul class="list-unstyled">
-	<li><a target="_blank" href="https://gr.linkedin.com/in/aalhour">@LinkedIn</a></li> 
-	<li><a target="_blank" href="http://github.com/aalhour">@GitHub</a></li>
-	<!--<li><a href="http://jsfiddle.net/user/jmcglone/fiddles/">@jsfiddle</a></li>-->
-	<!-- <li><a href="http://dribbble.com/jmcglone">@Dribbble</a></li> -->
-	<li>Or by sending an e-mail to <span class="obfuscate">moc.liamg@ruohla.z.a</span></li>
-	</ul>
+		{% for item in site.data.social_links %}
+			<li><a target="_blank" href="{{ item.link }}">@{{ item.text }}</a></li> 
+		{% endfor %}
 
+		<br />
+		
+		<li>Or by sending an e-mail to <span class="obfuscate">moc.liamg@ruohla.z.a</span></li>
+	</ul>
 </div>
