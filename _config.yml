@@ -4,7 +4,7 @@ email: a.z.alhour@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Programming, Software Development, Computer Science, and other stuff.
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://aalhour.github.io" # the base hostname & protocol for your site
+url: "http://aalhour.com" # the base hostname & protocol for your site
 twitter_username: ahmad_alhour
 github_username:  aalhour
 
