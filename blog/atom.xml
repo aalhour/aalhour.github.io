@@ -11,15 +11,15 @@ layout: feed
  <id>http://aalhour.github.io/blog/</id>
  <author>
    <name>Ahmad Alhour</name>
-   <email>jwmcglone@gmail.com</email>
+   <email>a.z.alhour@gmail.com</email>
  </author>
 
  {% for post in site.posts %}
  <entry>
    <title>{{ post.title }}</title>
-   <link href="http://aalhour.github.io{{ post.url }}"/>
+   <link href="http://aalhour.com/{{ post.url }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
-   <id>http://aalhour.github.io/blog{{ post.id }}</id>
+   <id>http://aalhour.com/blog{{ post.id }}</id>
    <content type="html">{{ post.content | xml_escape }}</content>
  </entry>
  {% endfor %}
