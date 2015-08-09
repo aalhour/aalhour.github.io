@@ -1,11 +1,14 @@
 <div class="footer">
 	<div class="row">
 		<div class="col-sm-8">
-			<p><small>&copy; aalhour 2015</small></p>
+			{% for item in site.data.social_links %}
+				<p><small>{{ item.text }}:&nbsp;<a href="{{ item.link }}">@{{ item.username }}</a></small></p> 
+			{% endfor %}
 		</div>
 
 		<div class="col-sm-4">
-			<p class="pull-right"><small><a href="/about" title="About this site">About</a></small></p>
+			<p class="pull-right"><small>&copy; AALHOUR 2015</small></p>
+			<!--<p class="pull-right"><small><a href="/about" title="About this site">ABOUT THIS SITE</a></small></p>-->
 		</div>
 	</div>
 </div> <!-- /footer -->
