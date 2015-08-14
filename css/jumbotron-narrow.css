@@ -16,6 +16,7 @@ body {
 .header {
   border-bottom: 1px solid #e5e5e5;
 }
+
 /* Make the masthead heading the same height as the navigation */
 .header h3 {
   margin-top: 0;
@@ -45,8 +46,14 @@ body {
     width: 190px;
   }
 }
+
 .container-narrow > hr {
   margin: 30px 0;
+}
+
+/* override the dt inside dl.dl-horizontal */
+.dl-horizontal dt {
+  text-align: left;
 }
 
 /* Main marketing message and sign up button */
