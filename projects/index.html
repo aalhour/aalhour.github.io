@@ -6,18 +6,18 @@ blog: passive
 home: passive
 contact: passive
 projects: active
-description: Projects of Ahmad Alhour, a Software Engineer living and working in Athens, Greece.
+description: Projects of Ahmad Alhour, a Software Engineer at TrustYou.
 ---
 
 <div class="projects">
-	<h4>Open-source projects and contributions:</h4>
-	
+	<h4>Selected open-source projects and contributions:</h4>
+
 	<br />
-	
+
 	{% for item in site.data.projects %}
 		<p class=""><strong><span>{{ item.title }}{% if item.subtitle != null and item.subtitle != "" %},&nbsp;{{ item.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ item.link }}">{{ item.linktitle }}</a>.</strong></p>
 		<p class="ml20">{{ item.description }}</p>
-		
+
 		<br/>
 	{% endfor %}
 </div>
