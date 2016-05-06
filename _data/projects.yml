@@ -4,10 +4,10 @@
   link: "https://github.com/aalhour/Assembler.hack"
   description: "A 16-bit machine code assembler written in Python 3. It reads a program written in the Hack Assembly Language (*.asm text file), assembles it to a 16-bit binary machine code program, written in the Hack Machine Language, and then saves the assembled machine code program to a new file (*.hack text file). This project was implemented as part of building a complete 16-bit computer through the <b>nand2tetris</b> project."
 
-- title: "micro_kanren"
+- title: "micro_kanren.py"
   subtitle: ""
   linktitle: "@GitHub"
-  link: "https://github.com/aalhour/micro_kanren"
+  link: "https://github.com/aalhour/micro_kanren.py"
   description: "microKanren (and miniKanren) refer to a family of embedded Domain Specific Languages for Relational-Declarative Logic programming. This is an object-oriented implementation of microKanren using Python 3 as the host language."
 
 - title: "C# Algorithms"
