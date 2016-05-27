@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ahmad Alhour</title>
+    <description>Blog of Ahmad Alhour. Projects and articles on Programming, Software Development, Computer Science, and other stuff.
+</description>
+    <link>http://aalhour.com/</link>
+    <atom:link href="http://aalhour.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>2016-05-27 12:01:52 +0200</pubDate>
+    <lastBuildDate>2016-05-27 12:01:52 +0200</lastBuildDate>
+    <generator>Jekyll v</generator>
+    
+      <item>
+        <title>nand2tetris, or How to Build a Computer from First Principles</title>
+        <description>&lt;p&gt;Last month (almost) I finished one of the most interesting and enjoyable Computer Courses on Coursera, the &lt;a href=&quot;https://www.coursera.org/learn/build-a-computer&quot;&gt;nand2tetris: Part I&lt;/a&gt; Course, or Build a Modern Computer from First Principles: Nand to Tetris.&lt;/p&gt;
+
+&lt;p&gt;The MOOC is based on the book &lt;em&gt;(“Elements of Computing System”)[https://mitpress.mit.edu/books/elements-computing-systems]&lt;/em&gt;, and the self-paced course that uses the book which is outlined on the website &lt;a href=&quot;http://www.nand2tetris.org/&quot;&gt;http://www.nand2tetris.org/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In a nutshell, what you do is basically start with a language that looks like a minified version of Verilog or VHDL called &lt;strong&gt;HDL&lt;/strong&gt; (Hardware Description Language) and a Nand gate implementation. From there, you implement all elementary single-bit logic gates:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;And&lt;/li&gt;
+  &lt;li&gt;Or&lt;/li&gt;
+  &lt;li&gt;Not&lt;/li&gt;
+  &lt;li&gt;Xor&lt;/li&gt;
+  &lt;li&gt;Mux: multiplexer&lt;/li&gt;
+  &lt;li&gt;DMux: demultiplexer&lt;/li&gt;
+  &lt;li&gt;DMux4Way: 4-ways 1-bit demultiplexer&lt;/li&gt;
+  &lt;li&gt;DMux8Way: 8-ways 1-bit demultiplexer&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;And some other multi-bits gates:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;And16: 16-bits AND gate&lt;/li&gt;
+  &lt;li&gt;Or16: 16-bits OR gate&lt;/li&gt;
+  &lt;li&gt;Mux16: 16-bits MUX gate&lt;/li&gt;
+  &lt;li&gt;Mux4Way16: 4-ways 16-bit multiplexer&lt;/li&gt;
+  &lt;li&gt;Mux8Way16: 8-ways 16-bit multiplexer&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>2015-08-02 01:30:00 +0200</pubDate>
+        <link>http://aalhour.com/blog/nand2tetris-how-to-build-a-computer-from-first-principles</link>
+        <guid isPermaLink="true">http://aalhour.com/blog/nand2tetris-how-to-build-a-computer-from-first-principles</guid>
+        
+        
+        <category>programming,</category>
+        
+        <category>github,</category>
+        
+        <category>nand2tetris,</category>
+        
+        <category>hardware,</category>
+        
+        <category>emulation,</category>
+        
+        <category>computer</category>
+        
+        <category>design,</category>
+        
+        <category>computer</category>
+        
+        <category>architecture,</category>
+        
+        <category>assembly,</category>
+        
+        <category>assemblers,</category>
+        
+        <category>machine</category>
+        
+        <category>code</category>
+        
+      </item>
+    
+      <item>
+        <title>Implementing Data Structures and Algorithms in C#</title>
+        <description>&lt;p&gt;I have been preparing for programming interviews since May this year. I started this preparation process by watching the MIT OCW Course &lt;strong&gt;&lt;a href=&quot;https://www.youtube.com/playlist?list=PLUl4u3cNGP61Oq3tWYp6V_F-5jb5L2iHb&quot;&gt;Introduction to Algorithms&lt;/a&gt;&lt;/strong&gt; and committing myself to implementing the various data structures and algorithms that I would be studying during the course in C#. However, I didn’t just want to implement them for the sake of training myself, I wanted to practice the best practices of OOP as well, and so I adopted the approach of developing an organized library of classes that would serve anyone as a class-library project (portable library), so that they can use it, for example, as an educational resource to aid them in implementing the same set of algorithms and data structures in C#, or maybe just use my code to solve algorithmic problems.&lt;/p&gt;
+
+&lt;p&gt;As of today, I have finished watching the video lectures, completed the associated readings and finished implementing the set of algorithms and data structures that I studied in the course. As a result, I have come up with a project that I didn’t see myself coming up with a few months ago.&lt;/p&gt;
+
+&lt;p&gt;What was beneficial to me, other than learning algorithms and implementing what I had learned, is the fact that many people found the library resourceful for their various needs. As of today, the library has been forked 40, and star-gazed by 250+ people over github. It has also been cloned from github 200+ times.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;All of the project is on &lt;strong&gt;&lt;a href=&quot;https://github.com/aalhour/C-Sharp-Algorithms&quot;&gt;@GitHub&lt;/a&gt;&lt;/strong&gt;.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;on-social-media&quot;&gt;On Social Media:&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;a href=&quot;https://www.reddit.com/r/programming/comments/3etf9f/c_algorithms_and_data_structures/&quot;&gt;@Reddit&lt;/a&gt;.&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;a href=&quot;http://www.codehunt.io/sub/c-algorithms/&quot;&gt;@CodeHunt&lt;/a&gt;.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>2015-08-02 01:30:00 +0200</pubDate>
+        <link>http://aalhour.com/blog/c-sharp-algos</link>
+        <guid isPermaLink="true">http://aalhour.com/blog/c-sharp-algos</guid>
+        
+        
+        <category>programming,</category>
+        
+        <category>github,</category>
+        
+        <category>datastructures,</category>
+        
+        <category>algorithms</category>
+        
+      </item>
+    
+      <item>
+        <title>Hello, World!</title>
+        <description>
+</description>
+        <pubDate>2015-06-11 02:12:00 +0200</pubDate>
+        <link>http://aalhour.com/blog/hello-world</link>
+        <guid isPermaLink="true">http://aalhour.com/blog/hello-world</guid>
+        
+        
+        <category>uncategorised</category>
+        
+      </item>
+    
+  </channel>
+</rss>
