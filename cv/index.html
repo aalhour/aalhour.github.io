@@ -22,6 +22,7 @@ description: Current CV for Ahmad Alhour, a Software Engineer at TrustYou.
 	</div>
 
 	<p>A citizen of the web and a full-time software engineer with a B.Sc. degree in Computer Science. Involved in full-stack software development (web &amp; desktop). Geek at heart, math-hobbyist, polyglot, ploymath and team-spirited.</p>
+	<p>Lately, I have been tinkering with <a target="_blank" href="https://github.com/aalhour/pycoolc" title="PyCOOLC">Compilers</a>.</p>
 
 	<br/>
 
@@ -103,7 +104,7 @@ description: Current CV for Ahmad Alhour, a Software Engineer at TrustYou.
 	<p>
 		<strong>B.Sc. in Computer Science, <abbr title="Princess Sumaya University for Technology">PSUT</abbr>,&nbsp;Amman, Jordan, 2007-2011.</strong>
 		<br/>
-		<a target="_blank" href="http://www.psut.edu.jo/">University Website</a>
+		<a target="_blank" href="http://www.psut.edu.jo/">University Website</a>.
 	</p>
 
 	<br />
@@ -112,9 +113,7 @@ description: Current CV for Ahmad Alhour, a Software Engineer at TrustYou.
 	<h2>Skills and Expertise</h2>
 	<dl class="dl-horizontal">
 		<dt>Human Languages</dt>
-		<dd>Arabic (Native language)<span class='mr10'>;</span>
-		English (Fluent)<span class='mr10'>;</span>
-		Greek (Basic)</dd>
+		<dd>Arabic (Native language)<span class='mr10'>;</span>English (Fluent)<span class='mr10'>;</span>Greek (Basic)</dd>
 	</dl>
 
 	<dl class="dl-horizontal">
@@ -128,8 +127,8 @@ description: Current CV for Ahmad Alhour, a Software Engineer at TrustYou.
 	</dl>
 
 	<dl class="dl-horizontal">
-		<dt>Other/Markup</dt>
-		<dd>SQL; HTML; CSS; XML</dd>
+		<dt>Other / Markup</dt>
+		<dd>SQL; HTML; CSS; XML; Markdown</dd>
 	</dl>
 
 	<dl class="dl-horizontal">
@@ -138,13 +137,18 @@ description: Current CV for Ahmad Alhour, a Software Engineer at TrustYou.
 	</dl>
 
 	<dl class="dl-horizontal">
-		<dt class="text-left">SCM/Build<br/>Management</dt>
+		<dt class="text-left">SCM / Build Tools</dt>
 		<dd>Git; GitHub; Travis-CI</dd>
 	</dl>
 
 	<dl class="dl-horizontal">
-		<dt>OS/Environments</dt>
-		<dd>OSX; CentOS Linux; Ubuntu; MS Windows; MS SQL Server; MySQL; PostgreSQL</dd>
+		<dt>Operating Systems</dt>
+		<dd>OS X; CentOS; Ubuntu; MS Windows</dd>
+	</dl>
+
+	<dl class="dl-horizontal">
+		<dt>Data Stores</dt>
+		<dd>PostgreSQL; MySQL; MS SQL Server; MongoDB</dd>
 	</dl>
 
 	<dl class="dl-horizontal">
@@ -157,11 +161,7 @@ description: Current CV for Ahmad Alhour, a Software Engineer at TrustYou.
 	<!-- OPEN SOURCE -->
 	<h2>Open-Source Projects and Contributions</h2>
 
-	{% for item in site.data.projects %}
-		<p class=""><strong><span>{{ item.title }}{% if item.subtitle != null and item.subtitle != "" %},&nbsp;{{ item.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ item.link }}">{{ item.linktitle }}</a>.</strong></p>
-		<p class="ml20">{{ item.description }}</p>
-		<br/>
-	{% endfor %}
+	<p>For a complete list of my open-sourced side projects, prototypes and contributions please refer to the <b>Projects</b> page (<a href="/projects" title="aalhour.com/projects">aalhour.com/projects</a>), and don't forget to pay me a visit at <b>GitHub</b> (<a target="_blank" href="https://github.com/aalhour" title="Ahmad Alhour GitHub Account">git.io/aalhour</a>) as well.</p>
 
 	<br />
 
