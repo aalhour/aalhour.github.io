@@ -7,7 +7,7 @@ blog: active
 categories: python, data structures, algorithms, linq, queryable, collections
 ---
 
-As a programmer who spent a long period of time developing software in C# and .NET, moving to the Python world was exciting, but at the same time it was not that easy. One of the challenges I had to face is to replace my dependance on the convenience of LINQ with other constructs that Python offers, such as the built-in methods `map`, `reduce` among others, in addition to the cool built-in modules `functools` and `itertools`.
+As a programmer who spent a long period of time developing software in C# and .NET, moving to the Python world was exciting, but at the same time it was not that easy. One of the challenges I had to face is to replace my dependance on the convenience of LINQ with other constructs that Python offers, such as the built-in methods `map`, `reduce` among others, as well as the cool built-in modules `functools` and `itertools`.
 
 Some people might argue that LINQ is not the most efficient solution for querying collections, and it isn't. But on the other hand, it's definitely the most convenient and simplest one to write expressions in terms of queries or transformations on a data collection.
 
@@ -52,11 +52,11 @@ result = reduce(add, numbers, 0)
 print(result)
 ```
 
-The biggest difference that one can notice is that C#'s LINQ functions work by chaining where Python's methods work by composition. I think this is the obvious challenge which also adds a cost to readability, at least in my own opinion.
+The biggest difference that one can notice is that C#’s LINQ functions work by chaining where as Python’s methods work by composition. I think this is an obvious challenge to readability, at least in my own opinion.
 
 There are, however, really nice functional and declarative programming features in Python, in addition to 3rd party tooling support from the community, but the gap for a LINQ in Python cannot be filled with tooling, only a language-integrated query DSL inside Python itself as a host language can fill that gap and adhere to the batteries-included philosophy.
 
-Tp cut the chase, I miss LINQ a lot and I've attempted, more playfully than not, to recreate some of its extensions to Python's lists. Please do note, that this is not a polished production-ready library or what not, this is just a tinkering attempt to introduce an immutable collection on top of Lists in Python that can be queried. A proof of concept, more or less.
+To cut to the chase, I miss LINQ a lot and I've attempted, more playfully than not, to recreate some of its extensions to Python's lists. Please do note, that this is not a polished production-ready library or what not, this is just a tinkering attempt to introduce an immutable collection on top of Lists in Python that can be queried. A proof of concept, more or less.
 
 The full source code is hosted on the GitHub Gist: [https://gist.github.com/aalhour/f80b874add5c34f7c8b7](https://gist.github.com/aalhour/f80b874add5c34f7c8b7).
 
@@ -94,7 +94,7 @@ reduced_result = query.reduce(add)
 print(reduced_result)
 ```
 
-I hope you have liked this and noticed how more beautiful and readable it is than Python's methods composition pattern. If you have any comments, just shoot them below or just head over to the **reddit discussion** linked below and join the others.
+I hope you enjoyed this and noticed how much more beautiful and readable the QueryableList solution is than Python's methods composition pattern. If you have any comments, just shoot them below or head over to the **reddit discussion** linked below and join the others.
 
 Until next time,
 
