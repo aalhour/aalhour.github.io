@@ -52,7 +52,7 @@ result = reduce(add, numbers, 0)
 print(result)
 ```
 
-The biggest difference that one can notice is that C#’s LINQ functions work by chaining where as Python’s methods work by composition. I think this is an obvious challenge to readability, at least in my own opinion.
+The biggest difference that one can notice is that C#’s LINQ functions work by chaining where as Python’s methods work by composition. I think this is an obvious challenge in terms of readability and writing complex expressions, at least in my own opinion.
 
 There are, however, really nice functional and declarative programming features in Python, in addition to 3rd party tooling support from the community, but the gap for a LINQ in Python cannot be filled with tooling, only a language-integrated query DSL inside Python itself as a host language can fill that gap and adhere to the batteries-included philosophy.
 
