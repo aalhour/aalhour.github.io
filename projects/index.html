@@ -10,14 +10,31 @@ description: Projects of Ahmad Alhour, a Software Engineer at TrustYou.
 ---
 
 <div class="projects">
-	<h4>Selected open-source projects and contributions:</h4>
-
+	<h3>My Open-Source Projects:</h3>
 	<br />
 
-	{% for item in site.data.projects %}
-		<p class=""><strong><span>{{ item.title }}{% if item.subtitle != null and item.subtitle != "" %},&nbsp;{{ item.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ item.link }}">{{ item.linktitle }}</a>.</strong></p>
-		<p class="ml20">{{ item.description }}</p>
+	{% for project in site.data.projects %}
+		{% if project.contribution_type == "owner" %}
+			<p class=""><strong><span>{{ project.title }}{% if project.subtitle != "" %},&nbsp;{{ project.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ project.link }}">{{ project.linktitle }}</a>.</strong></p>
+			<p class="ml20">{{ project.long_description }}</p>
 
-		<br/>
+			<br/>
+		{% endif %}
 	{% endfor %}
+
+	<hr /><br />
+
+	<h3>Contributions to Other Projects:</h3>
+	<br />
+
+	{% for project in site.data.projects %}
+		{% if project.contribution_type == "contributor" %}
+			<p class=""><strong><span>{{ project.title }}{% if project.subtitle != "" %},&nbsp;{{ project.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ project.link }}">{{ project.linktitle }}</a>.</strong></p>
+			<p class="ml20">{{ project.long_description }}</p>
+
+			<br/>
+		{% endif %}
+	{% endfor %}
+
+	<p>For a complete list of my open-source contributions, please refer to my GitHub account: <a href="https://github.com/aalhour" title="github.com/aalhour">github.com/aalhour</a></p>
 </div>

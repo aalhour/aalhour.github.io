@@ -4,6 +4,7 @@ title: "nand2tetris, or How to Build a Computer from First Principles: A Review"
 date: 2016-04-01 12:00:00
 categories: programming, github, nand2tetris, hardware, emulation, computer design, computer architecture, assembly, assemblers, machine code
 blog: active
+noteinfo: programming, github, nand2tetris, hardware, emulation, computer design, computer architecture, assembly, assemblers, machine code
 ---
 
 Last month I finished one of the most interesting and enjoyable Computer Courses on Coursera, the [nand2tetris: Part I](https://www.coursera.org/learn/build-a-computer) Course which goes by the title *"Build a Modern Computer from First Principles: Nand to Tetris"*.
