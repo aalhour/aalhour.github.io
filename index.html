@@ -10,11 +10,11 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 ---
 
 <div class="row marketing">
-	<div class="col-sm-4">
-	 	<img  class="img-circle avatar" alt="Ahmad Alhour" src="img/aalhour_athens_dark.jpg" width="250" />
+	<div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+	 	<center><img  class="img-circle avatar" alt="Ahmad Alhour" src="img/aalhour_athens_dark.jpg" width="250" /></center>
 	</div>
 
-	<div itemscope itemtype="http://data-vocabulary.org/Person" class="col-sm-8 home">
+	<div itemscope itemtype="http://data-vocabulary.org/Person" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 home">
 		<p class="lead">Hi, I'm <span itemprop="name">Ahmad Alhour</span>.</p>
 
 		<p>I am a <span itemprop="title">software engineer</span>, originally from <span itemprop="address" itemscope
@@ -38,7 +38,10 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 				<ul class="listnotes list-unstyled">
 					{% for project in site.data.projects limit: 4 %}
 						{% if project.contribution_type == "owner" and project.home_enabled == "true" %}
-							<li><span><strong><a target="_blank" href="{{ project.link }}">{{ project.title }}</a></strong></span>&nbsp;&raquo;&nbsp;{{ project.short_description }}</li>
+							<li>
+								<span>&raquo;&nbsp;<a target="_blank" href="{{ project.link }}">{{ project.title }}</a></span>:&nbsp;{{ project.short_description }}
+								<span class="visible-xs-*"><br/></span>
+							</li>
 						{% endif %}
 					{% endfor %}
 				</ul>
@@ -57,7 +60,7 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 			<div class="notelist">
 				<ul class="listnotes list-unstyled">
 					{% for post in site.posts limit: 3 %}
-						<li><span>{{ post.date | date_to_string }}&nbsp;&raquo;</span>&nbsp;<a href="{{ post.url }}">{{ post.title }}</a></li>
+						<li><span>&raquo;&nbsp;</span><a href="{{ post.url }}">{{ post.title }}</a><span class="hidden-sm hidden-xs">&nbsp;({{ post.date | date_to_string }})</span></li>
 					{% endfor %}
 				</ul>
 				<br />
