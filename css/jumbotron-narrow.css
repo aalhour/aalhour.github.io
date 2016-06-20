@@ -8,8 +8,8 @@ body { padding-top: 20px; padding-bottom: 20px; }
 .header { border-bottom: 1px solid #e5e5e5; }
 
 /* Make the masthead heading the same height as the navigation */
-.header h3 { margin-top: 0; margin-bottom: 0; line-height: 40px; padding-bottom: 19px; }
-.header h4 { margin-top: 0; margin-bottom: 0; line-height: 40px; padding-bottom: 19px; }
+.header h3 { margin-top: 0; margin-bottom: 0; line-height: 40px; padding-bottom: 15px; }
+.header h4 { margin-top: 0; margin-bottom: 0; line-height: 40px; padding-bottom: 15px; }
 
 /* Custom page footer */
 .footer { padding-top: 19px; color: #777; border-top: 1px solid #e5e5e5; }
