@@ -1,12 +1,23 @@
-<div class="header clearfix">
-	<nav>
-		<ul class="nav nav-pills pull-right">
-			<li role="presentation" class="{{ page.blog }}"><a href="/blog" title="Blog">Blog</a></li>
-			<li role="presentation" class="{{ page.projects }}"><a href="/projects" title="Projects">Projects</a></li>
- 			<li role="presentation" class="{{ page.cv }}"><a href="/cv" title="CV">CV</a></li>
- 			<li role="presentation" class="{{ page.contact }}"><a href="/contact" title="Contact">Contact</a></li>
-		</ul>
-	</nav>
-	
-	<h3 class="text-muted"><a href="/">Ahmad Alhour</a></h3>
-</div>
+<nav class="navbar header clearfix" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      	<span class="icon-bar"></span>
+    	</button>
+
+			<h3 id="navbar-title" class="text-muted text-left"><a href="/">Ahmad Alhour</a></h3>
+		</div>
+
+		<div id="navbar" class="collapse navbar-collapse">
+			<ul class="nav nav-pills pull-right">
+				<li role="presentation" class="{{ page.blog }}"><a href="/blog" title="Blog">Blog</a></li>
+				<li role="presentation" class="{{ page.projects }}"><a href="/projects" title="Projects">Projects</a></li>
+	 			<li role="presentation" class="{{ page.cv }}"><a href="/cv" title="CV">CV</a></li>
+	 			<li role="presentation" class="{{ page.contact }}"><a href="/contact" title="Contact">Contact</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>

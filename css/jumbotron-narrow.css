@@ -2,16 +2,22 @@
 body { padding-top: 20px; padding-bottom: 20px; }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
-.header, .marketing, .footer { padding-left: 15px; padding-right: 15px; }
+.marketing, .footer { padding-left: 15px; padding-right: 15px; }
 
 /* Custom page header */
-.header { border-bottom: 1px solid #e5e5e5; }
+.header { padding-left: 0px; padding-right: 0px; border-bottom: 1px solid #e5e5e5; }
 
 /* Make the masthead heading the same height as the navigation */
-.header h3, .header h4 { margin-top: 0; margin-bottom: 0; line-height: 40px; padding-bottom: 19px; }
+// .header h3, .header h4 { margin: 0px; line-height: 40px; padding-bottom: 19px; }
+#navbar-title { margin: 0px; line-height: 40px; padding-bottom: 15px; }
 
 /* Custom page footer */
 .footer { padding-top: 19px; color: #777; border-top: 1px solid #e5e5e5; }
+
+@media (max-width: 768px) {
+  #navbar li { width:100%; }
+  #navbar-title { font-size: 18px; }
+}
 
 @media (min-width: 768px) {
   .container { max-width: 860px; }
@@ -34,9 +40,13 @@ body { padding-top: 20px; padding-bottom: 20px; }
     .dl-horizontal dd { margin-left: 200px; }
     .dl-horizontal dt { width: 190px; }
     /* Remove the padding we set earlier */
-    .header, .marketing, .footer { padding-left: 0; padding-right: 0; }
+    .marketing, .footer { padding-left: 0; padding-right: 0; }
     /* Space out the masthead */
     .header { margin-bottom: 30px; }
     /* Remove the bottom border on the jumbotron for visual effect */
     .jumbotron { border-bottom: 0; }
 }
+
+/* extend bootstrap's navbar collapsable buttons classes */
+.navbar-toggle { border-color: #ddd; }
+.navbar-toggle .icon-bar { background-color: #888; }
