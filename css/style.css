@@ -8,7 +8,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 { font-family: 'Merriweathe
 blockquote p { font-size: 16px; line-height: 1.6em; }
 
 /* Masthead */
-.header, .footer, .header h3, .header h4 { font-family: 'Montserrat', Helvetica, sans-serif; text-transform: uppercase; font-weight: normal; }
+.header, .footer, .social, .header h3, .header h4 { font-family: 'Montserrat', Helvetica, sans-serif; text-transform: uppercase; font-weight: normal; }
+.social a.social-item { text-decoration: none; color: inherit; }
 .footer p { font-family: 'Montserrat', Helvetica, sans-serif; text-transform: none; font-weight: normal; }
 
 /* Navigation */
@@ -99,5 +100,18 @@ pre.prettyprint { padding: 10px !important; margin: 40px; font-size: 12px;}
 	margin: 5px 15px 0px 0px;
 	font-family: 'Montserrat', Helvetica, sans-serif; }
 
+.ml5 { margin-left: 5px; }
+.mr5 { margin-right: 5px; }
+.ml10 { margin-left: 10px; }
+.mr10 { margin-right: 10px; }
+.ml15 { margin-left: 15px; }
+.mr15 { margin-right: 15px; }
 .ml20 { margin-left: 20px; }
-.mr10 { margin-right: 10px;}
+
+/* fontawesome icons color */
+.twitter-color { color: #00aced; }
+.linkedin-color { color: #007bb6; }
+.stackoverflow-color { color: orange; }
+.angellist-color { color: #000000; }
+.github-color { color: #000000; }
+.rss-color { color: orange; }
