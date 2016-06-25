@@ -1,6 +1,23 @@
 @import url(http://fonts.googleapis.com/css?family=Merriweather:300,300italic,400,400italic,700,700italic);
 @import url(http://fonts.googleapis.com/css?family=Montserrat);
 
+/***
+ * BOOTSTRAP OVERRIDE
+ *--------------------------------------------------------------------------- */
+ /* Space out content a bit */
+ body { padding-top: 20px; padding-bottom: 20px; }
+
+ /* Supporting marketing content */
+ .marketing { margin: 40px 0; padding-left: 15px; padding-right: 15px; }
+ .marketing p + h4 { margin-top: 28px; }
+
+ /* Extend bootstrap's navbar collapsable buttons classes */
+ .navbar-toggle { border-color: #ddd; margin-right: 0px; }
+ .navbar-toggle .icon-bar { background-color: #888; }
+
+/***
+ * CUSTOM STYLES
+ *--------------------------------------------------------------------------- */
 body { font-family: 'Merriweather', Georgia, Times; font-size: 16px; }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 { font-family: 'Merriweather', Georgia, Times; font-weight: 700;}
@@ -12,13 +29,29 @@ blockquote p { font-size: 16px; line-height: 1.6em; }
 .social a.social-item { text-decoration: none; color: inherit; }
 .footer p { font-family: 'Montserrat', Helvetica, sans-serif; text-transform: none; font-weight: normal; }
 
+/* Custom page header */
+.header { padding-left: 0px; padding-right: 0px; border-bottom: 1px solid #e5e5e5; }
+
+/* Make the masthead heading the same height as the navigation */
+.navbar-title { margin: 8px 0px 0px 8px; line-height: 40px; padding-bottom: 15px; }
+
 /* Navigation */
 h3.text-muted a, h4.text-muted a { text-decoration: none; color: #999999; }
 h3.text-muted a:hover, h4.text-muted a:hover { text-decoration: none; color: #0088cc; }
 
+/* Custom page footer */
+.footer { padding-left: 15px; padding-right: 15px; padding-top: 19px; color: #777; border-top: 1px solid #e5e5e5; }
+
+/* override the dt inside dl.dl-horizontal */
+.dl-horizontal dt { text-align: left; }
+
+/* Avatar image */
+img.avatar { margin-bottom: 30px; width: 250px; }
+
 /* Custom container */
 .container > hr { margin: 30px 0; }
 .container > hr.footer {margin-bottom: 15px; }
+.container-narrow > hr { margin: 30px 0; }
 
 /* E-Mail */
 .obfuscate { unicode-bidi: bidi-override; direction: rtl; }
@@ -114,3 +147,74 @@ pre.prettyprint { padding: 10px !important; margin: 40px; font-size: 12px;}
 .angellist-color { color: #000000; }
 .github-color { color: #000000; }
 .rss-color { color: orange; }
+
+
+/***
+ * MEDIA SCREEN QUERIES
+ *--------------------------------------------------------------------------- */
+
+/* Large desktops and laptops */
+@media (min-width: 1200px) {
+	/* empty */
+}
+
+/* Landscape tablets and medium desktops */
+@media (min-width: 992px) and (max-width: 1199px) {
+	/* empty */
+}
+
+/* Portrait tablets and small desktops */
+@media (min-width: 768px) {
+	.container { max-width: 860px; }
+	.dl-horizontal dd { margin-left: 200px; }
+	.dl-horizontal dt { width: 190px; }
+}
+
+/* Landscape phones and portrait tablets */
+@media (max-width: 768px) {
+	.navbar-container li { width: 100%; }
+	.navbar-title { font-size: 18px; }
+}
+
+/* Portrait tablets and small desktops */
+@media screen and (min-width: 768px) {
+	.container { max-width: 860px; }
+	.dl-horizontal dd { margin-left: 200px; }
+	.dl-horizontal dt { width: 190px; }
+	/* Remove the padding we set earlier */
+	.marketing, .footer { padding-left: 0; padding-right: 0; }
+	/* Space out the masthead */
+	.header { margin-bottom: 30px; }
+	/* Remove the bottom border on the jumbotron for visual effect */
+	.jumbotron { border-bottom: 0; }
+}
+
+/* Portrait phones and smaller */
+/* Origianl max-width is 450px */
+@media (max-width: 430px) {
+	.marketing { margin: 0px; }
+	img.avatar { width: 150px; }
+	body { font-size: inherit; }
+	.marketing { margin: 20px 0; padding: 0px; }
+}
+
+/* Extremely small devices */
+@media (max-width: 360px) {
+	body { font-size: 7px; }
+	.header { padding-left: 10px; padding-right: 10px; }
+	.container { margin: 0 auto; padding-left: 5px; padding-right: 5px; }
+	.marketing { margin: 0px; padding: 0px; }
+	.footer { padding: 5px 5px 5px 5px; }
+	img.avatar { width: 75px; }
+
+	p, span, li, a, article, input, label, button, info { font-size: 7px; }
+	h1, h2, h3, h4, h5, h6, .header h3, p.lead, p.lead span { font-size: 10px; }
+	h3.navbar-title a { font-size: 10px; }
+
+	p, span, li, h1, h2, h3, h4, h5, h6,
+	.header h3, h3.text-muted a, h4.text-muted a, .marketing p.lead, p.lead, .home p, .marketing p, ul.listnotes li { line-height: 11px; }
+
+	.navbar-toggle { padding: 3px 6px; }
+	.navbar-toggle .icon-bar { width: 8px; height: 1px; }
+
+}

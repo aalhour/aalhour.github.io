@@ -25,7 +25,7 @@
   cv_enabled: "true"
   home_enabled: "true"
   contribution_type: "owner"
-  short_description: "Relational-Declarative Logic programming DSL for Python 3."
+  short_description: "A Relational-Declarative Logic programming DSL for Python 3."
   long_description: "μKanren (microKanren and miniKanren) refer to a family of embedded DSLs (Domain-Specific Languages) for Relational-Declarative Logic programming. This is an object-oriented implementation of μKanren for Python, using Python 3 as the host language."
 
 - title: "C# Algorithms"
