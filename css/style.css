@@ -33,6 +33,12 @@ p, ul, ol, dl {
   text-rendering: geometricPrecision;
 }
 
+/* Generated list items from Markdown */
+ul li p,
+ol li p {
+  margin-bottom: 15px;
+}
+
 blockquote p { font-size: 16px; line-height: 1.6em; }
 
 /* Masthead */
@@ -104,10 +110,9 @@ ul.swatch li:first-child { webkit-border-top-left-radius: 9px; -webkit-border-bo
 .home p:last-child { margin-bottom: 0px; }
 
 /* CV */
-.cv {line-height: 23px; width: 90%; margin: 0 auto;}
-.cv li { line-height: 23px; }
-.cv h2 { font-size: 26.5px; }
+.cv {line-height: 1.5em; width: 90%; margin: 0 auto;}
 .cv h1 { font-size: 32.5px; }
+.cv h2 { font-size: 26.5px; }
 
 .notes, .contact, .about, .cv, .error, .swatches { margin-bottom: 30px; }
 
@@ -115,7 +120,7 @@ ul.swatch li:first-child { webkit-border-top-left-radius: 9px; -webkit-border-bo
 iframe {font-family: 'Merriweather', Georgia, Times; font-size: 16px;}
 
 /* About */
-.about ul.list-unstyled li { line-height: 30px; text-indent: -30px; margin-left: 30px;}
+.about ul.list-unstyled li { line-height: 1.42em; text-indent: -30px; margin-left: 30px;}
 
 /* Guides */
 .guide { width: 90%; margin: 0 auto 60px auto; line-height: 26px;}
