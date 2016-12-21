@@ -9,6 +9,7 @@
  /* Space out content a bit */
  body { padding-top: 20px; padding-bottom: 20px; }
 
+.lead { font-size: 2.5rem; }
  /* Supporting marketing content */
  .marketing { margin: 40px 0; padding-left: 15px; padding-right: 15px; }
  .marketing p + h4 { margin-top: 28px; }
@@ -20,9 +21,23 @@
 /***
  * CUSTOM STYLES
  *--------------------------------------------------------------------------- */
-body { font-family: "Merriweather",serif; letter-spacing: 0.01rem; font-size: 1.8rem; line-height: 1.75em; font-weight: 100; }
+body { font-family: "Merriweather",serif; letter-spacing: 0.02rem; font-size: 1.8rem; line-height: 1.42em; font-weight: 100; }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 { font-family: 'Merriweather', Georgia, Times; font-weight: 700;}
+
+p, ul, ol, dl {
+  -webkit-font-feature-settings: 'liga' 1,'onum' 1,'kern' 1;
+  -moz-font-feature-settings: 'liga' 1,'onum' 1,'kern' 1;
+  -o-font-feature-settings: 'liga' 1,'onum' 1,'kern' 1;
+  margin: 0 0 1.75em 0;
+  text-rendering: geometricPrecision;
+}
+
+/* Generated list items from Markdown */
+ul li p,
+ol li p {
+  margin-bottom: 15px;
+}
 
 blockquote p { font-size: 16px; line-height: 1.6em; }
 
@@ -95,10 +110,9 @@ ul.swatch li:first-child { webkit-border-top-left-radius: 9px; -webkit-border-bo
 .home p:last-child { margin-bottom: 0px; }
 
 /* CV */
-.cv {line-height: 23px; width: 90%; margin: 0 auto;}
-.cv li { line-height: 23px; }
-.cv h2 { font-size: 26.5px; }
+.cv {line-height: 1.5em; width: 90%; margin: 0 auto;}
 .cv h1 { font-size: 32.5px; }
+.cv h2 { font-size: 26.5px; }
 
 .notes, .contact, .about, .cv, .error, .swatches { margin-bottom: 30px; }
 
@@ -106,7 +120,7 @@ ul.swatch li:first-child { webkit-border-top-left-radius: 9px; -webkit-border-bo
 iframe {font-family: 'Merriweather', Georgia, Times; font-size: 16px;}
 
 /* About */
-.about ul.list-unstyled li { line-height: 30px; text-indent: -30px; margin-left: 30px;}
+.about ul.list-unstyled li { line-height: 1.42em; text-indent: -30px; margin-left: 30px;}
 
 /* Guides */
 .guide { width: 90%; margin: 0 auto 60px auto; line-height: 26px;}
@@ -178,7 +192,6 @@ pre.prettyprint { padding: 10px !important; margin: 40px; font-size: 12px;}
 /* Landscape phones and portrait tablets */
 @media (max-width: 768px) {
 	.navbar-container li { width: 100%; }
-	.navbar-title { font-size: 18px; }
 }
 
 /* Portrait tablets and small desktops */
@@ -199,14 +212,11 @@ pre.prettyprint { padding: 10px !important; margin: 40px; font-size: 12px;}
 @media (max-width: 430px) {
 	.marketing { margin: 0px; }
 	img.avatar { width: 150px; }
-	body { font-size: inherit; }
 	.marketing { margin: 20px 0; padding: 0px; }
 }
 
 /* Extremely small devices */
 @media (max-width: 360px) {
-	.header { padding-left: 10px; padding-right: 10px; }
-	.container { margin: 0 auto; padding-left: 5px; padding-right: 5px; }
 	.marketing { margin: 0px; padding: 0px; }
 	.footer { padding: 10px 5px 5px 5px; }
 	img.avatar { width: 150px; }
