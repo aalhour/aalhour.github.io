@@ -38,6 +38,16 @@
   short_description: "Portable C# library of 35+ Data Structures and 30+ Algorithms."
   long_description: "A C# plug-and-play class-library project of standard Data Structures and Algorithms. It contains 35+ Data Structures and 30+ Algorithms designed as Object-Oriented isolated components. Even though this project started for educational purposes, the implemented Data Structures and Algorithms are efficient, stable and tested."
 
+- title: "Awesome Compilers"
+  subtitle: ""
+  linktitle: "@GitHub"
+  link: "https://github.com/aalhour/awesome-compilers"
+  cv_enabled: "true"
+  home_enabled: "true"
+  contribution_type: "owner"
+  short_description: "A curated list of awesome resources on Compilers, Interpreters and Runtimes."
+  long_description: "A curated list of awesome resources on Compilers, Interpreters and Runtimes."
+
 - title: "C# ORM"
   subtitle: "co-creator"
   linktitle: "@GitHub"

@@ -63,13 +63,13 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 		<div class="notes">
 			<div class="notelist">
 				<ul class="listnotes list-unstyled">
-					{% for project in site.data.projects limit: 4 %}
+					{% for project in site.data.projects limit: 5 %}
 						{% if project.contribution_type == "owner" and project.home_enabled == "true" %}
 							<li>
 								<span>&raquo;&nbsp;<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>:</span>&nbsp;{{ project.short_description }}
 							</li>
 
-							{% if forloop.index < 4 %}
+							{% if forloop.index < 5 %}
 								<br class="hidden-lg hidden-md hidden-sm" />
 							{% endif %}
 						{% endif %}
