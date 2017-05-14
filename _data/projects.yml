@@ -5,8 +5,8 @@
   cv_enabled: "true"
   home_enabled: "true"
   contribution_type: "owner"
-  short_description: "A compiler for the <b>COOL</b> Language, targeting the MIPS 32-bit arch."
-  long_description: "A compiler for the <b>COOL</b> Programming Language, targetting the MIPS 32-bit architecture, written entirely in Python 3. <b>COOL</b> is a type-safe, object-oriented and statically typed language. <b>PyCOOLC</b> is a compiler for COOL that emits MIPS 32-bit assembly code.<br/>Status: WIP."
+  short_description: "Compiler for the <b>COOL</b> Language, targeting the MIPS 32-bit arch."
+  long_description: "Compiler for the <b>COOL</b> Programming Language, targetting the MIPS 32-bit architecture, written entirely in Python 3. <b>COOL</b> is a type-safe, object-oriented and statically typed language. <b>PyCOOLC</b> is a compiler for COOL that emits MIPS 32-bit assembly code.<br/>Status: WIP."
 
 - title: "Assembler.hack"
   subtitle: ""
@@ -16,7 +16,7 @@
   home_enabled: "true"
   contribution_type: "owner"
   short_description: "16-bit machine code assembler for the Hack-Assembly Language."
-  long_description: "A 16-bit machine code assembler written in Python 3. It reads a program written in the Hack Assembly Language (*.asm text file), assembles it to a 16-bit binary machine code program, written in the Hack Machine Language, and then saves the assembled machine code program to a new file (*.hack text file). This project was implemented as part of building a complete 16-bit computer through the <b>nand2tetris</b> project."
+  long_description: "16-bit machine code assembler written in Python 3. It reads a program written in the Hack Assembly Language (*.asm text file), assembles it to a 16-bit binary machine code program, written in the Hack Machine Language, and then saves the assembled machine code program to a new file (*.hack text file). This project was implemented as part of building a complete 16-bit computer through the <b>nand2tetris</b> project."
 
 - title: "micro_kanren.py"
   subtitle: ""
@@ -25,7 +25,7 @@
   cv_enabled: "true"
   home_enabled: "true"
   contribution_type: "owner"
-  short_description: "A Relational-Declarative Logic Programming DSL for Python 3."
+  short_description: "Relational-Declarative Logic Programming DSL for Python 3."
   long_description: "μKanren (microKanren and miniKanren) refer to a family of embedded DSLs (Domain-Specific Languages) for Relational-Declarative Logic programming. This is an object-oriented implementation of μKanren for Python, using Python 3 as the host language."
 
 - title: "C# Algorithms"
@@ -36,7 +36,7 @@
   home_enabled: "true"
   contribution_type: "owner"
   short_description: "Portable C# library of 35+ Data Structures and 30+ Algorithms."
-  long_description: "A C# plug-and-play class-library project of standard Data Structures and Algorithms. It contains 35+ Data Structures and 30+ Algorithms designed as Object-Oriented isolated components. Even though this project started for educational purposes, the implemented Data Structures and Algorithms are efficient, stable and tested."
+  long_description: "C#-powered plug-and-play class-library project of standard Data Structures and Algorithms. It contains 35+ Data Structures and 30+ Algorithms designed as Object-Oriented isolated components. Even though this project started for educational purposes, the implemented Data Structures and Algorithms are efficient, stable and tested."
 
 - title: "Awesome Compilers"
   subtitle: ""
@@ -55,8 +55,8 @@
   cv_enabled: "false"
   home_enabled: "false"
   contribution_type: "contributor"
-  short_description: "A lightweight objet-relational mapper written in C#."
-  long_description: "A lightweight object-relational mapper, written in C# as a class-library project. Capable of processing database table's relations and generating SQL queries."
+  short_description: "Lightweight objet-relational mapper written in C#."
+  long_description: "Lightweight object-relational mapper, written in C# as a class-library project. Capable of processing database table's relations and generating SQL queries."
 
 - title: "iBill"
   subtitle: "co-creator"
@@ -65,5 +65,5 @@
   cv_enabled: "false"
   home_enabled: "false"
   contribution_type: "contributor"
-  short_description: "An enterprise billing and invoiving application for various telephony providers, written in C#.NET."
-  long_description: "An enterprise, multi-featured, billing, invoicing and reporting app of various telephony infrastructures and providers (i.e. MS Lync and Asterisk), written in C# and ASP.NET Web Forms."
+  short_description: "Enterprise billing and invoiving application for various telephony providers, written in C#.NET."
+  long_description: "Enterprise, multi-featured, billing, invoicing and reporting app of various telephony infrastructures and providers (i.e. MS Lync and Asterisk), written in C# and ASP.NET Web Forms."
