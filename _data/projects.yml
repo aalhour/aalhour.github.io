@@ -5,8 +5,8 @@
   cv_enabled: "true"
   home_enabled: "true"
   contribution_type: "owner"
-  short_description: "Compiler for the <b>COOL</b> Language, targetting the MIPS 32-bit architecture."
-  long_description: "A Compiler for the <b>COOL</b> Programming Language targetting the MIPS 32-bit architecture, written entirely in Python 3. <b>COOL</b> is a type-safe, object-oriented and statically typed language. <b>PyCOOLC</b> is a compiler for COOL that emits MIPS 32-bit assembly code.<br/>Status: WIP."
+  short_description: "A compiler for the <b>COOL</b> Language, targeting the MIPS 32-bit arch."
+  long_description: "A compiler for the <b>COOL</b> Programming Language, targetting the MIPS 32-bit architecture, written entirely in Python 3. <b>COOL</b> is a type-safe, object-oriented and statically typed language. <b>PyCOOLC</b> is a compiler for COOL that emits MIPS 32-bit assembly code.<br/>Status: WIP."
 
 - title: "Assembler.hack"
   subtitle: ""
@@ -25,7 +25,7 @@
   cv_enabled: "true"
   home_enabled: "true"
   contribution_type: "owner"
-  short_description: "A Relational-Declarative Logic programming DSL for Python 3."
+  short_description: "A Relational-Declarative Logic Programming DSL for Python 3."
   long_description: "μKanren (microKanren and miniKanren) refer to a family of embedded DSLs (Domain-Specific Languages) for Relational-Declarative Logic programming. This is an object-oriented implementation of μKanren for Python, using Python 3 as the host language."
 
 - title: "C# Algorithms"
