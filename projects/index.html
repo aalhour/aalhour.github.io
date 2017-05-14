@@ -10,29 +10,31 @@ description: Projects of Ahmad Alhour, a Software Engineer at TrustYou.
 ---
 
 <div class="projects">
-	<h3>My Open-Source Projects:</h3>
+	<h3>My Open-Source Projects</h3>
 	<br />
 
 	{% for project in site.data.projects %}
 		{% if project.contribution_type == "owner" %}
-			<p class=""><strong><span>{{ project.title }}{% if project.subtitle != "" %},&nbsp;{{ project.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ project.link }}">{{ project.linktitle }}</a>.</strong></p>
-			<p class="ml20">{{ project.long_description }}</p>
-
-			<br/>
+			<p>
+				<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %},&nbsp;<strong>{{ project.subtitle }}</strong>{% endif %}
+				<br />
+				<span>{{ project.long_description }}</span>
+			</p>
 		{% endif %}
 	{% endfor %}
 
-	<hr /><br />
+	<hr />
 
-	<h3>Open-Source Contributions:</h3>
+	<h3>Other Open-Source Contributions</h3>
 	<br />
 
 	{% for project in site.data.projects %}
 		{% if project.contribution_type == "contributor" %}
-			<p class=""><strong><span>{{ project.title }}{% if project.subtitle != "" %},&nbsp;{{ project.subtitle }}{% endif %}</span>,&nbsp;<a target="_blank" href="{{ project.link }}">{{ project.linktitle }}</a>.</strong></p>
-			<p class="ml20">{{ project.long_description }}</p>
-
-			<br/>
+			<p>
+				<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %}<strong>,&nbsp;{{ project.subtitle }}</strong>{% endif %}
+				<br/>
+				<span>{{ project.long_description }}</span>
+			</p>
 		{% endif %}
 	{% endfor %}
 
