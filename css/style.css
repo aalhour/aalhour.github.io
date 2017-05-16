@@ -81,14 +81,15 @@ img.avatar { margin-bottom: 30px; width: 250px; }
 .marketing p.lead { line-height: 30px; }
 
 /* Note */
-.note, .contact, .projects, .about, .error, .swatches { width: 90%; margin: 0 auto; }
+.wider-notes { width: 95%; margin: 0 auto; }
+.notes, .contact, .projects, .about, .error, .swatches { width: 90%; margin: 0 auto; }
 .note h2.date, .swatch-log h2.date { font-size: 24.5px; font-weight: 300; font-style: italic; }
 .projects p.title, p.project-title { font-family: 'Montserrat', Helvetica, sans-serif; text-transform: uppercase; }
 .projects p.description, p.project-description { margin-left: 20px; }
 .notebody { word-wrap: break-word; }
 
 /* Notes */
-.notelist { width: 95%; margin: 0 auto; }
+.notelist { margin: 0 auto; }
 ul.listnotes { margin: 0 auto; }
 ul.listnotes li {line-height: 30px; }
 
@@ -114,7 +115,7 @@ ul.swatch li:first-child { webkit-border-top-left-radius: 9px; -webkit-border-bo
 .cv h1 { font-size: 32.5px; }
 .cv h2 { font-size: 26.5px; }
 
-.notes, .contact, .about, .cv, .error, .swatches { margin-bottom: 30px; }
+.notes, .wider-notes, .contact, .about, .cv, .error, .swatches { margin-bottom: 30px; }
 
 /* Contact */
 iframe {font-family: 'Merriweather', Georgia, Times; font-size: 16px;}

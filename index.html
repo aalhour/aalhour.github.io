@@ -59,17 +59,17 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 <div class="row">
 	<div class="col-sm-12">
 		<h3>Latest Projects:</h3>
-		<br />
-		<div class="notes">
+
+		<div class="wider-notes">
 			<div class="notelist">
 				<ul class="listnotes list-unstyled">
-					{% for project in site.data.projects limit: 4 %}
+					{% for project in site.data.projects limit: 5 %}
 						{% if project.contribution_type == "owner" and project.home_enabled == "true" %}
 							<li>
 								<span>&raquo;&nbsp;<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>:</span>&nbsp;{{ project.short_description }}
 							</li>
 
-							{% if forloop.index < 4 %}
+							{% if forloop.index < 5 %}
 								<br class="hidden-lg hidden-md hidden-sm" />
 							{% endif %}
 						{% endif %}
@@ -80,15 +80,15 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 
 				<p>For more projects, head over to <a href="/projects" title="Blog">/projects</a>.</p>
 			</div><!--/.notelist -->
-		</div><!--/.notes -->
+		</div><!--/.wider-notes -->
 	</div>
 </div>
 
 <div class="row">
 	<div class="col-sm-12">
 		<h3>Latest Blog Posts:</h3>
-		<br />
-		<div class="notes">
+
+		<div class="wider-notes">
 			<div class="notelist">
 				<ul class="listnotes list-unstyled">
 					{% for post in site.posts limit: 3 %}
@@ -106,6 +106,6 @@ description: Ahmad Alhour is a Software Engineer at TrustYou.
 
 				<p>For more blog posts and essays, head over to <a href="/blog" title="Blog">/blog</a>.</p>
 			</div><!--/.notelist -->
-		</div><!--/.notes -->
+		</div><!--/.wider-notes -->
 	</div>
 </div>
