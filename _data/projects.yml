@@ -46,7 +46,7 @@
   home_enabled: "true"
   contribution_type: "owner"
   short_description: "A curated list of awesome resources on Compilers, Interpreters and Runtimes."
-  long_description: "A curated list of awesome resources on Compilers, Interpreters and Runtimes."
+  long_description: "A curated list of awesome resources, learning materials, tools, frameworks, platforms, technologies and projects in the field of Compilers, Interpreters and Runtimes."
 
 - title: "C# ORM"
   subtitle: "co-creator"
