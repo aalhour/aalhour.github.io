@@ -46,7 +46,7 @@
   home_enabled: "true"
   contribution_type: "owner"
   short_description: "Yet another interpreter for the BrainFuck Programming Language."
-  long_description: "Yet anotehr educational interpreter for the BrainFuck Programming Language written in Python 3. This might not be the shortest BrainFuck interpreter you came acorss, however the style of programming is for educational purposes only."
+  long_description: "Yet another educational interpreter for the BrainFuck Programming Language written in Python 3. This might not be the shortest BrainFuck interpreter you'd come acorss, however the style of programming is for educational purposes only."
 
 - title: "Awesome Compilers"
   subtitle: ""
