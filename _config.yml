@@ -20,8 +20,8 @@ linkedin:
   username: aalhour
 
 # Build settings
-# permalink: /blog/:year/:month/:day/:title
-permalink: /blog/:title
+# permalink: /blog/:title
+permalink: /blog/:year/:month/:day/:title
 markdown: kramdown
 highlighter: rouge
 kramdown:
