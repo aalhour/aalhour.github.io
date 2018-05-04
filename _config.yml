@@ -29,5 +29,5 @@ kramdown:
   syntax_highlighter: rouge
 
 # Site's Gems
-gems:
+plugins:
   - jekyll-seo-tag
