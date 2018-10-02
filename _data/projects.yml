@@ -58,6 +58,16 @@
   short_description: "A curated list of awesome resources on Compilers, Interpreters and Runtimes."
   long_description: "A curated list of awesome resources, learning materials, tools, frameworks, platforms, technologies and projects in the field of Compilers, Interpreters and Runtimes."
 
+- title: "Aiohttp-SQLAlchemy-Swagger Cookiecutter"
+  subtitle: ""
+  linktitle: "@aalhour.com"
+  link: "http://aalhour.com/cookiecutter-aiohttp-sqlalchemy"
+  cv_enabled: "true"
+  home_enabled: "true"
+  contribution_type: "owner"
+  short_description: "Fat cookiecutter template for building async Web Apps powered by Aiohttp, SQLAlchemy and Swagger"
+  long_description: "Fat cookiecutter template for building async Web Apps powered by Aiohttp, SQLAlchemy and Swagger. Features: Run SQLAlchemy queries in non-blocking fashion; Manage database transactional sessions via the context manager interface; Swagger-UI integration, and much more ..."
+
 - title: "C# ORM"
   subtitle: "co-creator"
   linktitle: "@GitHub"
