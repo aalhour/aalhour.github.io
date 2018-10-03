@@ -65,8 +65,8 @@
   cv_enabled: "true"
   home_enabled: "true"
   contribution_type: "owner"
-  short_description: "Fat cookiecutter template for building async Web Apps powered by Aiohttp, SQLAlchemy and Swagger"
-  long_description: "Fat cookiecutter template for building async Web Apps powered by Aiohttp, SQLAlchemy and Swagger, included features: running SQLAlchemy queries in non-blocking fashion, managing database transactional sessions via the context manager interface, Swagger-UI integration, packaging and many more ..."
+  short_description: "Fat and opinionated cookiecutter template for building async Web Apps powered by Aiohttp, SQLAlchemy and Swagger"
+  long_description: "Fat and opinionated cookiecutter template for building async Web Apps powered by Aiohttp, SQLAlchemy and Swagger, included features: running SQLAlchemy queries in non-blocking fashion, managing database transactional sessions via the context manager interface, Swagger-UI integration, packaging and many more ..."
 
 - title: "C# ORM"
   subtitle: "co-creator"
