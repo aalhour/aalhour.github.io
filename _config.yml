@@ -9,15 +9,9 @@ url: "http://aalhour.com" # the base hostname & protocol for your site
 logo: http://aalhour.com/favicon.ico
 
 # Social Links
-twitter_username: ahmad_alhour
-github_username: aalhour
-linkedin_username: aalhour
-twitter:
-  username: ahmad_alhour
-github:
-  username: aalhour
-linkedin:
-  username: aalhour
+twitter: ahmad_alhour
+github: aalhour
+linkedin: aalhour
 
 # Build settings
 # permalink: /blog/:title
@@ -31,3 +25,12 @@ kramdown:
 # Site's Gems
 plugins:
   - jekyll-seo-tag
+
+# Site's themes
+theme: minimal-mistakes-jekyll
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - _site
+  - CNAME
