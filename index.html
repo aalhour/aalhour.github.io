@@ -61,6 +61,33 @@ description: Ahmad Alhour's Personal Webstie.
 
 <div class="row">
 	<div class="col-sm-12">
+		<h3>Latest Talks:</h3>
+
+		<div class="wider-notes">
+			<div class="notelist">
+				<ul class="listnotes list-unstyled">
+					{% for talk in site.data.talks limit: 5 %}
+						{% if talk.home_enabled == "true" %}
+							<li>
+								<span>&raquo;&nbsp;<a target="_blank" href="{{ talk.link }}"><strong>{{ talk.title }}</strong></a>:</span>&nbsp;{{ talk.short_description }}
+							</li>
+
+							{% if forloop.index < 5 %}
+								<br class="hidden-lg hidden-md hidden-sm" />
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</ul>
+
+				<br />
+
+			</div><!--/.notelist -->
+		</div><!--/.wider-notes -->
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
 		<h3>Latest Projects:</h3>
 
 		<div class="wider-notes">
