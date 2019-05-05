@@ -19,9 +19,9 @@ description: Ahmad Alhour's Personal Webstie.
 
 		<p>I am a <span itemprop="title">software engineer</span>, originally from <span itemprop="address" itemscope
 	    itemtype="http://data-vocabulary.org/Address"><span itemprop="region">Amman</span>, <span itemprop="country-name">Jordan</span></span>, and currently living in <span itemprop="address" itemscope
-	    itemtype="http://data-vocabulary.org/Address"><span itemprop="region">Munich</span>, <span itemprop="country-name">Germany</span></span>, where I build cool stuff at <a title="TrustYou, GmbH" target="_blank" href="http://www.trustyou.net">TrustYou</a>.</p>
+	    itemtype="http://data-vocabulary.org/Address"><span itemprop="region">Munich</span>, <span itemprop="country-name">Germany</span></span>, where I build cool stuff at <a title="TrustYou, GmbH" target="" href="http://www.trustyou.net">TrustYou</a>.</p>
 
-	    <p>In my free time, I like to <a href="https://www.goodreads.com/aalhour" target="_blank" title="GoodRead Account">read</a>, work on my side <a href="/projects">projects</a>, try solving <a target="_blank" href="https://projecteuler.net/profile/aalhour.png"><span itemprop="title">recreational puzzles</span></a>, explore different ways to brew my own coffee and practice <a href="https://www.facebook.com/SayocKaliMunich/" target="_blank" title="Sayoc Kali Munchen">martial arts</a>.</p>
+	    <p>In my free time, I like to <a href="https://www.goodreads.com/aalhour" target="" title="GoodRead Account">read</a>, work on my side <a href="/projects">projects</a>, try solving <a target="" href="https://projecteuler.net/profile/aalhour.png"><span itemprop="title">recreational puzzles</span></a>, explore different ways to brew my own coffee and practice <a href="https://www.facebook.com/SayocKaliMunich/" target="" title="Sayoc Kali Munchen">martial arts</a>.</p>
 
 		<p>I sometimes <a href="/blog">blog</a>, mostly but not exclusively, about Computer Science and the craft of building Software.</p>
 	</div>
@@ -32,25 +32,25 @@ description: Ahmad Alhour's Personal Webstie.
 <div class="row social">
 	<div class="col-md-12">
 		<center>
-			<a class="social-item" target="_blank" title="GitHub" href="https://github.com/aalhour">
+			<a class="social-item" target="" title="GitHub" href="https://github.com/aalhour">
 				<li class="fab fa-github fa-2x github-color m15"></li>
 			</a>
-			<a class="social-item" target="_blank" title="LinkedIn" href="https://linkedin.com/in/aalhour">
+			<a class="social-item" target="" title="LinkedIn" href="https://linkedin.com/in/aalhour">
 				<li class="fab fa-linkedin fa-2x linkedin-color m15"></li>
 			</a>
-			<a class="social-item" target="_blank" title="Twitter" href="https://twitter.com/ahmad_alhour">
+			<a class="social-item" target="" title="Twitter" href="https://twitter.com/ahmad_alhour">
 				<li class="fab fa-twitter fa-2x twitter-color m15"></li>
 			</a>
-			<!--<a class="social-item" target="_blank" title="Medium Blog" href="https://medium.com/aalhour">
+			<!--<a class="social-item" target="" title="Medium Blog" href="https://medium.com/aalhour">
 				<li class="fab fa-medium fa-2x medium-color m15"></li>
 			</a>-->
-			<!--<a class="social-item" target="_blank" title="AngelList" href="https://angel.co/aalhour">
+			<!--<a class="social-item" target="" title="AngelList" href="https://angel.co/aalhour">
 				<li class="fab fa-angellist fa-2x angellist-color m15"></li>
 			</a>-->
-			<!--<a class="social-item" target="_blank" title="StackOverFlow" href="http://stackoverflow.com/users/278691/ahmad-alhour">
+			<!--<a class="social-item" target="" title="StackOverFlow" href="http://stackoverflow.com/users/278691/ahmad-alhour">
 				<li class="fab fa-stack-overflow fa-2x stackoverflow-color m15"></li>
 			</a>-->
-			<a class="social-item" target="_blank" title="RSS Feed" href="{{ "/feed.xml" | prepend: site.baseurl }}">
+			<a class="social-item" target="" title="RSS Feed" href="{{ "/feed.xml" | prepend: site.baseurl }}">
 				<li class="fas fa-rss-square fa-2x rss-color m15"></li>
 			</a>
 		</center>
@@ -69,7 +69,16 @@ description: Ahmad Alhour's Personal Webstie.
 					{% for talk in site.data.talks limit: 5 %}
 						{% if talk.home_enabled == "true" %}
 							<li>
-								<span>&raquo;&nbsp;<a target="_blank" href="{{ talk.link }}"><strong>{{ talk.title }}</strong></a>:</span>&nbsp;{{ talk.short_description }}
+								<i class="fa fa-play-circle" aria-hidden="true"></i>
+								<span>
+									<a target="_blank" href="{{ talk.video_link }}">
+										<strong>
+											{{ talk.title }},
+										</strong>
+									</a>
+									{{ talk.conference }}
+									<span class='hidden'>(<a target="" href="{{ talk.slides_link }}">Slides</a>)</span>
+								</span>
 							</li>
 
 							{% if forloop.index < 5 %}
@@ -96,7 +105,15 @@ description: Ahmad Alhour's Personal Webstie.
 					{% for project in site.data.projects limit: 5 %}
 						{% if project.contribution_type == "owner" and project.home_enabled == "true" %}
 							<li>
-								<span>&raquo;&nbsp;<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>:</span>&nbsp;{{ project.short_description }}
+								<span>
+									&raquo;&nbsp;
+									<a target="_blank" href="{{ project.link }}">
+										<strong>
+											{{ project.title }}:
+										</strong>
+									</a>
+									{{ project.short_description }}
+								</span>
 							</li>
 
 							{% if forloop.index < 5 %}
@@ -123,7 +140,11 @@ description: Ahmad Alhour's Personal Webstie.
 				<ul class="listnotes list-unstyled">
 					{% for post in site.posts limit: 5 %}
 						<li>
-							<span>&raquo;&nbsp;</span><a href="{{ post.url }}">{{ post.title }}</a><span class="hidden-sm hidden-xs">&nbsp;({{ post.date | date_to_string }})</span>
+							<span>
+								&raquo;&nbsp;
+								<a href="{{ post.url }}">{{ post.title }}</a>
+							</span>
+							<span class="hidden-sm hidden-xs">&nbsp;({{ post.date | date_to_string }})</span>
 						</li>
 
 						{% if forloop.index < 3 %}
