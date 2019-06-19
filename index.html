@@ -6,7 +6,7 @@ blog: passive
 home: active
 projects: passive
 contact: passive
-description: Ahmad Alhour's Personal Webstie.
+description: Ahmad Alhour's Personal Website.
 ---
 
 <div class="row marketing">
@@ -71,11 +71,8 @@ description: Ahmad Alhour's Personal Webstie.
 							<li>
 								<i class="fa fa-play-circle" aria-hidden="true"></i>
 								<span>
-									<a target="_blank" href="{{ talk.video_link }}">
-										{{ talk.title }},
-									</a>
-									{{ talk.conference }}
-									<span class='hidden'>(<a target="" href="{{ talk.slides_link }}">Slides</a>)</span>
+									<a target="_blank" href="{{ talk.video_link }}"><strong>{{ talk.title }}</strong></a>,&nbsp;{{ talk.conference }}
+									<span>(<a target="" href="{{ talk.slides_link }}">Slides</a>)</span>
 								</span>
 							</li>
 
@@ -105,10 +102,7 @@ description: Ahmad Alhour's Personal Webstie.
 							<li>
 								<span>
 									&raquo;&nbsp;
-									<a target="_blank" href="{{ project.link }}">
-										{{ project.title }}:
-									</a>
-									{{ project.short_description }}
+									<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>:&nbsp;{{ project.short_description }}
 								</span>
 							</li>
 
