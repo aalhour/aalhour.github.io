@@ -3,7 +3,7 @@
   type: "talk"
   location: "PyCon X, Italy, 2019"
   description: "Everything I learned about effective engineering leadership in my four years leading several engineering teams and projects at TrustYou, this talk contains a lot of information I acquired from personal experience, research, training and conversing with other team lead both inside and outside TrustYou."
-  thumbnail: "/img/talks_and_trainings/pycon_x_logo_florence_italy_2019.png"
+  thumbnail: "/img/talks_and_trainings/pycon_x_logo_florence_italy_2019_128x128.png"
   link_to_slides: "true"
   video_link: "https://www.youtube.com/watch?v=rentFl6mO5U"
   slides_link: "/files/how_to_become_a_kickass_team_lead_101.pdf"
@@ -20,7 +20,7 @@
   description: "
 
 Full-day introductory training to the Python programming language and basics of programming for people who are interested in the subject but have never done anything related to it before and would like to explore it from a beginner's standpoint. This training was held at the TrustYou HQ office in Munich, Germany, once per quarter between 2017 and 2019."
-  thumbnail: "/img/talks_and_trainings/intro_to_python_ty_training.png"
+  thumbnail: "/img/talks_and_trainings/intro_to_python_ty_training_128x121.png"
   link_to_slides: "false"
   video_link: "/files/intro_to_python_ty_training_2019.pdf"
   slides_link: "/files/intro_to_python_ty_training_2019.pdf"
