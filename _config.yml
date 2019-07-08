@@ -25,6 +25,25 @@ kramdown:
 # Site's Gems
 plugins:
   - jekyll-seo-tag
+  - jekyll-gzip
+
+# Jekyll::Gzip Configuration
+gzip:
+  extensions:
+    - '.html'
+    - '.css'
+    - '.js'
+    - '.txt'
+    - '.ttf'
+    - '.atom'
+    - '.stl'
+    - '.xml'
+    - '.svg'
+    - '.eot'
+    - '.png'
+    - '.jpg'
+    - '.jpeg'
+    - '.woff2'
 
 # Site's themes
 theme: minimal-mistakes-jekyll
