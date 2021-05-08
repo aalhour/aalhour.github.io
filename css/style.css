@@ -165,17 +165,6 @@ pre.prettyprint { padding: 10px !important; margin: 40px; font-size: 12px;}
 /***
  * MEDIA SCREEN QUERIES
  *--------------------------------------------------------------------------- */
-
-/* Large desktops and laptops */
-@media (min-width: 1200px) {
-	/* empty */
-}
-
-/* Landscape tablets and medium desktops */
-@media (min-width: 992px) and (max-width: 1199px) {
-	.container { max-width: 920px; }
-}
-
 /* Portrait tablets and small desktops */
 @media (min-width: 768px) {
 	.container { max-width: 920px; }
