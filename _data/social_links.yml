@@ -1,14 +1,15 @@
-- type: github
-  text: GitHub
-  username: aalhour
-  link: http://github.com/aalhour
+- label : "Twitter"
+  icon  : "fab fa-fw fa-twitter-square"
+  url   : "https://twitter.com/ahmad_alhour"
 
-- type: linkedin
-  text: LinkedIn
-  username: aalhour
-  link: https://gr.linkedin.com/in/aalhour
+- label : "GitHub"
+  icon  : "fab fa-fw fa-github"
+  url   : "https://github.com/aalhour/"
 
-- type: twitter
-  text: Twitter
-  username: ahmad_alhour
-  link: https://twitter.com/ahmad_alhour
+- label : "LinkedIn"
+  icon  : "fab fa-fw fa-linkedin"
+  url   : "https://www.linkedin.com/in/aalhour/"
+
+- label : "Mastodon"
+  icon  : "fab fa-fw fa-mastodon"
+  url   : "https://hachyderm.io/@aalhour"

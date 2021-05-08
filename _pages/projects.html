@@ -1,0 +1,40 @@
+---
+layout: single
+title: Projects
+permalink: /projects/
+description: Open Source Projects and Contributions
+author_profile: true
+header:
+  show_overlay_excerpt: false
+  overlay_image: /assets/images/unsplash-image-3.jpg
+  overlay_filter: 0.5 # same as adding an opacity of 0.5 to a black background
+  caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
+---
+
+<h4>Fun and educational side projects:</h4>
+
+{% for project in site.data.projects %}
+	{% if project.contribution_type == "owner" %}
+		<p class="small">
+			<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %},&nbsp;<strong>{{ project.subtitle }}</strong>{% endif %}
+			<br />
+			<span>{{ project.long_description }}</span>
+		</p>
+	{% endif %}
+{% endfor %}
+
+<hr />
+
+<h4>Other open-source contributions:</h4>
+
+{% for project in site.data.projects %}
+	{% if project.contribution_type == "contributor" %}
+		<p class="small">
+			<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %}<strong>,&nbsp;{{ project.subtitle }}</strong>{% endif %}
+			<br/>
+			<span>{{ project.long_description }}</span>
+		</p>
+	{% endif %}
+{% endfor %}
+
+<p class="small">For a complete list of my open-source contributions, please refer to my GitHub account: <a href="https://github.com/aalhour" title="github.com/aalhour" target="_blank">github.com/aalhour</a></p>

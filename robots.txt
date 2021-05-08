@@ -1,4 +1,2 @@
 User-agent: *
-Disallow: /files/*
-Disallow: /img/*
-Disallow: /cv/*
+Disallow: /assets/*
