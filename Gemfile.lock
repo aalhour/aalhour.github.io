@@ -264,7 +264,7 @@ PLATFORMS
 DEPENDENCIES
   github-pages
   jekyll
-  jekyll-gzip
+  jekyll-gzip (~> 2.5)
   jekyll-seo-tag
   minimal-mistakes-jekyll
   webrick (~> 1.8)
