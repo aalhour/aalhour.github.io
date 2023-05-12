@@ -32,6 +32,8 @@ kramdown:
 plugins:
   - jekyll-seo-tag
   - jekyll-gzip
+  - jekyll-feed
+  - jekyll-sitemap
 
 # Jekyll::Gzip Configuration
 gzip:
