@@ -52,7 +52,7 @@ gzip:
     - '.woff2'
 
 # Site's themes
-theme: minimal-mistakes-jekyll
+# theme: minimal-mistakes-jekyll
 
 exclude:
   - Gemfile
