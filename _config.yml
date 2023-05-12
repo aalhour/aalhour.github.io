@@ -1,11 +1,10 @@
 # Site settings
 title: Ahmad Alhour | What does Software Engineering, Leadership and Martial Arts have in common?
 author: Ahmad Alhour
-url: http://aalhour.com
+url: https://aalhour.com
 email: a.z.alhour@gmail.com
 description: Ahmad Alhour's personal website. Projects, articles and essays on Software Engineering, Leadership and Book-worming!
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://aalhour.com" # the base hostname & protocol for your site
 logo: http://aalhour.com/favicon.ico
 
 # Social Links
@@ -15,12 +14,19 @@ linkedin: aalhour
 
 # Build settings
 # permalink: /blog/:title
+# Defaults for GitHub Pages
+lsi: false
+safe: true
 permalink: /blog/:year/:month/:day/:title
 markdown: kramdown
+incremental: true
 highlighter: rouge
+gist:
+  noscript: false
 kramdown:
-  input: GFM
+  math_engine: mathjax
   syntax_highlighter: rouge
+  # input: GFM
 
 # Site's Gems
 plugins:
@@ -53,3 +59,4 @@ exclude:
   - Gemfile.lock
   - _site
   - CNAME
+  - vendor

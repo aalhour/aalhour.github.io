@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
-gem "jekyll"
-gem "jekyll-seo-tag"
-gem "minimal-mistakes-jekyll"
-gem 'jekyll-gzip'
-gem "kramdown-parser-gfm"
+
+gem "github-pages", group: :jekyll_plugins
+gem "jekyll", group: :jekyll_plugins
+gem "jekyll-seo-tag", group: :jekyll_plugins
+gem "minimal-mistakes-jekyll", group: :jekyll_plugins
+gem 'jekyll-gzip', group: :jekyll_plugins
+gem "webrick", "~> 1.8", group: :jekyll_plugins
