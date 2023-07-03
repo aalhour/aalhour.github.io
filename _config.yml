@@ -1,185 +1,175 @@
 # Site settings
-title: Ahmad Alhour | Random thoughts on software engineering, math, books and philosophy
-masthead_title: "AALHOUR"
-description: Ahmad Alhour's personal blog
-url: https://aalhour.com
-title_separator: "|"
-locale: en
-repository: aalhour/aalhour.github.io
-date_format: "%Y-%m-%d"
-# subtitle: Random thoughts on software engineering, math, books and philosophy.
-# logo: http://aalhour.com/favicon.ico
-# baseurl: "/" # the subpath of your site, e.g. /blog/
+title             : "Ahmad Alhour | Random thoughts on software engineering, math, books and philosophy"
+masthead_title    : "AALHOUR"
+description       : "Ahmad Alhour's personal blog"
+baseurl           : ""
+url               : https://aalhour.com
+github_username   : "aalhour"
+title_separator   : "|"
+locale            : "en"
+repository        : "aalhour/aalhour.github.io"
+date_format       : "%Y-%m-%d"
+# subtitle        : "Random thoughts on software engineering, math, books and philosophy"
+# logo            : "http://aalhour.com/favicon.ico"
 
 # Author profile
 author:
-  name      : "Ahmad Alhour"
-  avatar    : "/assets/images/me.jpg"
-  bio       : "Software Author. Data Plumber. (Martial) Artist. I like to tinker with code, and sometimes I write about it."
-  location  : "Germany"
+  name            : "Ahmad Alhour"
+  avatar          : "/assets/images/me.jpg"
+  bio             : "Software Author. Data Plumber. (Martial) Artist. I like to tinker with code, and sometimes I write about it."
+  location        : "Germany"
   links:
-    - label : "Twitter"
-      icon  : "fab fa-fw fa-twitter-square"
-      url   : "https://twitter.com/ahmad_alhour"
-    - label : "GitHub"
-      icon  : "fab fa-fw fa-github"
-      url   : "https://github.com/aalhour/"
-    - label : "LinkedIn"
-      icon  : "fab fa-fw fa-linkedin"
-      url   : "https://www.linkedin.com/in/aalhour/"
-    - label : "Mastodon"
-      icon  : "fab fa-fw fa-mastodon"
-      url   : "https://hachyderm.io/@aalhour"
+    - label       : "Twitter"
+      icon        : "fab fa-fw fa-twitter-square"
+      url         : "https://twitter.com/ahmad_alhour"
+    - label       : "GitHub"
+      icon        : "fab fa-fw fa-github"
+      url         : "https://github.com/aalhour/"
+    - label       : "LinkedIn"
+      icon        : "fab fa-fw fa-linkedin"
+      url         : "https://www.linkedin.com/in/aalhour/"
+    - label       : "Mastodon"
+      icon        : "fab fa-fw fa-mastodon"
+      url         : "https://hachyderm.io/@aalhour"
 
 social:
-  type: Person
-  name: Ahmad Alhour
+  type            : Person
+  name            : Ahmad Alhour
   links:
     - "https://github.com/aalhour/"
     - "https://twitter.com/ahmad_alhour"
     - "https://www.linkedin.com/in/aalhour/"
 
 # Site's themes
-theme: minimal-mistakes-jekyll
-minimal_mistakes_skin: "mint" # "default", "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+theme                   : minimal-mistakes-jekyll
+minimal_mistakes_skin   : "mint"  # "default", "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Conversion
-markdown: kramdown
-highlighter: rouge
-lsi: false
-excerpt_separator: "\n\n"
-incremental: false
-safe: true
+markdown                : kramdown
+highlighter             : rouge
+lsi                     : false
+excerpt_separator       : "\n\n"
+incremental             : false
+safe                    : true
 gist:
-  noscript: false
+  noscript              : false
 
 # Markdown Processing
 kramdown:
-  input: GFM
-  hard_wrap: false
-  auto_ids: true
-  footnote_nr: 1
-  entity_output: as_char
-  toc_levels: 1..6
-  smart_quotes: lsquo,rsquo,ldquo,rdquo
-  enable_coderay: false
-  math_engine: mathjax
-  syntax_highlighter: rouge
+  input                 : GFM
+  hard_wrap             : false
+  auto_ids              : true
+  footnote_nr           : 1
+  entity_output         : as_char
+  toc_levels            : 1..6
+  smart_quotes          : lsquo,rsquo,ldquo,rdquo
+  enable_coderay        : false
+  math_engine           : mathjax
+  syntax_highlighter    : rouge
 
 # Search Settings
-search: true
+search                  : true
 # lunr:
-#   search_within_pages: true
-#   search_full_content: true
+#   search_within_pages : true
+#   search_full_content : true
 algolia:
-  application_id: B9MM80G8SS
-  index_name: blog_index
-  search_only_api_key: 4b47ee8242b2c4cfec23e9c5c0303630
-  powered_by: true
+  application_id        : B9MM80G8SS
+  index_name            : blog_index
+  search_only_api_key   : 4b47ee8242b2c4cfec23e9c5c0303630
+  powered_by            : true
 
 # Outputting Settings
-permalink: /blog/:title
-timezone: Europe/Berlin
+permalink               : /blog/:title
+timezone                : Europe/Berlin
 
 # Pagination Settings
 pagination:
-  enabled: true
-  debug: false
-  collection: 'posts'
-  per_page: 10
-  permalink: '/page/:num/' # Pages are index.html inside this folder (default)
-  title: ':title - page :num/:max'
-  limit: 0
-  sort_field: 'date'
-  sort_reverse: true
-  category: 'posts'
-  tag: ''
-  locale: '' 
+  enabled               : true
+  debug                 : false
+  collection            : 'posts'
+  per_page              : 10
+  permalink             : '/page/:num/'
+  title                 : ':title - page :num/:max'
+  limit                 : 0
+  sort_field            : 'date'
+  sort_reverse          : true
+  category              : 'posts'
+  tag                   : ''
+  locale                : '' 
   trail: 
-    before: 2
-    after: 2
-
-  # Optional, the default file extension for generated pages (e.g html, json, xml).
-  # Internally this is set to html by default
-  extension: html
-
-  # Optional, the default name of the index file for generated pages (e.g. 'index.html')
-  # Without file extension
-  indexpage: 'index'
+    before              : 2
+    after               : 2
+  extension             : html
+  indexpage             : 'index'
 
 # Taxonomy & Archive Settings
 category_archive:
-  type: liquid
-  path: /categories/
+  type                  : liquid
+  path                  : /categories/
 tag_archive:
-  type: liquid
-  path: /tags/
+  type                  : liquid
+  path                  : /tags/
 
 # Breadcrum Settings
-breadcrumbs: true
+breadcrumbs             : true
 
 # Compression Settings
 compress_html:
-  clippings: all
+  clippings             : all
   ignore:
-    envs: development
+    envs                : development
 
 # Site's defaults
 collections:
   portfolio:
     # output an index.html page for each project in _portfolio/
-    output: true
-    permalink: /:collection/:path/
+    output              : true
+    permalink           : /:collection/:path/
 
 # Site's Defaults
 defaults:
   # _posts
   - scope:
-      path: ""
-      type: posts
+      path              : ""
+      type              : posts
     values:
-      layout: single
-      author_profile: true
-      read_time: true
-      comments: true
-      share: true
-      related: true
-      show_date: true
-      header:
-        show_overlay_excerpt: false
-        overlay_image: /assets/images/unsplash-image-2.jpg
-        overlay_filter: 0.5 # same as adding an opacity of 0.5 to a black background
-        caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
+      layout            : single
+      author_profile    : true
+      read_time         : true
+      comments          : true
+      share             : true
+      related           : true
+      show_date         : true
   # _pages
   - scope:
-      path: ""
-      type: pages
+      path              : ""
+      type              : pages
     values:
-      layout: single
-      author_profile: true
+      layout            : single
+      author_profile    : true
   # _portfolio
   - scope:
-      path: ""
-      type: portfolio
+      path              : ""
+      type              : portfolio
     values:
-      layout: single
-      author_profile: false
-      share: true
+      layout            : single
+      author_profile    : false
+      share             : true
   # _tag_archive
   - scope:
-      path: ""
-      type: tag
+      path              : ""
+      type              : tag
     values:
-      author_profile: true
-      comments: false
+      author_profile    : true
+      comments          : false
   # _category_archive
   - scope:
-      path: ""
-      type: category
+      path              : ""
+      type              : category
     values:
-      layout: archive-taxonomy
-      author_profile: true
-      comments: false
+      layout            : archive-taxonomy
+      author_profile    : true
+      comments          : false
 
 # Site's Gems
 plugins:

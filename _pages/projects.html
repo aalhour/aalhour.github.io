@@ -11,34 +11,30 @@ header:
   caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
 ---
 
-<div class="projects">
-	<h3>My Open-Source Projects</h3>
-	<br/>
+<h4>Fun and educational side projects:</h4>
 
-	{% for project in site.data.projects %}
-		{% if project.contribution_type == "owner" %}
-			<p>
-				<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %},&nbsp;<strong>{{ project.subtitle }}</strong>{% endif %}
-				<br />
-				<span>{{ project.long_description }}</span>
-			</p>
-		{% endif %}
-	{% endfor %}
+{% for project in site.data.projects %}
+	{% if project.contribution_type == "owner" %}
+		<p class="small">
+			<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %},&nbsp;<strong>{{ project.subtitle }}</strong>{% endif %}
+			<br />
+			<span>{{ project.long_description }}</span>
+		</p>
+	{% endif %}
+{% endfor %}
 
-	<hr />
+<hr />
 
-	<h3>Other Open-Source Contributions</h3>
-	<br />
+<h4>Other open-source contributions:</h4>
 
-	{% for project in site.data.projects %}
-		{% if project.contribution_type == "contributor" %}
-			<p>
-				<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %}<strong>,&nbsp;{{ project.subtitle }}</strong>{% endif %}
-				<br/>
-				<span>{{ project.long_description }}</span>
-			</p>
-		{% endif %}
-	{% endfor %}
+{% for project in site.data.projects %}
+	{% if project.contribution_type == "contributor" %}
+		<p class="small">
+			<a target="_blank" href="{{ project.link }}"><strong>{{ project.title }}</strong></a>{% if project.subtitle != "" %}<strong>,&nbsp;{{ project.subtitle }}</strong>{% endif %}
+			<br/>
+			<span>{{ project.long_description }}</span>
+		</p>
+	{% endif %}
+{% endfor %}
 
-	<p>For a complete list of my open-source contributions, please refer to my GitHub account: <a href="https://github.com/aalhour" title="github.com/aalhour" target="_blank">github.com/aalhour</a></p>
-</div>
+<p class="small">For a complete list of my open-source contributions, please refer to my GitHub account: <a href="https://github.com/aalhour" title="github.com/aalhour" target="_blank">github.com/aalhour</a></p>

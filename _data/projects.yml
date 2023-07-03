@@ -16,7 +16,7 @@
   home_enabled: "true"
   contribution_type: "owner"
   short_description: "Compiler for the C.O.O.L. Language, targeting the MIPS 32-bit arch"
-  long_description: "Compiler for the C.O.O.L. Programming Language, targetting the MIPS 32-bit architecture, written entirely in Python 3. <b>COOL</b> is a type-safe, object-oriented and statically typed language. <b>PyCOOLC</b> is a compiler for COOL that emits MIPS 32-bit assembly code.<br/>Status: WIP."
+  long_description: "Compiler for the C.O.O.L. Programming Language, targetting the MIPS 32-bit architecture, written entirely in Python 3. COOL is a type-safe, object-oriented and statically typed language. The compiler generates MIPS 32-bit assembly code."
 
 - title: "Assembler.hack"
   subtitle: ""
