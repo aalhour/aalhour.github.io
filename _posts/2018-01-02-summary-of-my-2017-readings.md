@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Summary of My 2017 Readings"
 date: 2018-01-02 09:45:00
 categories: books, 2017

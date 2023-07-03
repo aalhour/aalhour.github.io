@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "jekyll"
+gem "jekyll", "~> 3.5"
 
 group :jekyll_plugins do
     gem "github-pages"
@@ -9,4 +9,5 @@ group :jekyll_plugins do
     gem "jekyll-sitemap", "~> 1.4"
     gem "jekyll-feed", "~> 0.15.1"
     gem "webrick", "~> 1.8"
+    gem "minimal-mistakes-jekyll", "~> 4.24"
 end

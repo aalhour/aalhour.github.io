@@ -1,8 +1,0 @@
-<div class="notelist">
-  <ul class="listnotes list-unstyled">
-    {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}&nbsp;&raquo;</span>&nbsp;<a href="{{ post.url }}">{{ post.title }}</a></li>
-      <br class="hidden-lg hidden-md hidden-sm" />
-    {% endfor %}
-  </ul>
-</div><!--/.notelist -->

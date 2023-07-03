@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "On Stoicism: 40 lessons I learned in 2017"
 date: 2018-01-03
 categories: books, 2017

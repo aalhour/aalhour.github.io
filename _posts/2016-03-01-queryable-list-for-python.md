@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "A Queryable List for Python: Proof of Concept"
 date: 2016-03-01 12:00:00
 categories: python, data structures, algorithms, linq, queryable, collections

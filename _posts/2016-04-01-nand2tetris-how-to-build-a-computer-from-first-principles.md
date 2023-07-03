@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "nand2tetris, or Building a Computer from First Principles"
 date: 2016-04-01 12:00:00
 categories: programming, github, nand2tetris, hardware, emulation, computer design, computer architecture, assembly, assemblers, machine code

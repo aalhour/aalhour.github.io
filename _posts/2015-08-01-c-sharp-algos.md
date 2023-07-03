@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Implementing Data Structures and Algorithms in C#"
 date: 2015-08-01 23:30:00
 categories: programming, github, data structures, algorithms
