@@ -1,10 +1,10 @@
 # Site settings
-title: Ahmad Alhour
-subtitle: Random thoughts on writing software, math and books!
-masthead_title: "AAlhour"
-description: Ahmad Alhour's personal website
+title: Ahmad Alhour | Random thoughts on software engineering, math, books and philosophy.
+# subtitle: Random thoughts on software engineering, math, books and philosophy.
+masthead_title: "AALHOUR"
+description: Ahmad Alhour's personal blog
 url: https://aalhour.com
-logo: http://aalhour.com/favicon.ico
+# logo: http://aalhour.com/favicon.ico
 title_separator: "|"
 locale: en
 timezone: Europe/Berlin
@@ -28,7 +28,7 @@ kramdown:
 author:
   name      : "Ahmad Alhour"
   avatar    : "/assets/images/me.jpg"
-  bio       : "Random thoughts on writing software, math and books."
+  bio       : "Software Author. Data Plumber. (Martial) Artist. I like to tinker with code, and sometimes I write about it."
   location  : "Germany"
   links:
     - label : "Twitter"
@@ -155,6 +155,9 @@ category_archive:
 tag_archive:
   type: liquid
   path: /tags/
+
+# Breadcrum Settings
+breadcrumbs: true
 
 # Compression Settings
 compress_html:

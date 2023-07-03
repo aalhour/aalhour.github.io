@@ -7,42 +7,42 @@ pagination:
   enabled: true
 ---
 
-21. “Who then is invincible? The one who cannot be upset by anything outside their reasoned choice.”
+1. "Who then is invincible? The one who cannot be disturbed by anything outside their reasoned choice."
 
-22. If you are in the middle of a freak out or a moment of rage, just ask yourself: "Is this making me feel better? Is this actually relieving any of the symptoms I wish were gone?".
+2. If you find yourself in a state of panic or rage, simply ask yourself: "Is this improving my well-being? Is it alleviating any of the symptoms I wish to be rid of?"
 
-23. Practice having no opinion on things. Practice the ability of having absolutely no thoughts about something - act as if you had no idea it ever occurred.
+3. Practice being impartial towards things. Cultivate the ability to have no thoughts or opinions about something—pretend as if it never happened.
 
-24. Locate that yearning for more, better, someday and see it for what it is: the enemy of your contentment. Choose it or your happiness. As Epictetus says, the two are not compatible.
+4. Recognize that yearning for more, better, or someday in the future, and acknowledge it as the enemy of your contentment. Choose between it and your happiness, as Epictetus states, for they are incompatible.
 
-25. "To want nothing makes one invincible—because nothing lies outside your control."
+5. "To desire nothing makes one invincible—because nothing lies outside of your control."
 
-26. Circumstances are incapable of considering or caring for your feelings, your anxiety, or your excitement. They don’t care about your reaction. They are not people.
+6. Circumstances are indifferent to your feelings, anxiety, or excitement. They do not care about your reaction. They are not sentient beings.
 
-27. We should enjoy this brief time we have on earth—not be enslaved to emotions that make us miserable and dissatisfied.
+7. We should savor this brief time we have on earth instead of being enslaved by emotions that make us miserable and dissatisfied.
 
-28. Remember that the tools and aims of our training are unaffected by the turbulence of the moment. Stop. Regain your composure. It’s waiting for you.
+8. Remember that the principles and goals of our training remain unaffected by the turbulence of the moment. Pause. Regain your composure. It patiently awaits your return.
 
-29. Empty your cup before powering more water into it. Clear your mind before seeking wisdom. Let go of pleasures before seeking new ones. Ask, do I really need this thing? Do I really need this new item? Clear your mind, empty your schedule and say no the stuff that don't matter.
+9. Empty your cup before filling it with more water. Clear your mind before seeking wisdom. Let go of pleasures before pursuing new ones. Ask yourself, "Do I truly need this? Do I really require this new item?" Clear your mind, declutter your schedule, and say no to things that do not matter.
 
-30. On possessions. ask yourself: Do I need this? Is it superfluous? What’s this actually worth? What is it costing me? Nothing comes for free.
+10. Regarding possessions, inquire: Do I need this? Is it unnecessary? What is its true value? What is it costing me? Nothing comes without a price.
 
-31. Don't brag and spread narratives about yourself. Say what is necessary. Listen and connect with people, don't perform for them.
+11. Avoid boasting and constructing narratives about yourself. Speak only when necessary. Listen and connect with others instead of performing for them.
 
-32. “Slavery resides under marble and gold.” Too many successful people are prisoners in jails of their own making. Is that what you want? Is that what you’re working hard toward?
+12. "Slavery resides under marble and gold." Too many accomplished individuals are prisoners within the confines they have created for themselves. Is that what you desire? Is that what your hard work is leading towards?
 
-33. “Today I escaped from the crush of circumstances, or better put, I threw them out, for the crush wasn’t from outside me but in my own assumptions.” — MARCUS AURELIUS
+13. "Today I escaped from the crush of circumstances, or better put, I threw them out, for the crush wasn't external but a result of my own assumptions." — Marcus Aurelius
 
-34. Remember, each individual has a choice. You are always the one in control.
+14. Remember, every individual possesses a choice. You are always the one in control.
 
-35. You are the product of your training.
+15. You are the product of your training.
 
-36. Your mind changes depending on the thoughts and beliefs that color it, just like when you sit on a desk for a living your pelvis changes and when you wear tight shoes your feet change in adaptation to it.
+16. Your mind undergoes changes based on the thoughts and beliefs that shape it, similar to how sitting at a desk for a living alters your posture or wearing tight shoes causes your feet to adapt.
 
-37. On testing our impressions: “From the very beginning, make it your practice to say to every harsh impression, ‘you are an impression and not at all what you appear to be.’ Next, examine and test it by the rules you possess, the first and greatest of which is this—whether it belongs to the things in our control or not in our control, and if the latter, be prepared to respond, ‘It is nothing to me.’” — Epictitus, The Enchiridion
+17. On testing our impressions: "From the very beginning, make it a habit to say to every harsh impression, 'You are merely an impression and not what you appear to be.' Then, examine and evaluate it based on the principles you possess, with the first and most important being whether it belongs to things within our control or beyond our control. If it belongs to the latter, be prepared to respond, 'It is of no concern to me.'" — Epictetus, The Enchiridion
 
-38. Judgments are the results of our attachment to opinions. If we want to feel less upset and angrey then how about we kick opinions out of our lives and just see things as they... are?
+18. Judgments stem from our attachment to opinions. To experience less distress and anger, how about we eliminate opinions from our lives and perceive things as they truly are?
 
-39. Always pay attention, and reflect on, your sphere of impulses, what causes them? What triggers them?
+19. Always pay attention to and reflect upon your range of impulses. What triggers them? What causes them?
 
-40. Do the things that happen to me help or harm me? It all depends, say the Stoics, on my values. They would go on to remind me that my values are things over which I have complete control. Therefore, if something external harms me, it is my own fault: I should have adopted different values.
+20. Do the events that occur to me benefit or harm me? It all depends, as the Stoics assert, on my values. They would further remind me that my values are entirely under my control. Therefore, if something external harms me, it is my own fault—I should have adopted different values.
