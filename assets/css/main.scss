@@ -4,35 +4,25 @@
 
 @charset "utf-8";
 
-/* Default type scale */
+/* Update the typeface */
+$serif              : "Noto Sans", Georgia, Times, serif;
+$sans-serif-narrow  : "Noto Sans Light", -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+$global-font-family : $serif;
+$header-font-family : $sans-serif-narrow;
+
+
+/* Update the type scale */
 $type-size-1 : 2.1em;       // original: 2.441em;  // ~39.056px
 $type-size-2 : 1.853em;     // original: 1.953em;  // ~31.248px
 $type-size-3 : 1.463em;     // original: 1.563em;  // ~25.008px
 $type-size-4 : 1.15em;      // original: 1.25em;   // ~20px
-$type-size-5 : 0.95em;      // original: 1em;      // ~16px
+$type-size-5 : 1.0em;       // original: 1em;      // ~16px
 $type-size-6 : 0.75;        // original: 0.75em;   // ~12px
 $type-size-7 : 0.6875em;    // original: 0.6875em; // ~11px
 $type-size-8 : 0.625em;;    // original: 0.625em;  // ~10px
 
-
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
-
-html {
-    font-size: 0.95em;
-
-    @include breakpoint($medium) {
-      font-size: 1em;
-    }
-  
-    @include breakpoint($large) {
-      font-size: 1.10em;
-    }
-  
-    @include breakpoint($x-large) {
-      font-size: 1.20em;
-    }
-}
 
 .page__title {
     font-size: $type-size-1;
@@ -64,3 +54,25 @@ h2 { font-size: 1.3em }
 h3 { font-size: 1.2em }
 h4 { font-size: 1.1em }
 h5 { font-size: 1.0em }
+
+div.highlighter-rouge, 
+figure.highlight,
+.highlighter-rouge pre {
+    font-size: $type-size-6;
+}
+
+html {
+    font-size: 1.0em;
+
+    @include breakpoint($medium) {
+      font-size: 1.0em;
+    }
+  
+    @include breakpoint($large) {
+      font-size: 1.0em;
+    }
+  
+    @include breakpoint($x-large) {
+      font-size: 1.0em;
+    }
+}
