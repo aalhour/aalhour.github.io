@@ -5,4 +5,6 @@ main:
     url: /projects/
   - title: "Blog"
     url: /blog/
+  - title: "Talks"
+    url: /talks/
   

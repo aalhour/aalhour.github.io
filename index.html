@@ -2,3 +2,26 @@
 layout: home
 author_profile: true
 ---
+<!-- <p>Hi there! I am a Ahmad Alhour.</p>
+<p>This is my digital spot where I keep track of my various hacks, tinkers and side-projects that I have built over the years, mostly for fun and rarely for profit.</p>
+<p>In my free time, I like to tinker on <a href="/projects">something new</a>, occasionally <a href="/blog">blog</a>, and sometimes lose myself in <a target="" href="https://projecteuler.net/"><span itemprop="title">recreational puzzles</span></a>.</p>
+
+<h3>Latest talks:</h3>
+<div>
+    {% for talk in site.data.talks_trainings limit: 5 %}
+        {% if talk.home_enabled == "true" %}
+            <div class="media">
+                <div class="media-left">
+                    <a href="{{ talk.video_link }}">
+                        <img class="media-object img-rounded" src="{{ talk.thumbnail }}" alt="[Thumbnail]" width="64" height="64">
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading"><a href="{{ talk.video_link }}">{{ talk.title }}</a></h4>
+                    <h4>{{ talk.location }}{% if talk.link_to_slides == "true" %}&nbsp;(<a href="{{ talk.speakerdeck_link }}">Slides</a>){% endif %}</h4>
+                    <span>{{ talk.description }}</span>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>/.wider-notes-->
