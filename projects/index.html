@@ -1,17 +1,13 @@
 ---
-layout: default
+layout: single
 title: Projects
-cv: passive
-blog: passive
-home: passive
-contact: passive
-projects: active
-description: Ahmad Alhour's Open Source Projects and Contributions.
+description: Open Source Projects and Contributions
+author_profile: true
 ---
 
 <div class="projects">
 	<h3>My Open-Source Projects</h3>
-	<br />
+	<br/>
 
 	{% for project in site.data.projects %}
 		{% if project.contribution_type == "owner" %}

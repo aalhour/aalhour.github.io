@@ -156,6 +156,12 @@ tag_archive:
   type: liquid
   path: /tags/
 
+# Compression Settings
+compress_html:
+  clippings: all
+  ignore:
+    envs: development  # disable compression in dev environment
+
 # Site's Gems
 plugins:
   - jekyll-seo-tag
