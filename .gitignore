@@ -7,3 +7,4 @@ _site
 .ruby-version
 .bundle/*
 vendor/*
+index_algolia.sh

@@ -1,22 +1,16 @@
 # Site settings
-title: aalhour
-# subtitle: What does software engineering, leadership and martial arts have in common?
+title: Ahmad Alhour
+subtitle: Random thoughts on writing software, math and books!
 name: Ahmad Alhour
 author: Ahmad Alhour
-masthead_title: "AALHOUR"
+masthead_title: "AAlhour"
 url: https://aalhour.com
-description: Ahmad Alhour's personal website. Projects, articles and essays on Software Engineering, Leadership and Book-worming!
+description: Ahmad Alhour's personal website
 logo: http://aalhour.com/favicon.ico
 title_separator: "|"
 locale: en
 repository: aalhour/aalhour.github.io
-# baseurl: "" # the subpath of your site, e.g. /blog/
-
-# Social Links
-twitter: ahmad_alhour
-github: aalhour
-linkedin: aalhour
-email: a.z.alhour@gmail.com
+baseurl: "/" # the subpath of your site, e.g. /blog/
 
 # Build settings
 # permalink: /blog/:year/:month/:day/:title
@@ -33,11 +27,28 @@ kramdown:
   syntax_highlighter: rouge
   # input: GFM
 
+# Enable Search
+search: true
+# lunr:
+#   search_within_pages: true
+#   search_full_content: true
+algolia:
+  application_id: B9MM80G8SS
+  index_name: blog_index
+  search_only_api_key: 4b47ee8242b2c4cfec23e9c5c0303630
+  powered_by: true
+
 # Site's themes
 theme: minimal-mistakes-jekyll
 minimal_mistakes_skin: "dark" # "default", "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site's defaults
+collections:
+  portfolio:
+    # output an index.html page for each project in _portfolio/
+    output: true
+    permalink: /:collection/:path/
+
 defaults:
   # _posts
   - scope:
@@ -58,6 +69,14 @@ defaults:
     values:
       layout: single
       author_profile: true
+  # _portfolio
+  - scope:
+      path: ""
+      type: portfolio
+    values:
+      layout: single
+      author_profile: false
+      share: true
 
 # Site's Gems
 plugins:

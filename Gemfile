@@ -10,4 +10,6 @@ group :jekyll_plugins do
     gem "jekyll-feed", "~> 0.15.1"
     gem "webrick", "~> 1.8"
     gem "minimal-mistakes-jekyll", "~> 4.24"
+    gem "jekyll-include-cache"
+    gem "jekyll-algolia"
 end
