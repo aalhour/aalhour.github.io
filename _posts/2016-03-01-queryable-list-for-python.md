@@ -1,9 +1,10 @@
 ---
 title: "A Queryable List for Python: Proof of Concept"
 date: 2016-03-01 12:00:00
-categories: python, data structures, algorithms, linq, queryable, collections
-blog: active
-categories: python, data structures, algorithms, linq, queryable, collections
+categoy: blog
+tags: python data-structures algorithms LINQ query-languages
+pagination:
+  enabled: true
 ---
 
 As a programmer who spent a long period of time developing software in C# and .NET, moving to the Python world was exciting, but at the same time it was not that easy. One of the challenges I had to face is to replace my dependance on the convenience of LINQ with other constructs that Python offers, such as the built-in methods `map`, `reduce` among others, as well as the cool built-in modules `functools` and `itertools`.

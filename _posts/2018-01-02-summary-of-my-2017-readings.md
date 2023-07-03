@@ -1,9 +1,10 @@
 ---
 title: "Summary of My 2017 Readings"
 date: 2018-01-02 09:45:00
-categories: books, 2017
-blog: active
-noteinfo: books, 2017
+category: blog
+tags: books
+pagination:
+  enabled: true
 ---
 
 2017 was a good year for me in terms of reading as I managed to read 12 books in total, meanwhile learning German, listening to engineering podcasts, attending two conferences and taking several courses online. Without further ado, here is the list of books I read and my own summaries of them:

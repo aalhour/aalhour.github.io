@@ -1,9 +1,10 @@
 ---
 title: "Implementing Data Structures and Algorithms in C#"
 date: 2015-08-01 23:30:00
-categories: programming, github, data structures, algorithms
-blog: active
-noteinfo: programming, github, data structures, algorithms
+category: blog
+tags: C# data-structures algorithms
+pagination:
+  enabled: true
 ---
 
 I have been preparing for programming interviews since May this year. I started this preparation process by watching the MIT OCW Course **[Introduction to Algorithms](https://www.youtube.com/playlist?list=PLUl4u3cNGP61Oq3tWYp6V_F-5jb5L2iHb)** and committing myself to implementing the various data structures and algorithms that I would be studying during the course in C#. However, I didn’t just want to implement them for the sake of training myself, I wanted to practice the best practices of OOP as well, and so I adopted the approach of developing an organized library of classes that would serve anyone as a class-library project (portable library), so that they can use it, for example, as an educational resource to aid them in implementing the same set of algorithms and data structures in C#, or maybe just use my code to solve algorithmic problems.
