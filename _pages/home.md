@@ -1,7 +1,6 @@
 ---
 title: Home
-layout: default
+layout: home
 permalink: /
-entries_layout: grid
-classes: narrow
+author_profile: true
 ---
