@@ -76,3 +76,11 @@ html {
       font-size: 1.0em;
     }
 }
+
+/* Custom new CSS */
+.media { display: block; margin-bottom: 2em; }
+.media .image {  display: block; float: left; }
+.media .image .rounded-corners { border: 0; border-radius: 6px; }
+.media .description { display: block; margin-left: 84px; }
+.media .description p { margin: 0 0 0.5em 0; }
+.media .description h4 { margin: 0 0 0.5em 0; }
