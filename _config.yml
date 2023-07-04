@@ -1,32 +1,175 @@
 # Site settings
-title: Ahmad Alhour | What does Software Engineering, Leadership and Martial Arts have in common?
-author: Ahmad Alhour
-url: https://aalhour.com
-email: a.z.alhour@gmail.com
-description: Ahmad Alhour's personal website. Projects, articles and essays on Software Engineering, Leadership and Book-worming!
-baseurl: "" # the subpath of your site, e.g. /blog/
-logo: http://aalhour.com/favicon.ico
+title             : "Ahmad Alhour | Random thoughts on software engineering, math, books and philosophy"
+masthead_title    : "AALHOUR"
+description       : "Ahmad Alhour's personal blog"
+baseurl           : ""
+url               : https://aalhour.com
+github_username   : "aalhour"
+title_separator   : "|"
+locale            : "en"
+repository        : "aalhour/aalhour.github.io"
+date_format       : "%Y-%m-%d"
+# subtitle        : "Random thoughts on software engineering, math, books and philosophy"
+# logo            : "http://aalhour.com/favicon.ico"
 
-# Social Links
-twitter: ahmad_alhour
-github: aalhour
-linkedin: aalhour
+# Author profile
+author:
+  name            : "Ahmad Alhour"
+  avatar          : "/assets/images/me.jpg"
+  bio             : "Software Author. Data Plumber. (Martial) Artist. I like to tinker with code, and sometimes I write about it."
+  location        : "Germany"
+  links:
+    - label       : "Twitter"
+      icon        : "fab fa-fw fa-twitter-square"
+      url         : "https://twitter.com/ahmad_alhour"
+    - label       : "GitHub"
+      icon        : "fab fa-fw fa-github"
+      url         : "https://github.com/aalhour/"
+    - label       : "LinkedIn"
+      icon        : "fab fa-fw fa-linkedin"
+      url         : "https://www.linkedin.com/in/aalhour/"
+    - label       : "Mastodon"
+      icon        : "fab fa-fw fa-mastodon"
+      url         : "https://hachyderm.io/@aalhour"
 
-# Build settings
-# permalink: /blog/:title
-# Defaults for GitHub Pages
-lsi: false
-safe: true
-permalink: /blog/:year/:month/:day/:title
-markdown: kramdown
-incremental: true
-highlighter: rouge
+social:
+  type            : Person
+  name            : Ahmad Alhour
+  links:
+    - "https://github.com/aalhour/"
+    - "https://twitter.com/ahmad_alhour"
+    - "https://www.linkedin.com/in/aalhour/"
+
+# Site's themes
+theme                   : minimal-mistakes-jekyll
+minimal_mistakes_skin   : "mint"  # "default", "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
+
+# Conversion
+markdown                : kramdown
+highlighter             : rouge
+lsi                     : false
+excerpt_separator       : "\n\n"
+incremental             : false
+safe                    : true
 gist:
-  noscript: false
+  noscript              : false
+
+# Markdown Processing
 kramdown:
-  math_engine: mathjax
-  syntax_highlighter: rouge
-  # input: GFM
+  input                 : GFM
+  hard_wrap             : false
+  auto_ids              : true
+  footnote_nr           : 1
+  entity_output         : as_char
+  toc_levels            : 1..6
+  smart_quotes          : lsquo,rsquo,ldquo,rdquo
+  enable_coderay        : false
+  math_engine           : mathjax
+  syntax_highlighter    : rouge
+
+# Search Settings
+search                  : true
+# lunr:
+#   search_within_pages : true
+#   search_full_content : true
+algolia:
+  application_id        : B9MM80G8SS
+  index_name            : blog_index
+  search_only_api_key   : 4b47ee8242b2c4cfec23e9c5c0303630
+  powered_by            : true
+
+# Outputting Settings
+permalink               : /blog/:title
+timezone                : Europe/Berlin
+
+# Pagination Settings
+pagination:
+  enabled               : true
+  debug                 : false
+  collection            : 'posts'
+  per_page              : 10
+  permalink             : '/page/:num/'
+  title                 : ':title - page :num/:max'
+  limit                 : 0
+  sort_field            : 'date'
+  sort_reverse          : true
+  category              : 'posts'
+  tag                   : ''
+  locale                : '' 
+  trail: 
+    before              : 2
+    after               : 2
+  extension             : html
+  indexpage             : 'index'
+
+# Taxonomy & Archive Settings
+category_archive:
+  type                  : liquid
+  path                  : /categories/
+tag_archive:
+  type                  : liquid
+  path                  : /tags/
+
+# Breadcrum Settings
+breadcrumbs             : true
+
+# Compression Settings
+compress_html:
+  clippings             : all
+  ignore:
+    envs                : development
+
+# Site's defaults
+collections:
+  portfolio:
+    # output an index.html page for each project in _portfolio/
+    output              : true
+    permalink           : /:collection/:path/
+
+# Site's Defaults
+defaults:
+  # _posts
+  - scope:
+      path              : ""
+      type              : posts
+    values:
+      layout            : single
+      author_profile    : true
+      read_time         : true
+      comments          : true
+      share             : true
+      related           : true
+      show_date         : true
+  # _pages
+  - scope:
+      path              : ""
+      type              : pages
+    values:
+      layout            : single
+      author_profile    : true
+  # _portfolio
+  - scope:
+      path              : ""
+      type              : portfolio
+    values:
+      layout            : single
+      author_profile    : false
+      share             : true
+  # _tag_archive
+  - scope:
+      path              : ""
+      type              : tag
+    values:
+      author_profile    : true
+      comments          : false
+  # _category_archive
+  - scope:
+      path              : ""
+      type              : category
+    values:
+      layout            : archive-taxonomy
+      author_profile    : true
+      comments          : false
 
 # Site's Gems
 plugins:
@@ -34,6 +177,19 @@ plugins:
   - jekyll-gzip
   - jekyll-feed
   - jekyll-sitemap
+  - jekyll-include-cache
+  - jekyll-gist
+  - jekyll-paginate
+
+# mimic GitHub Pages with --safe
+whitelist:
+  - jekyll-seo-tag
+  - jekyll-gzip
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-include-cache
+  - jekyll-gist
+  - jekyll-paginate
 
 # Jekyll::Gzip Configuration
 gzip:
@@ -53,12 +209,39 @@ gzip:
     - '.jpeg'
     - '.woff2'
 
-# Site's themes
-# theme: minimal-mistakes-jekyll
-
+include: ["_pages"]
 exclude:
+  - "*.sublime-project"
+  - "*.sublime-workspace"
+  - _site
+  - vendor
+  - .asset-cache
+  - .bundle
+  - .jekyll-assets-cache
+  - .sass-cache
+  - assets/js/plugins
+  - assets/js/_main.js
+  - assets/js/vendor
+  - Capfile
+  - CHANGELOG
+  - config
   - Gemfile
   - Gemfile.lock
-  - _site
+  - Gruntfile.js
+  - gulpfile.js
+  - LICENSE
+  - log
+  - node_modules
+  - package.json
+  - package-lock.json
+  - Rakefile
+  - README
+  - tmp
   - CNAME
-  - vendor
+  - /docs # ignore Minimal Mistakes /docs
+  - /test # ignore Minimal Mistakes /test
+keep_files:
+  - .git
+  - .svn
+encoding: "utf-8"
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
