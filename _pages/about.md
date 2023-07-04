@@ -12,4 +12,4 @@ I am Ahmad Alhour, and this is my digital spot where I keep track of my various 
 
 In my free time, I like to tinker on [something new](/projects), occasionally [blog](/blog), and sometimes lose myself in [recreational puzzles](https://projecteuler.net/).
 
-You can get in touch with me via email [here](mailto:a.z.alhour@gmail.com).
+<!-- You can get in touch with me via email [here](mailto:< NO EMAIL >). -->
