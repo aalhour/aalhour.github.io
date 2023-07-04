@@ -120,6 +120,10 @@ compress_html:
   ignore:
     envs                : development
 
+compress_css:
+  ignore:
+    envs                : development
+
 # Site's defaults
 collections:
   portfolio:
