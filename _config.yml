@@ -32,13 +32,20 @@ author:
       icon        : "fab fa-fw fa-mastodon"
       url         : "https://hachyderm.io/@aalhour"
 
-social:
-  type            : Person
-  name            : Ahmad Alhour
+footer:
   links:
-    - "https://github.com/aalhour/"
-    - "https://twitter.com/ahmad_alhour"
-    - "https://www.linkedin.com/in/aalhour/"
+    - label       : "Twitter"
+      icon        : "fab fa-fw fa-twitter-square"
+      url         : "https://twitter.com/ahmad_alhour"
+    - label       : "GitHub"
+      icon        : "fab fa-fw fa-github"
+      url         : "https://github.com/aalhour/"
+    - label       : "LinkedIn"
+      icon        : "fab fa-fw fa-linkedin"
+      url         : "https://www.linkedin.com/in/aalhour/"
+    - label       : "Mastodon"
+      icon        : "fab fa-fw fa-mastodon"
+      url         : "https://hachyderm.io/@aalhour"
 
 # Site's themes
 # theme                   : minimal-mistakes-jekyll
@@ -141,10 +148,10 @@ defaults:
       layout            : single
       author_profile    : true
       read_time         : true
-      comments          : true
-      share             : true
       related           : true
       show_date         : true
+      comments          : false
+      share             : false
   # _pages
   - scope:
       path              : ""
