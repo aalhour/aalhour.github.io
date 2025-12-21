@@ -1,6 +1,8 @@
 ---
-title: "Posts by Category"
+title: Categories
+icon: fas fa-stream
+order: 5
 layout: categories
 permalink: /categories/
-author_profile: true
 ---
+

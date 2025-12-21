@@ -1,0 +1,23 @@
+# The contact options displayed in the sidebar
+# Icons from Font Awesome
+
+- type: github
+  icon: 'fab fa-github'
+  url: 'https://github.com/aalhour'
+
+- type: twitter
+  icon: 'fab fa-twitter'
+  url: 'https://twitter.com/ahmad_alhour'
+
+- type: linkedin
+  icon: 'fab fa-linkedin'
+  url: 'https://www.linkedin.com/in/aalhour'
+
+- type: mastodon
+  icon: 'fab fa-mastodon'
+  url: 'https://hachyderm.io/@aalhour'
+
+- type: rss
+  icon: 'fas fa-rss'
+  url: '/feed.xml'
+

@@ -1,3 +1,3 @@
 # aalhour.com
 
-Powered by Jekyll, Algolia and Minimal Mistakes.
+Powered by Jekyll and Minimal Mistakes.
