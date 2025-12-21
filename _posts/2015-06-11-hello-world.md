@@ -4,7 +4,6 @@ date: 2015-06-11 00:12:00
 categories:
   - Uncategoried
 tags:
-  - First Post
 pagination: 
   enabled: true
 header:
