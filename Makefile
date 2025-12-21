@@ -20,3 +20,6 @@ build-prod: ## Builds the site for PROD ENV
 serve: ## Start local dev server
 	bundle exec jekyll serve --port 4000
 
+drafts: ## Start local dev server with drafts
+	bundle exec jekyll serve --port 4000 --drafts
+
