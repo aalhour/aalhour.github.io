@@ -1,0 +1,67 @@
+---
+---
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* append your custom style below */
+
+/* ========== Space Grotesk Font ========== */
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/SpaceGrotesk-Bold.woff2') format('woff2');
+}
+
+/* ========== Apply Space Grotesk ========== */
+
+body {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.site-title,
+.site-subtitle,
+.nav-link,
+.post-title,
+.page-title {
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+#sidebar {
+  .site-title,
+  .site-subtitle,
+  .nav-link {
+    font-family: 'Space Grotesk', sans-serif !important;
+  }
+}
+
+.post-content,
+.page-content {
+  font-family: 'Space Grotesk', sans-serif !important;
+  line-height: 1.7;
+}
+
