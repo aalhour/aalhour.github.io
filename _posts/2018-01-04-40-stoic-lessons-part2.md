@@ -1,7 +1,6 @@
 ---
 title: "On Stoicism: 40 lessons I learned in 2017, Part 2"
 date: 2018-01-04
-category: blog
 categories:
   - Philosophy
 tags:
