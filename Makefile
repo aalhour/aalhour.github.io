@@ -20,6 +20,9 @@ build-prod: ## Builds the site for PROD ENV
 serve: ## Start local dev server
 	bundle exec jekyll serve --port 4000
 
-drafts: ## Start local dev server with drafts
+serve-drafts: ## Start local dev server with drafts
 	bundle exec jekyll serve --port 4000 --drafts
 
+lint: ## Check for unknown categories
+	@echo "Categories in use:"; \
+	grep -rh "^categories:" _posts _drafts 2>/dev/null | sed 's/categories: \[//' | sed 's/\]//' | sed 's/,/\n/g' | tr -d ' ' | grep -v "^categories:" | sort | uniq -c | sort -rn

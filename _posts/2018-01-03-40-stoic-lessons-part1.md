@@ -1,21 +1,8 @@
 ---
 title: "On Stoicism: 40 lessons I learned in 2017, Part 1"
 date: 2018-01-03
-categories:
-  - Philosophy
-tags:
-  - Books
-  - Reflections
-  - Philosophy
-  - Stoicism
-  - Life
-pagination:
-  enabled: true
-header:
-  show_overlay_excerpt: false
-  overlay_image: /assets/images/unsplash-image-2.jpg
-  overlay_filter: 0.5 # same as adding an opacity of 0.5 to a black background
-  caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
+categories: [Philosophy]
+tags: [Stoicism, Reflections, Life Lessons]
 ---
 
 1. The three Stoic tenets are: a) perception, b) directed action, c) will.
