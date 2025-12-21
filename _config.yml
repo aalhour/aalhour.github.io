@@ -28,7 +28,7 @@ linkedin:
 theme: jekyll-theme-chirpy
 
 # Avatar (profile image)
-avatar: /assets/images/me.jpg
+avatar: /assets/images/me.webp
 
 # Timezone
 timezone: Europe/Berlin
@@ -65,6 +65,15 @@ pageviews:
 
 # Table of Contents
 toc: true
+
+# Self-hosted static assets (no CDN)
+assets:
+  self_host:
+    enabled: true
+
+# PWA (Progressive Web App)
+pwa:
+  enabled: false
 
 # Plugins
 plugins:
