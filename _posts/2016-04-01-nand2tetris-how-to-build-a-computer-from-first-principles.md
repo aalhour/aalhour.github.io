@@ -1,21 +1,8 @@
 ---
 title: "nand2tetris, or Building a Computer from First Principles"
-date: 2016-04-01 12:00:00
-categories:
-  - Programming
-tags:
-  - Hadrware
-  - Emulation
-  - Assembly
-  - Machine Code
-  - Algorithms
-pagination:
-  enabled: true
-header:
-  show_overlay_excerpt: false
-  overlay_image: /assets/images/unsplash-image-2.jpg
-  overlay_filter: 0.5 # same as adding an opacity of 0.5 to a black background
-  caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
+date: 2016-04-01
+categories: [Programming]
+tags: [Hardware, Assembly, Computer Architecture, Courses]
 ---
 
 Last month I finished one of the most interesting and enjoyable Computer Courses on Coursera, the [nand2tetris: Part I](https://www.coursera.org/learn/build-a-computer) Course which goes by the title *"Build a Modern Computer from First Principles: Nand to Tetris"*.

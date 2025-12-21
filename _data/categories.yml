@@ -1,0 +1,12 @@
+# Standardized categories for the blog
+# Use exactly these names in post front matter
+#
+# Example:
+#   categories: [Programming]
+#
+# Keep this list small — use tags for granularity
+
+- Programming   # Code, languages, tools, databases, systems
+- Philosophy    # Life, stoicism, reflections
+- Books         # Reading summaries and reviews
+- Career        # Job, industry, professional growth

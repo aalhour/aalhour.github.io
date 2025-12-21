@@ -1,22 +1,8 @@
 ---
 title: "Summary of My 2017 Readings"
-date: 2018-01-02 09:45:00
-categories:
-  - Books
-tags:
-  - Books
-  - Stoicism
-  - Business
-  - Philosophy
-  - Management
-  - Programming
-pagination:
-  enabled: true
-header:
-  show_overlay_excerpt: false
-  overlay_image: /assets/images/unsplash-image-2.jpg
-  overlay_filter: 0.5 # same as adding an opacity of 0.5 to a black background
-  caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
+date: 2018-01-02
+categories: [Books]
+tags: [Stoicism, Philosophy, Management, Yearly Review]
 ---
 
 2017 was a good year for me in terms of reading as I managed to read 12 books in total, meanwhile learning German, listening to engineering podcasts, attending two conferences and taking several courses online. Without further ado, here is the list of books I read and my own summaries of them:
