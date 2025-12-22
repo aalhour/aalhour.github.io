@@ -1,12 +1,12 @@
 ---
-title: Side Projects
+title: Projects
 icon: fas fa-code
 order: 2
 layout: page
 permalink: /projects/
 ---
 
-A collection of side-projects I've built over the years, mainly for the fun of learning new things.
+_A collection of side projects I've built over the years, mostly for the joy of learning new things._
 
 {% for project in site.data.projects %}
 {% if project.hidden == "false" %}

@@ -6,14 +6,15 @@ layout: page
 permalink: /talks/
 ---
 
-Talks, podcasts, and trainings I've given over the years.
+_Talks, podcasts, and workshops I've done over the years._
+
 
 {% for item in site.data.talks_trainings %}
-### {{ item.title }}
-
-![{{ item.title }}]({{ item.thumbnail }}){: .left w="120" h="60" }
+#### {{ item.title }}
 
 **{{ item.type | capitalize }}** — {{ item.location }}
+
+![{{ item.title }}]({{ item.thumbnail }}){: .left w="120" h="60" }
 
 {{ item.description }}
 
