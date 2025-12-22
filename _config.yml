@@ -1,7 +1,7 @@
 # Site settings
 title: "Ahmad Alhour"
-tagline: "Random thoughts on software engineering, math, books and philosophy."
-description: "Ahmad Alhour's personal blog"
+tagline: "Notes on software, systems, books, and curiosity."
+description: "aalhour - notes on software, systems, books, and curiosity."
 url: "https://aalhour.com"
 baseurl: ""
 
@@ -28,7 +28,7 @@ linkedin:
 theme: jekyll-theme-chirpy
 
 # Avatar (profile image)
-avatar: /assets/images/me.webp
+avatar: /assets/images/me.dark.webp
 
 # Timezone
 timezone: Europe/Berlin
@@ -39,8 +39,8 @@ lang: en
 # Pagination
 paginate: 10
 
-# Theme mode - light, dark, or leave empty for auto
-theme_mode: dark
+# Theme mode - leave empty to enable toggle (dark default via JS)
+theme_mode:
 
 # CDN endpoint for media resources (optional)
 # cdn:

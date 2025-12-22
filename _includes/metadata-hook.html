@@ -1,6 +1,13 @@
 <!-- Custom meta and styles -->
 <!-- Styles moved to assets/css/jekyll-theme-chirpy.scss -->
 
+<!-- Default to dark mode on first visit -->
+<script>
+  if (!localStorage.getItem('mode')) {
+    localStorage.setItem('mode', 'dark');
+  }
+</script>
+
 <!-- OneDollarStats Analytics -->
 <script 
   defer 

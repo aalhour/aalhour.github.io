@@ -1,0 +1,11 @@
+---
+permalink: /robots.txt
+---
+
+User-agent: *
+
+Disallow: /norobots/
+Disallow: /assets/docs/
+
+Sitemap: {{ '/sitemap.xml' | absolute_url }}
+
