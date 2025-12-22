@@ -52,16 +52,7 @@ theme_mode: dark
 comments:
   provider:
 
-# Self-hosted analytics
-analytics:
-  google:
-    id:
-  goatcounter:
-    id:
-
-# Page view tracking
-pageviews:
-  provider:
+# Analytics - using OneDollarStats (script in _includes/metadata-hook.html)
 
 # Table of Contents
 toc: true
@@ -140,6 +131,7 @@ exclude:
   - "*.gemspec"
   - docs
   - tools
+  - _manual
   - README.md
   - LICENSE
   - purgecss.js

@@ -1,0 +1,5 @@
+User-agent: *
+
+Disallow: /assets/docs
+
+Sitemap: https://aalhour.com/sitemap.xml
