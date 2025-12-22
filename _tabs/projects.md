@@ -6,15 +6,13 @@ layout: page
 permalink: /projects/
 ---
 
-A collection of open-source projects and side-projects I've built over the years.
+A collection of side-projects I've built over the years, mainly for the fun of learning new things.
 
 {% for project in site.data.projects %}
-{% if project.home_enabled == "true" %}
-### [{{ project.title }}]({{ project.link }})
+{% if project.hidden == "false" %}
+#### [{{ project.title }}]({{ project.link }})
 
-{{ project.short_description }}
-
-{{ project.long_description }}
+{{ project.description }}
 
 ---
 
