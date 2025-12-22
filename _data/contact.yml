@@ -2,22 +2,26 @@
 # Icons from Font Awesome
 
 - type: github
+  title: GitHub
   icon: 'fab fa-github'
   url: 'https://github.com/aalhour'
 
-- type: goodreads
-  icon: 'fab fa-goodreads'
-  url: 'https://www.goodreads.com/aalhour'
-
 - type: linkedin
+  title: LinkedIn
   icon: 'fab fa-linkedin'
   url: 'https://www.linkedin.com/in/aalhour'
 
-- type: mastodon
-  icon: 'fab fa-mastodon'
-  url: 'https://hachyderm.io/@aalhour'
+- type: goodreads
+  title: GoodReads
+  icon: 'fab fa-goodreads'
+  url: 'https://www.goodreads.com/aalhour'
+
+# - type: mastodon
+#   icon: 'fab fa-mastodon'
+#   url: 'https://hachyderm.io/@aalhour'
 
 - type: rss
+  title: Subscribe
   icon: 'fas fa-rss'
   url: '/feed.xml'
 

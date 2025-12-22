@@ -1,8 +1,8 @@
 ---
 title: "On Stoicism: 40 lessons I learned in 2017, Part 2"
-date: 2018-01-04
 categories: [Philosophy]
 tags: [Stoicism, Reflections]
+# image: /assets/images/posts/2018-01-04-stoicism-part-2.webp
 ---
 
 1. "Who then is invincible? The one who cannot be disturbed by anything outside their reasoned choice."

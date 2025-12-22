@@ -1,4 +1,4 @@
-.PHONY: help update build serve
+.PHONY: help update build serve clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -26,3 +26,6 @@ serve-drafts: ## Start local dev server with drafts
 lint: ## Check for unknown categories
 	@echo "Categories in use:"; \
 	grep -rh "^categories:" _posts _drafts 2>/dev/null | sed 's/categories: \[//' | sed 's/\]//' | sed 's/,/\n/g' | tr -d ' ' | grep -v "^categories:" | sort | uniq -c | sort -rn
+
+clean: ## Remove all build artifacts
+	rm -rf _site .jekyll-cache .sass-cache .jekyll-metadata

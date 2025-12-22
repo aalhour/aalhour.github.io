@@ -253,10 +253,11 @@ blockquote.prompt-monologue {
   }
 }
 
-/* ========== Hide Panel on Post Pages ========== */
+/* ========== Hide "Recently Updated" & "Trending Tags" on Post Pages ========== */
 
-/* Hide "Recently Updated" and "Trending Tags" sidebar on post/article pages */
-body[data-layout="post"] #panel-wrapper {
+/* Hide only the access sections (Recently Updated, Trending Tags) on post pages */
+/* Keep the TOC (#toc-wrapper) visible */
+body:has(article[data-toc]) #panel-wrapper .access {
   display: none !important;
 }
 
