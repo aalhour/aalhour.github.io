@@ -1,3 +1,11 @@
+- title: "PyCOOLC"
+  subtitle: ""
+  linktitle: "@GitHub"
+  link: "https://github.com/aalhour/PyCOOLC"
+  hidden: "false"
+  contribution_type: "owner"
+  description: "I've always wondered how compilers are built, until I found the [Stanford Compilers course](https://online.stanford.edu/courses/soe-ycscs1-compilers) on edX. I started watching this course in my free time and wrote PyCOOLC on the side, a compiler for the _Classroom Object Oriented Language_ (COOL), targeting the [MIPS 32-bit architecture](https://en.wikipedia.org/wiki/MIPS_architecture) and written in Python 3."
+
 - title: "micro_kanren.py"
   linktitle: "@GitHub"
   link: "https://github.com/aalhour/micro_kanren.py"
@@ -11,14 +19,6 @@
   hidden: "false"
   contribution_type: "owner"
   description: "I watched the `nand2tetris` Coursera courses ([part 1](https://www.coursera.org/learn/build-a-computer), [part 2](https://www.coursera.org/learn/nand2tetris2#modules)) and built a 16-bit machine code assembler for the Hack-Assembly Language. These courses, coupled with topics from computer design and architecture all the way to the software layer, are a joy to learn."
-
-- title: "PyCOOLC"
-  subtitle: ""
-  linktitle: "@GitHub"
-  link: "https://github.com/aalhour/PyCOOLC"
-  hidden: "false"
-  contribution_type: "owner"
-  description: "I've always wondered how compilers are built, until I found the [Stanford Compilers course](https://online.stanford.edu/courses/soe-ycscs1-compilers) on edX. I started watching this course in my free time and wrote PyCOOLC on the side, a compiler for the _Classroom Object Oriented Language_ (COOL), targeting the [MIPS 32-bit architecture](https://en.wikipedia.org/wiki/MIPS_architecture) and written in Python 3."
 
 - title: "PBFI"
   subtitle: ""
