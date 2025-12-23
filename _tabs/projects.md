@@ -6,9 +6,8 @@ layout: page
 permalink: /projects/
 ---
 
-_Side projects I've built over the years, mostly for the joy of learning._
+_A mix of production tools I’ve shipped and learning projects I built to understand how things work... In addition to the occasional rabbit hole :D_
 
----
 
 ## Learning / Explorations
 
