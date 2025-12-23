@@ -150,6 +150,16 @@ blockquote.prompt-monologue {
   color: #f87171;
 }
 
+/* ========== Projects Page Spacing ========== */
+
+.projects-page dt {
+  margin-top: 1.5rem;
+}
+
+.projects-page dl dt:first-of-type {
+  margin-top: 0;
+}
+
 /* ========== Hide "Recently Updated" & "Trending Tags" on Post Pages ========== */
 
 /* Hide only the access sections (Recently Updated, Trending Tags) on post pages */
