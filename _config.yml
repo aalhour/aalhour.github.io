@@ -40,7 +40,7 @@ lang: en
 paginate: 10
 
 # Theme mode - leave empty to enable toggle (dark default via JS)
-theme_mode:
+theme_mode: dark
 
 # CDN endpoint for media resources (optional)
 # cdn:
