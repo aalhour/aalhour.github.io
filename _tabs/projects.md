@@ -6,9 +6,10 @@ layout: page
 permalink: /projects/
 ---
 
-_A mix of production tools I’ve shipped and learning projects I built to understand how things work... In addition to the occasional rabbit hole :D_
+_A mix of production tools I've shipped and learning projects I built to understand how things work... In addition to the occasional rabbit hole :D_
 
 
+<div class="projects-page" markdown="1">
 ## Learning / Explorations
 
 {% for project in site.data.projects %}
@@ -32,3 +33,4 @@ _A mix of production tools I’ve shipped and learning projects I built to under
 
 {% endif %}
 {% endfor %}
+</div>

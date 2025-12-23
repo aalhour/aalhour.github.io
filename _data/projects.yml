@@ -39,7 +39,7 @@
   link_title: "github"
   link: "https://gist.github.com/aalhour/9a80c6f630df22351ce70a4a45ffea13"
   hidden: "false"
-  status: "archived"
+  status: "finished"
   contribution_type: "owner"
   description: "An educational interpreter for the [Brainfuck programming language](https://en.wikipedia.org/wiki/Brainfuck), written in Python 3. Definitely **not** the shortest one; the point is readability."
 
@@ -68,7 +68,7 @@
   hidden: "false"
   status: "maintained"
   contribution_type: "owner"
-  description: "Fat and opinionated cookiecutter template for async web apps (Aiohttp + SQLAlchemy + Swagger), with Swagger UI integration and sane transactional session handling. Built at [TrustYou](https://www.trustyou.com/) and used as a starter kit for many Python microservices."
+  description: "A modern, opinionated [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/) template for building async Python web APIs powered by Aiohttp, SQLAlchemy 2.0, and PostgreSQL. Built at [TrustYou](https://www.trustyou.com/) and used as a starter kit for many Python microservices."
 
 - title: "kaos"
   category: "production"
