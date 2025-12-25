@@ -10,10 +10,13 @@
 (function() {
   'use strict';
 
-  if (typeof anime === 'undefined') {
-    console.error('LSM Animation: anime.js is required');
+  if (typeof anime === 'undefined' || !anime.animate) {
+    console.error('LSM Animation: anime.js v4+ is required');
     return;
   }
+
+  // Anime.js v4 API shortcuts
+  const { animate, createTimeline, stagger } = anime;
 
   const config = {
     width: 680,
@@ -375,8 +378,8 @@
   }
 
   function playEntranceAnimation() {
-    anime.timeline({ easing: 'easeOutExpo' })
-      .add({ targets: '#static-layer > *', opacity: [0, 1], translateY: [10, 0], duration: 400, delay: anime.stagger(30) });
+    createTimeline({ ease: 'out(3)' })
+      .add('#static-layer > *', { opacity: [0, 1], translateY: [10, 0], duration: 400, delay: stagger(30) });
   }
 
   function handlePut() {
@@ -457,29 +460,27 @@
     animLayer.appendChild(walParticle);
 
     // Appear
-    await anime({ targets: particle.querySelector('circle'), r: [0, 10], duration: 150, easing: 'easeOutExpo' }).finished;
-    anime({ targets: particle.querySelector('text'), opacity: [0, 1], duration: 120 });
-    anime({ targets: walParticle, r: [0, 6], duration: 150, easing: 'easeOutExpo' });
+    await animate(particle.querySelector('circle'), { r: [0, 10], duration: 150, ease: 'out(3)' });
+    animate(particle.querySelector('text'), { opacity: [0, 1], duration: 120 });
+    animate(walParticle, { r: [0, 6], duration: 150, ease: 'out(3)' });
 
     await delay(100);
 
     // Animate both in parallel
-    const memPromise = anime({
-      targets: particle,
+    const memPromise = animate(particle, {
       translateX: layout.memtable.x + 90,
       translateY: layout.memtable.y + 35,
       duration: 280,
-      easing: 'easeInOutQuad'
-    }).finished;
+      ease: 'inOutQuad'
+    });
 
-    const walPromise = anime({
-      targets: walParticle,
+    const walPromise = animate(walParticle, {
       cx: layout.wal.x + layout.wal.w/2,
       cy: layout.wal.y + 65,
       opacity: 0,
       duration: 350,
-      easing: 'easeInOutQuad'
-    }).finished;
+      ease: 'inOutQuad'
+    });
 
     await Promise.all([memPromise, walPromise]);
     walParticle.remove();
@@ -494,7 +495,7 @@
     }
     addLog(`✅ ${key}=${value}`, 'success');
 
-    await anime({ targets: particle, opacity: 0, duration: 120 }).finished;
+    await animate(particle, { opacity: 0, duration: 120 });
     particle.remove();
     render();
 
@@ -511,16 +512,15 @@
     state.flushCount++;
 
     const entries = svg.querySelectorAll('#memtable-entries .entry');
-    await anime({
-      targets: entries,
+    await animate(entries, {
       translateX: 50,
       translateY: 50,
       opacity: 0,
       scale: 0.6,
       duration: 280,
-      delay: anime.stagger(40, { direction: 'reverse' }),
-      easing: 'easeInBack'
-    }).finished;
+      delay: stagger(40, { reversed: true }),
+      ease: 'inBack'
+    });
 
     state.sstCounter++;
     const newSST = {
@@ -537,7 +537,7 @@
 
     const newSst = svg.querySelector('.level-0-files').lastElementChild;
     if (newSst) {
-      anime({ targets: newSst, scale: [0, 1], opacity: [0, 1], duration: 280, easing: 'easeOutBack' });
+      animate(newSst, { scale: [0, 1], opacity: [0, 1], duration: 280, ease: 'outBack' });
     }
 
     updateStats();
@@ -568,15 +568,14 @@
     state.compactCount++;
 
     const l0Files = svg.querySelectorAll('.level-0-files .sst-file');
-    await anime({
-      targets: l0Files,
+    await animate(l0Files, {
       translateY: 15,
       scale: 0.7,
       opacity: 0.3,
       duration: 250,
-      delay: anime.stagger(30),
-      easing: 'easeInQuad'
-    }).finished;
+      delay: stagger(30),
+      ease: 'inQuad'
+    });
 
     const merged = new Map();
     for (const file of state.levels[0]) {
@@ -599,7 +598,7 @@
 
     const newL1 = svg.querySelector('.level-1-files').lastElementChild;
     if (newL1) {
-      anime({ targets: newL1, scale: [0, 1], duration: 280, easing: 'easeOutBack' });
+      animate(newL1, { scale: [0, 1], duration: 280, ease: 'outBack' });
     }
 
     updateStats();
@@ -632,12 +631,11 @@
     const capacity = state.memtable.length / config.maxMemtableSize;
     const bar = svg.querySelector('#capacity-bar');
     if (bar) {
-      anime({
-        targets: bar,
+      animate(bar, {
         width: (mem.w - 12) * capacity,
         fill: capacity >= 1 ? '#ef4444' : config.colors.memtable,
         duration: 180,
-        easing: 'easeOutQuad'
+        ease: 'outQuad'
       });
     }
   }
