@@ -1,7 +1,7 @@
 ---
 title: Talks
 icon: fas fa-microphone
-order: 1
+order: 2
 layout: page
 permalink: /talks/
 ---

@@ -13,12 +13,12 @@
 <div id="{{ container_id }}"></div>
 
 <script src="{{ '/assets/vendor/anime.min.js' | relative_url }}"></script>
-<script src="{{ '/assets/js/lsm-animation/lsm-anime-full.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/lsm-animation/lsm-tree-demo.js' | relative_url }}"></script>
 <script>
 (function() {
   function initLSM() {
-    if (typeof LSMAnimeFull !== 'undefined') {
-      LSMAnimeFull.init('{{ container_id }}');
+    if (typeof LSMTreeDemo !== 'undefined') {
+      LSMTreeDemo.init('{{ container_id }}');
     }
   }
   if (document.readyState === 'loading') {
