@@ -1,8 +1,8 @@
 # Site settings
-title: "ahmad alhour"
-tagline: "notes on software, systems, books, and curiosity."
-description: "aalhour - notes on software, systems, books, and curiosity."
-url: "https://aalhour.com"
+title: ahmad alhour
+tagline: notes on software, systems, books, and curiosity.
+description: aalhour - notes on software, systems, books, and curiosity.
+url: https://aalhour.com
 baseurl: ""
 
 # Social links (used for SEO)
@@ -28,7 +28,7 @@ linkedin:
 theme: jekyll-theme-chirpy
 
 # Avatar (profile image)
-avatar: /assets/images/me.dark.webp
+avatar: /assets/images/me.light.webp
 
 # Timezone
 timezone: Europe/Berlin
@@ -40,7 +40,7 @@ lang: en
 paginate: 10
 
 # Theme mode - leave empty to enable toggle (dark default via JS)
-theme_mode: dark
+theme_mode:
 
 # CDN endpoint for media resources (optional)
 # cdn:

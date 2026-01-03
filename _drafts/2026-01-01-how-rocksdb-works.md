@@ -10,6 +10,9 @@ This interactive visualization demonstrates how LSM-Tree (Log-Structured Merge-T
 
 {% include animations/lsm-tree.html %}
 
+> This is a simplified visualization for educational purposes. Real LSM-Tree implementations (RocksDB, Cassandra, HBase) include additional optimizations like bloom filters, block-based SST storage, background compaction threads, write stalls, and sophisticated compaction strategies (leveled, size-tiered, FIFO).
+{: .prompt-info }
+
 ---
 
 ## How It Works
@@ -29,21 +32,3 @@ The visualization shows the RocksDB architecture with two planes:
 2. **Flush** - When the Memtable fills up (4 entries), it's flushed to disk as an SST file in L0
 3. **Get** - Reads check Memtable first, then SST files from newest (L0) to oldest (L2)
 4. **Compact** - When there are 2+ files in L0, they can be merged into L1 (deduplicating keys)
-
-## Usage
-
-To add this visualization to any post, simply include it:
-
-{% raw %}
-```liquid
-{% include animations/lsm-tree.html %}
-```
-{% endraw %}
-
-You can also pass a custom container id:
-
-{% raw %}
-```liquid
-{% include animations/lsm-tree.html id="my-lsm-viz" %}
-```
-{% endraw %}
