@@ -1,5 +1,6 @@
 /**
- * LSM-Tree Interactive Visualization - Anime.js Version
+ * LSM-Tree Interactive Visualization.
+ * @author: Ahmad Alhour (github.com/aalhour)
  * 
  * Layout based on RocksDB architecture:
  * - Memory plane (top): Memtable only
@@ -87,6 +88,8 @@
 
   let container, svg;
 
+  let themeObserver = null;
+
   function init(containerId) {
     container = document.getElementById(containerId);
     if (!container) return;
@@ -100,6 +103,37 @@
     addLog('🚀 LSM-Tree ready');
     render();
     playEntranceAnimation();
+
+    // Watch for theme changes and re-render
+    if (!themeObserver) {
+      themeObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.attributeName === 'data-mode') {
+            rebuildForTheme();
+          }
+        }
+      });
+      themeObserver.observe(document.documentElement, { attributes: true });
+    }
+  }
+
+  function rebuildForTheme() {
+    if (!container) return;
+
+    // Preserve current state
+    const currentState = { ...state };
+
+    // Rebuild HTML with new colors
+    container.innerHTML = buildHTML();
+    svg = container.querySelector('#anime-svg');
+
+    // Restore state
+    Object.assign(state, currentState);
+
+    setupControls();
+    drawComponents();
+    render();
+    updateStats();
   }
 
   function buildHTML() {
@@ -190,7 +224,7 @@
         .btn-demo { background: ${colors.highlight}; color: #000; }
         .btn-put { background: ${colors.memtable}; color: ${dark ? '#000' : '#fff'}; }
         .btn-get { background: ${colors.wal}; color: #fff; }
-        .btn-compact { background: ${colors.sst[0]}; color: #fff; }
+        .btn-delete { background: #ef4444; color: #fff; }
         .btn-secondary { background: ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; color: ${colors.text}; }
         .lsm-anime-svg-container {
           background: ${dark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.02)'};
@@ -283,8 +317,9 @@
           </div>
           <div class="lsm-anime-toolbar-divider-small"></div>
           <div class="lsm-anime-toolbar-section">
-            <span class="lsm-anime-section-label">Compact</span>
-            <button class="lsm-anime-btn btn-compact" id="anime-btn-compact">Compact</button>
+            <span class="lsm-anime-section-label">Delete</span>
+            <input type="text" id="anime-del-key" placeholder="key" maxlength="6">
+            <button class="lsm-anime-btn btn-delete" id="anime-btn-delete">Del</button>
           </div>
         </div>
         <div class="lsm-anime-svg-container">
@@ -356,7 +391,7 @@
   function setupControls() {
     container.querySelector('#anime-btn-put').addEventListener('click', handlePut);
     container.querySelector('#anime-btn-get').addEventListener('click', handleGet);
-    container.querySelector('#anime-btn-compact').addEventListener('click', handleCompact);
+    container.querySelector('#anime-btn-delete').addEventListener('click', handleDelete);
     container.querySelector('#anime-btn-demo').addEventListener('click', runDemo);
     container.querySelector('#anime-btn-reset').addEventListener('click', handleReset);
 
@@ -368,6 +403,9 @@
     });
     container.querySelector('#anime-get-key').addEventListener('keypress', e => {
       if (e.key === 'Enter') handleGet();
+    });
+    container.querySelector('#anime-del-key').addEventListener('keypress', e => {
+      if (e.key === 'Enter') handleDelete();
     });
   }
 
@@ -503,11 +541,13 @@
     getAnimated(key);
   }
 
-  function handleCompact() {
+  function handleDelete() {
     if (state.isAnimating) return;
-    if (state.levels[0].length < 2) { addLog('⚠️ Need 2+ L0 files', 'error'); return; }
+    const key = container.querySelector('#anime-del-key').value.trim();
+    if (!key) { addLog('⚠️ Enter key', 'error'); return; }
     setButtonsLocked(true);
-    compact();
+    deleteKey(key);
+    container.querySelector('#anime-del-key').value = '';
   }
 
   function handleReset() {
@@ -601,10 +641,59 @@
     const existing = state.memtable.findIndex(e => e.key === key);
     if (existing >= 0) {
       state.memtable[existing].value = value;
+      state.memtable[existing].deleted = false; // Reset deleted flag if key was previously deleted
     } else {
-      state.memtable.push({ key, value });
+      state.memtable.push({ key, value, deleted: false });
     }
     addLog(`✅ PUT ${key}=${value}`, 'success');
+
+    await animate(particle, { opacity: 0, duration: 120 });
+    particle.remove();
+    render();
+
+    if (state.memtable.length >= config.maxMemtableSize) {
+      await flush();
+    }
+
+    updateStats();
+    state.isAnimating = false;
+    setButtonsLocked(false);
+  }
+
+  async function deleteKey(key) {
+    state.isAnimating = true;
+    state.operationCount++;
+
+    const { layout, colors } = config;
+    const animLayer = svg.querySelector('#animation-layer');
+
+    // Create animated particle (red for delete)
+    const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    particle.setAttribute('cx', 120);
+    particle.setAttribute('cy', 80);
+    particle.setAttribute('r', 6);
+    particle.setAttribute('fill', '#ef4444');
+    animLayer.appendChild(particle);
+
+    // Animate to memtable
+    const mem = layout.memtable;
+    await animate(particle, {
+      cx: mem.x + mem.w / 2,
+      cy: mem.y + mem.h / 2,
+      duration: 350,
+      ease: 'out(3)'
+    });
+
+    // Add tombstone to WAL and Memtable
+    state.wal.push({ op: 'DELETE', key });
+    const existing = state.memtable.findIndex(e => e.key === key);
+    if (existing >= 0) {
+      state.memtable[existing].value = '💀 DEL'; // Tombstone marker
+      state.memtable[existing].deleted = true;
+    } else {
+      state.memtable.push({ key, value: '💀 DEL', deleted: true });
+    }
+    addLog(`🗑️ DEL ${key}`, 'error');
 
     await animate(particle, { opacity: 0, duration: 120 });
     particle.remove();
@@ -669,13 +758,13 @@
   async function getAnimated(key) {
     state.isAnimating = true;
     addLog(`🔍 GET ${key}...`, 'highlight');
-    
+
     const { layout, colors } = config;
     const mem = layout.memtable;
     const lvl = layout.levels;
     const animLayer = svg.querySelector('#animation-layer');
-    
-    // Create scanning indicator
+
+    // Create scanning indicator (progress bar style)
     const scanLine = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     scanLine.setAttribute('width', '4');
     scanLine.setAttribute('height', '0');
@@ -683,35 +772,48 @@
     scanLine.setAttribute('fill', colors.highlight);
     scanLine.setAttribute('opacity', '0.8');
     animLayer.appendChild(scanLine);
-    
-    // Scan Memtable
+
+    // Scan Memtable (vertical progress bar)
     scanLine.setAttribute('x', mem.x + 5);
     scanLine.setAttribute('y', mem.y + 45);
-    await animate(scanLine, { height: [0, mem.h - 60], duration: 300, ease: 'out(2)' });
-    
+    await animate(scanLine, { height: [0, mem.h - 60], duration: 500, ease: 'linear' });
+
     const memEntry = state.memtable.find(e => e.key === key);
     if (memEntry) {
+      if (memEntry.deleted) {
+        // Found tombstone in memtable - key was deleted
+        await animate(scanLine, { fill: '#ef4444', opacity: [0.8, 1, 0.8], duration: 250 });
+        addLog(`💀 "${key}" was deleted`, 'error');
+        await animate(scanLine, { opacity: 0, duration: 200 });
+        scanLine.remove();
+        state.isAnimating = false;
+        setButtonsLocked(false);
+        return;
+      }
       // Found in memtable - flash success
-      await animate(scanLine, { fill: colors.memtable, opacity: [0.8, 1, 0.8], duration: 200 });
+      await animate(scanLine, { fill: colors.memtable, opacity: [0.8, 1, 0.8], duration: 250 });
       addLog(`🎯 Memtable: ${key}="${memEntry.value}"`, 'success');
-      await animate(scanLine, { opacity: 0, duration: 150 });
+      await animate(scanLine, { opacity: 0, duration: 200 });
       scanLine.remove();
       state.isAnimating = false;
       setButtonsLocked(false);
       return;
     }
-    
+
     addLog(`📋 Not in Memtable, scanning disk...`, 'highlight');
-    await animate(scanLine, { opacity: 0, duration: 100 });
-    
-    // Scan each level
+    await animate(scanLine, { opacity: 0, duration: 150 });
+
+    // Scan each level (horizontal progress bar per level)
     for (let level = 0; level < state.levels.length; level++) {
       const ly = lvl.y + level * (lvl.levelH + lvl.gap);
       scanLine.setAttribute('x', lvl.x + 5);
       scanLine.setAttribute('y', ly + 5);
-      scanLine.setAttribute('height', '4');
-      await animate(scanLine, { opacity: [0, 0.8], width: [4, lvl.w - 10], duration: 250, ease: 'out(2)' });
-      
+      scanLine.setAttribute('height', '6');
+      scanLine.setAttribute('width', '0');
+
+      // Progress bar animation across the level
+      await animate(scanLine, { opacity: [0, 0.9], width: [0, lvl.w - 10], duration: 600, ease: 'linear' });
+
       for (let i = state.levels[level].length - 1; i >= 0; i--) {
         const file = state.levels[level][i];
         const entry = file.entries.find(e => e.key === key);
@@ -719,11 +821,21 @@
           // Found - flash the SST file
           const sstFile = svg.querySelectorAll(`.level-${level}-files .sst-file`)[i];
           if (sstFile) {
-            await animate(sstFile, { opacity: [1, 0.5, 1], duration: 200 });
+            await animate(sstFile, { opacity: [1, 0.5, 1], duration: 300 });
           }
-          await animate(scanLine, { fill: colors.sst[level], opacity: [0.8, 1, 0.8], duration: 200 });
+          if (entry.deleted) {
+            // Found tombstone - key was deleted
+            await animate(scanLine, { fill: '#ef4444', opacity: [0.9, 1, 0.9], duration: 250 });
+            addLog(`💀 "${key}" was deleted`, 'error');
+            await animate(scanLine, { opacity: 0, duration: 200 });
+            scanLine.remove();
+            state.isAnimating = false;
+            setButtonsLocked(false);
+            return;
+          }
+          await animate(scanLine, { fill: colors.sst[level], opacity: [0.9, 1, 0.9], duration: 250 });
           addLog(`🎯 L${level}: ${key}="${entry.value}"`, 'success');
-          await animate(scanLine, { opacity: 0, duration: 150 });
+          await animate(scanLine, { opacity: 0, duration: 200 });
           scanLine.remove();
           state.isAnimating = false;
           setButtonsLocked(false);
@@ -731,9 +843,10 @@
         }
       }
       
-      await animate(scanLine, { opacity: 0, width: 4, duration: 100 });
+      // Fade out before moving to next level
+      await animate(scanLine, { opacity: 0, width: 0, duration: 200 });
     }
-    
+
     // Not found
     addLog(`❌ "${key}" not found`, 'error');
     scanLine.remove();
@@ -743,38 +856,82 @@
 
   async function compact() {
     state.isAnimating = true;
-    addLog('⚡ Compacting L0→L1...', 'highlight');
     state.compactCount++;
 
     // Add COMPACT entry to WAL
     state.wal.push({ op: 'COMPACT' });
 
-    const l0Files = svg.querySelectorAll('.level-0-files .sst-file');
-    await animate(l0Files, {
-      opacity: 0,
-      duration: 350,
-      delay: stagger(50),
-      ease: 'inQuad'
-    });
+    // Compact L0 → L1 if there are 2+ files in L0
+    if (state.levels[0].length >= 2) {
+      addLog('⚡ Compacting L0→L1...', 'highlight');
 
-    const merged = new Map();
-    for (const file of state.levels[0]) {
-      for (const entry of file.entries) {
-        merged.set(entry.key, entry.value);
+      const l0Files = svg.querySelectorAll('.level-0-files .sst-file');
+      await animate(l0Files, {
+        opacity: 0,
+        duration: 350,
+        delay: stagger(50),
+        ease: 'inQuad'
+      });
+
+      // Count total entries before merge
+      let totalEntries = 0;
+      const merged = new Map();
+      for (const file of state.levels[0]) {
+        totalEntries += file.entries.length;
+        for (const entry of file.entries) {
+          merged.set(entry.key, entry.value);
+        }
       }
+
+      state.sstCounter++;
+      const newSST = {
+        id: state.sstCounter,
+        entries: Array.from(merged, ([k, v]) => ({ key: k, value: v })).sort((a, b) => a.key.localeCompare(b.key))
+      };
+
+      const deduped = totalEntries - newSST.entries.length;
+      state.levels[0] = [];
+      state.levels[1].push(newSST);
+      addLog(`✨ → SST-${newSST.id} (L1)${deduped > 0 ? ` [${deduped} dups removed]` : ''}`, 'highlight');
+      render();
+      await delay(200);
     }
 
-    state.sstCounter++;
-    const newSST = {
-      id: state.sstCounter,
-      entries: Array.from(merged, ([k, v]) => ({ key: k, value: v })).sort((a, b) => a.key.localeCompare(b.key))
-    };
+    // Compact L1 → L2 if there are 3+ files in L1
+    if (state.levels[1].length >= 3) {
+      addLog('⚡ Compacting L1→L2...', 'highlight');
 
-    state.levels[0] = [];
-    state.levels[1].push(newSST);
+      const l1Files = svg.querySelectorAll('.level-1-files .sst-file');
+      await animate(l1Files, {
+        opacity: 0,
+        duration: 350,
+        delay: stagger(50),
+        ease: 'inQuad'
+      });
 
-    addLog(`✨ → SST-${newSST.id} (L1)`, 'highlight');
-    render();
+      // Count total entries before merge
+      let totalEntries = 0;
+      const merged = new Map();
+      for (const file of state.levels[1]) {
+        totalEntries += file.entries.length;
+        for (const entry of file.entries) {
+          merged.set(entry.key, entry.value);
+        }
+      }
+
+      state.sstCounter++;
+      const newSST = {
+        id: state.sstCounter,
+        entries: Array.from(merged, ([k, v]) => ({ key: k, value: v })).sort((a, b) => a.key.localeCompare(b.key))
+      };
+
+      const deduped = totalEntries - newSST.entries.length;
+      state.levels[1] = [];
+      state.levels[2].push(newSST);
+      addLog(`✨ → SST-${newSST.id} (L2)${deduped > 0 ? ` [${deduped} dups removed]` : ''}`, 'highlight');
+      render();
+    }
+
     updateStats();
     state.isAnimating = false;
     setButtonsLocked(false);
@@ -797,10 +954,13 @@
       g.classList.add('entry');
       const rowY = mem.y + 65 + i * 16;
       g.setAttribute('transform', `translate(${mem.x + 10}, ${rowY})`);
+      const isDeleted = entry.deleted;
+      const bgColor = isDeleted ? '#ef4444' : config.colors.memtable;
+      const textColor = isDeleted ? '#ef4444' : config.colors.text;
       g.innerHTML = `
-        <rect width="${mem.w - 20}" height="14" rx="3" fill="${config.colors.memtable}" opacity="0.1"/>
-        <text x="10" y="11" fill="${config.colors.text}" font-size="9">${entry.key}</text>
-        <text x="${mem.w/2 + 10}" y="11" fill="${config.colors.text}" font-size="9">${entry.value}</text>
+        <rect width="${mem.w - 20}" height="14" rx="3" fill="${bgColor}" opacity="0.1"/>
+        <text x="10" y="11" fill="${textColor}" font-size="9"${isDeleted ? ' text-decoration="line-through"' : ''}>${entry.key}</text>
+        <text x="${mem.w/2 + 10}" y="11" fill="${textColor}" font-size="9">${entry.value}</text>
       `;
       entriesGroup.appendChild(g);
     });
@@ -835,22 +995,43 @@
 
   function renderLevels() {
     if (!svg) return;
+    // SST files get wider at lower levels (compaction merges files)
+    const sstWidths = [48, 72, 100]; // L0, L1, L2
+    const sstSpacing = [52, 78, 106]; // width + 4px gap
+    const maxVisible = [6, 4, 3]; // max files visible per level
+
     for (let level = 0; level < 3; level++) {
       const filesGroup = svg.querySelector(`.level-${level}-files`);
       if (!filesGroup) continue;
       filesGroup.innerHTML = '';
 
-      state.levels[level].forEach((file, i) => {
+      const w = sstWidths[level];
+      const spacing = sstSpacing[level];
+      const files = state.levels[level].slice(-maxVisible[level]); // show most recent
+
+      files.forEach((file, i) => {
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.classList.add('sst-file');
-        g.setAttribute('transform', `translate(${i * 52}, 0)`);
+        g.setAttribute('transform', `translate(${i * spacing}, 0)`);
         g.innerHTML = `
-          <rect width="48" height="28" rx="4" fill="${config.colors.sst[level]}18" stroke="${config.colors.sst[level]}" stroke-width="1.5"/>
-          <text x="24" y="12" text-anchor="middle" fill="${config.colors.text}" font-size="8" font-weight="600">SST-${file.id}</text>
-          <text x="24" y="23" text-anchor="middle" fill="${config.colors.textMuted}" font-size="7">${file.entries.length}k</text>
+          <rect width="${w}" height="28" rx="4" fill="${config.colors.sst[level]}18" stroke="${config.colors.sst[level]}" stroke-width="1.5"/>
+          <text x="${w/2}" y="12" text-anchor="middle" fill="${config.colors.text}" font-size="8" font-weight="600">SST-${file.id}</text>
+          <text x="${w/2}" y="23" text-anchor="middle" fill="${config.colors.textMuted}" font-size="7">${file.entries.length} keys</text>
         `;
         filesGroup.appendChild(g);
       });
+
+      // Show overflow indicator if there are more files
+      if (state.levels[level].length > maxVisible[level]) {
+        const overflow = state.levels[level].length - maxVisible[level];
+        const indicator = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        indicator.setAttribute('x', '-25');
+        indicator.setAttribute('y', '18');
+        indicator.setAttribute('fill', config.colors.textMuted);
+        indicator.setAttribute('font-size', '8');
+        indicator.textContent = `+${overflow}`;
+        filesGroup.appendChild(indicator);
+      }
     }
   }
 
