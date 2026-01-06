@@ -26,6 +26,9 @@ serve-drafts: ## Start local dev server with drafts
 lint: ## Check for unknown categories
 	@echo "Categories in use:"; \
 	grep -rh "^categories:" _posts _drafts 2>/dev/null | sed 's/categories: \[//' | sed 's/\]//' | sed 's/,/\n/g' | tr -d ' ' | grep -v "^categories:" | sort | uniq -c | sort -rn
+	@echo "------------------"
+	@echo "Tags in use:"; \
+	grep -rh "^tags:" _posts _drafts 2>/dev/null | sed 's/tags: \[//' | sed 's/\]//' | sed 's/,/\n/g' | tr -d ' ' | grep -v "^tags:" | sort | uniq -c | sort -rn
 
 clean: ## Remove all build artifacts
 	rm -rf _site .jekyll-cache .sass-cache .jekyll-metadata

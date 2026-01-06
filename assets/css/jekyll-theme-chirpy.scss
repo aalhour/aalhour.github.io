@@ -168,3 +168,53 @@ body:has(article[data-toc]) #panel-wrapper .access {
   display: none !important;
 }
 
+// /* ========== Dark Mode Text Color Override ========== */
+
+// /* Reference: Original Chirpy dark mode text color (for comparison) */
+// .chirpy-text-original {
+//   --text-color-original: rgb(175, 176, 177); /* #AFB0B1 - default dark mode */
+// }
+
+// /* Override: Lightened text color for better readability in dark mode */
+// html[data-mode="dark"] {
+//   --text-color: rgb(210, 212, 214); /* #D2D4D6 - lightened ~20% */
+// }
+
+// /* Apply override to body text in dark mode */
+// html[data-mode="dark"] body {
+//   color: rgb(210, 212, 214) !important;
+// }
+
+// html[data-mode="dark"] .post-content,
+// html[data-mode="dark"] .page-content,
+// html[data-mode="dark"] p,
+// html[data-mode="dark"] li {
+//   color: rgb(210, 212, 214);
+// }
+
+// /* Left sidebar: Use the new lighter text color */
+// html[data-mode="dark"] #sidebar {
+//   .site-title,
+//   .site-subtitle,
+//   .nav-link {
+//     color: rgb(210, 212, 214);
+//   }
+
+//   /* Social links at bottom: Keep muted (old color) */
+//   .sidebar-bottom a,
+//   .bottom-wrapper a,
+//   .icon-border {
+//     color: rgb(175, 176, 177);
+//   }
+// }
+
+// /* Right panel (TOC, Recently Updated, Trending Tags): Keep the old darker tone */
+// html[data-mode="dark"] #panel-wrapper,
+// html[data-mode="dark"] #toc-wrapper,
+// html[data-mode="dark"] .access {
+//   color: rgb(175, 176, 177); /* Original dark mode color */
+
+//   a, li, p, span, h2, h3 {
+//     color: rgb(175, 176, 177);
+//   }
+// }

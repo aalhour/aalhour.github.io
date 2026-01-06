@@ -2,7 +2,7 @@
 title: "nand2tetris, or Building a Computer from First Principles"
 date: 2016-04-01
 categories: [Programming]
-tags: [Hardware, Assembly, Computer Architecture, Courses]
+tags: [hardware, assembly, computer-architecture, courses]
 ---
 
 Last month I finished one of the most interesting and enjoyable Computer Courses on Coursera, the [nand2tetris: Part I](https://www.coursera.org/learn/build-a-computer) Course which goes by the title *"Build a Modern Computer from First Principles: Nand to Tetris"*.

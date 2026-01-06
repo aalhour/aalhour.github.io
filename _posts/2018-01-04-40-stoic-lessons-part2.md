@@ -1,7 +1,7 @@
 ---
 title: "On Stoicism: 40 lessons I learned in 2017, Part 2"
 categories: [Philosophy]
-tags: [Stoicism, Reflections]
+tags: [stoicism, reflections]
 # image: /assets/images/posts/2018-01-04-stoicism-part-2.webp
 ---
 

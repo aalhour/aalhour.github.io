@@ -2,7 +2,7 @@
 title: "On Watershed Moments: Boredom, Growth, and Curiosity"
 date: 2025-12-21
 categories: [Career]
-tags: [Career, Layoffs, Growth, Databases, Systems]
+tags: [career, layoffs, growth, databases, systems]
 image: /assets/images/posts/2025-12-21-on-watershed-moments.webp 
 # pin: true        # Pin to the top of home
 # math: true       # Enable MathJax
