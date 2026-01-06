@@ -1,8 +1,8 @@
 ---
-title: "LSM-Tree Animation Demo"
+title: "Building a database from scratch"
 date: 2025-12-25
 categories: [Programming]
-tags: [Databases, Systems]
+tags: [beachdb, databases, architecture]
 toc: false
 ---
 
