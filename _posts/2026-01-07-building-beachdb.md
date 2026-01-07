@@ -45,7 +45,7 @@ You can follow the project on GitHub: [github.com/aalhour/beachdb](https://githu
 - Make correctness and durability first-class (WAL[^5], recovery, explicit invariants).
 - Keep the system small, understandable, and easy to inspect with tooling.
 - Define crisp semantics for writes, deletes, snapshots, and iteration before tuning.
-- Layer the system intentionally: engine first, then server API, then Raft replication.
+- Layer the system intentionally: engine first, then server API, then Raft[^1] replication.
 - Use a small set of fixed workloads to guide measurement and explain tradeoffs.
 
 ### Non-goals (by design)
@@ -57,13 +57,13 @@ You can follow the project on GitHub: [github.com/aalhour/beachdb](https://githu
 - Full transactions or serializable isolation.
 - Auto sharding, region split/merge, rebalancing, quorum reads, gossip/repair.
 
-## The Architecture: A 10,000 ft view
+## The Architecture: A 10,000 ft. view
 
 The architecture of BeachDB follows three layers intentionally designed to make building for the sake of learning as easy as possible:
 
-1. An LSM-Trees[^4] storage engine inspired by [Facebook's RocksDB](https://rocksdb.org/)
-2. A single-node server that embeds the storage engine and exposes an API protocol for clients
-3. A distributed cluster of many nodes that replicate state over the Raft[^1] protocol
+1. An LSM-Trees[^4] storage engine inspired by [Facebook's RocksDB](https://rocksdb.org/).
+2. A single-node server that embeds the storage engine and exposes an API protocol for clients.
+3. A distributed cluster of many nodes that replicate state over the Raft[^1] protocol.
 
 Given that we don't have a storage engine yet, it's appropriate to start there and park the other two layers of the onion until it's time to peel them.
 
@@ -97,7 +97,7 @@ Before the bullets, here's the mental model I keep in my head: **writes are chea
 1. **Put**: Writes go to both the Memtable (memory) **and** WAL[^5] (disk) for durability.
    - The Memtable gives you a fast sorted view for reads.
    - The WAL is your "I swear I saw this write" receipt when the process crashes at the worst possible time.
-2. **Flush**: When the Memtable fills up (4 entries), it's flushed to disk as an SST[^6] file in L0.
+2. **Flush**: When the Memtable fills up (4 entries[^7]), it's flushed to disk as an SST[^6] file in L0.
    - Flushing turns volatile memory into an immutable, sorted file.
    - Now the Memtable can be reset and keep taking writes, while the disk holds the history.
 3. **Get**: Reads check Memtable first, then SST[^6] files from newest (L0) to oldest (L2).
@@ -128,9 +128,13 @@ I recommend watching the following lecture from the CMU Database course about LS
 
 BeachDB is my excuse to stop hand-waving storage engines and actually build one: define the semantics, write the invariants down, crash it on purpose, and make the on-disk state inspectable.
 
-Right now the repo is still empty (besides plans in markdown files), and that's fine. The point of this series isn't to drop a polished codebase on day one. It's to show the messy, mechanical steps that turn "I understand LSM trees" into "I can implement one and explain where it breaks."
+Right now the repo ([github.com/aalhour/beachdb](https://github.com/aalhour/beachdb)) is still empty (besides plans in markdown files), and that's fine. The point of this series isn't to drop a polished codebase on day one. It's to show the messy, mechanical steps that turn "I understand LSM trees" into "I can implement one and explain where it breaks."
 
 Next up, I'll start putting real code on the page: the first slices of the storage engine (WAL + memtable + flushing into an SST format), plus some tiny tools/tests to prove it survives restarts and doesn't lie about what it stored.
+
+Until we meet again.
+
+Adios! ✌🏼
 
 <!--
 
@@ -160,9 +164,12 @@ To keep BeachDB small and finishable, these are intentionally out of scope, at l
 
 ---
 
-[^1]: Raft is a consensus protocol that was built to make distributed consensus easier to understand and implement in fault-tolerant distributed systems. Rumor has it, it was built after the industry collectively had nightmares about Paxos xD, see: [Raft docs & demo](https://raft.github.io/), [Paxos Made Simple](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf), [Paxos Made Really Simple](https://medium.datadriveninvestor.com/2025-paxos-made-really-simple-64174ac8feb5), [Just Say NO to Paxos overhead](https://www.usenix.org/system/files/conference/osdi16/osdi16-li.pdf).
+## Notes & references
+
+[^1]: Raft is a consensus protocol that was built to make distributed consensus easier to understand and implement in fault-tolerant distributed systems. Rumor has it, it was built after the industry collectively had nightmares about Paxos xD, see: [Raft docs & demo](https://raft.github.io/) to learn more about Raft. For context on Paxos, see: [The Part-time Parliament](https://lamport.azurewebsites.net/pubs/lamport-paxos.pdf) (original paper), [Paxos Made Simple](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf), [Paxos Made Really Simple](https://medium.datadriveninvestor.com/2025-paxos-made-really-simple-64174ac8feb5), and [Just Say NO to Paxos overhead](https://www.usenix.org/system/files/conference/osdi16/osdi16-li.pdf).
 [^2]: HBase runs on top of the Hadoop Distributed Filesystem (HDFS) which handles sharding and replication of files for HBase, in addition to that different companies and deployments have different cross-cluster replication, see: [The HBase Book](https://hbase.apache.org/book.html#_cluster_replication) and [Cloudera docs](http://188.93.19.26/static/help/topics/cdh_bdr_hbase_replication.html).
 [^3]: [Cassandra 3.x Replication Docs](https://docs.datastax.com/en/cassandra-oss/3.x/cassandra/architecture/archDataDistributeAbout.html).
-[^4]: "LSM" or "LSMT" is short for Log-structured merge tree, a data structure invented by O'Neil, Cheng and Gawlick in 1996 and has been widely used in famous database systems, such as: Google Bigtable, HBase, Cassandra, Dynamo, RocksDB and others. See: [Wikipedia article](https://en.wikipedia.org/wiki/Log-structured_merge-tree), [1996 paper](https://link.springer.com/article/10.1007/s002360050048), and [LSM techniques survey by Luo & Carey](https://arxiv.org/pdf/1812.07527).
+[^4]: "LSM" or "LSMT" is short for Log-structured merge tree, a data structure invented by O'Neil, Cheng and Gawlick in 1996 and has been widely used in famous database systems, such as: Google Bigtable, HBase, Cassandra, Dynamo, RocksDB and others. See: [Wikipedia article](https://en.wikipedia.org/wiki/Log-structured_merge-tree), [original 1996 paper](https://www.cs.umb.edu/~poneil/lsmtree.pdf), and the ["LSM techniques survey" paper by Luo & Carey](https://arxiv.org/pdf/1812.07527).
 [^5]: "WAL" is short for Write-Ahead Log or write-ahead logging, a technique utilized by database systems that promise durability and crash-recovery, where mutations to the database state are appended as facts to a log file for speed and performance reasons before they are applied internally (see: [Wikipedia article](https://en.wikipedia.org/wiki/Write-ahead_logging)).
-[^6]: SST is short for Sorted-string table, which is a format for files that the storage engine uses when writing the contents of Memtables into. SSTables are sorted by key. See [Bigtable paper](https://research.google/pubs/bigtable-a-distributed-storage-system-for-structured-data/), [ScyllaDB's article on SSTs](https://www.scylladb.com/glossary/sstable/).
+[^6]: SST is short for Sorted-string table, which is a format for files that the storage engine uses when writing the contents of Memtables into disk. SSTables are sorted by key. See: [Bigtable paper](https://research.google/pubs/bigtable-a-distributed-storage-system-for-structured-data/), and [ScyllaDB's article on SSTs](https://www.scylladb.com/glossary/sstable/).
+[^7]: To keep the demo and explanation simple, the memtable size is measured in terms of # of entries. In practice, the size is measured in standard binary formats (bytes, kilobytes ... etc).
