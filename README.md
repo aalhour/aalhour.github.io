@@ -1,3 +1,3 @@
 # aalhour.com
 
-Powered by Jekyll and Chirpy.
+Personal website. Powered by Jekyll and Chirpy. [MIT licensed](LICENSE).
