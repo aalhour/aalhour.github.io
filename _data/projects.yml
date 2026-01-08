@@ -48,9 +48,9 @@
   link_title: "github"
   link: "https://github.com/aalhour/c-sharp-algorithms"
   hidden: "false"
-  status: "archived"
+  status: "maintained"
   contribution_type: "owner"
-  description: "A collection of data structures and algorithms I built (circa ~2014) to go back to the fundamentals. It grew over time and eventually got contributions from others."
+  description: "A library of reference implementations for known data structures and algorithms I built (circa ~2014) to go back to the fundamentals. It grew over time and eventually got contributions from others."
 
 - title: "Awesome Compilers"
   category: "learning"
