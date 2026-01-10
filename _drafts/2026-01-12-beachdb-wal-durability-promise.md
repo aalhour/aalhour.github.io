@@ -1,6 +1,6 @@
 ---
 title: "Durability is a promise you can’t hand-wave: WAL v1"
-date: 2026-01-07
+date: 2026-01-10
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, wal]
 toc: true
