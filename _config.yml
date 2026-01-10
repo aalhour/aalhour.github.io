@@ -48,9 +48,22 @@ theme_mode:
 # Sidebar avatar image
 # img_cdn:
 
-# Comments
+# Comments (Giscus - GitHub Discussions)
 comments:
-  provider:
+  provider: giscus
+  giscus:
+    repo: aalhour/aalhour.github.io
+    repo_id: MDEwOlJlcG9zaXRvcnkzNzEyODQwOQ==
+    category: Blog Comments
+    category_id: DIC_kwDOAjaI2c4C0y11
+    mapping: pathname
+    strict: 0
+    reactions_enabled: 1
+    emit_metadata: 0
+    input_position: bottom
+    theme: preferred_color_scheme
+    lang: en
+    crossorigin: anonymous
 
 # Analytics - using OneDollarStats (script in _includes/metadata-hook.html)
 
