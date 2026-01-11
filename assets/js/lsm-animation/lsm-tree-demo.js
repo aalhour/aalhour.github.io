@@ -1,6 +1,7 @@
 /**
  * LSM-Tree Interactive Visualization.
  * @author: Ahmad Alhour (github.com/aalhour)
+ * @license: MIT, see: LICENCE file at root dir of the project.
  * 
  * Layout based on RocksDB architecture:
  * - Memory plane (top): Memtable only

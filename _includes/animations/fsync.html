@@ -1,0 +1,12 @@
+<!-- fsync() Durability Animation -->
+<div id="fsync-animation-container"></div>
+
+<script src="/assets/vendor/anime.min.js"></script>
+<script src="/assets/js/fsync-animation/fsync-demo.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof FsyncDemo !== 'undefined') {
+      FsyncDemo.init('fsync-animation-container');
+    }
+  });
+</script>
