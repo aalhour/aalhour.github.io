@@ -1,13 +1,13 @@
 ---
 title: "Durability is a promise you can't hand-wave: Write-Ahead Log v1"
-date: 2026-02-08
+date: 2026-02-12
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, wal]
 toc: true
 track: https://soundcloud.com/silent-planet/trilogy?in=exixts/sets/3-ovens
 ---
 
-## Milestone 1: Complete
+## The first milestone!
 
 In my [last post]({% post_url 2026-01-07-building-beachdb %}), I introduced [BeachDB](https://github.com/aalhour/beachdb): a distributed NoSQL database I'm building from scratch in Go to learn storage internals, durability, and eventually distributed consensus. I showed an interactive LSM-Tree visualization and talked about the architecture.
 
@@ -15,11 +15,13 @@ Now it's time to show real code.
 
 [BeachDB v0.0.1](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) is the first tagged release, and it ships the Write-Ahead Log (WAL). The WAL is the durability spine of the database. Every write lands here before it's acknowledged. If the process crashes and restarts, the WAL is how we recover state.
 
+If you want to see runnable examples in Go, head over to: [github.com/aalhour/beachdb/examples/](https://github.com/aalhour/beachdb/tree/main/examples), and play with the code under `engine/`. The [`examples/engine/basic_usage/`](https://github.com/aalhour/beachdb/blob/main/examples/engine/basic_usage/main.go) is a good starting point, as it demonstrates basic API usage of the storage engine, namely: create a new database, and call Put, Get and Delete on it.
+
 This post walks through what I built, why I made certain design decisions, and how I tested it. If you've ever wondered what it takes to make a database that doesn't lie about your data, this is the answer.
 
 ## What is this thing you call a WAL?
 
-A WAL is a log that a database promising durability uses in order to track evidence of data mutations (create, update, delete). The concept is old and most serious databases, such as: PostgreSQL and SQLite, use one. In the LSM-tree world, [LevelDB](https://github.com/google/leveldb/blob/main/doc/log_format.md) and [RocksDB](https://github.com/facebook/rocksdb/wiki/Write-Ahead-Log-%28WAL%29) both have well-documented WAL implementations that BeachDB draws inspiration from.
+A WAL is a log that a database promising durability uses in order to track evidence of data mutations (create, update, delete). The concept is old and most serious databases, such as: PostgreSQL and SQLite, use one. In the LSM-tree world, LevelDB[^1] and RocksDB[^2] both have well-documented WAL implementations that BeachDB draws inspiration from.
 
 When a new `db.Put(key, value)` or `db.Delete(key)` comes in, the first thing that the database would do is to append an entry to the WAL documenting the action before actually doing anything with it — which varies from one database to another. Some databases modify the filesystem as a part of the critical path for serving writes, some just cache them in-memory (in addition to appending the WAL entry).
 
@@ -56,6 +58,7 @@ import (
 )
 
 func main() {
+    // Create a new file and check the returned error value
     f, err := os.Create("/tmp/hello-fsync.txt")
     if err != nil {
         log.Fatal(err)
@@ -63,15 +66,18 @@ func main() {
     defer f.Close()
 
     data := []byte("Hello, world!")
+
+    // Write the data to the file
     if _, err := f.Write(data); err != nil {
         log.Fatal(err)
     }
 
+    // Is the data guaranteed to be on disk now?
     fmt.Println("Data written and maybe synced to disk.")
 }
 ```
 
-When the above program calls `file.Write(data)`, the bytes don't go to disk. They go to the **kernel's page cache**[^4]: a region of RAM that the operating system uses to buffer I/O. The kernel will eventually flush those pages to the physical storage device, but "eventually" might mean seconds, minutes, or never (if the machine loses power first). Unless you call `f.Sync()`.
+When the above program calls `file.Write(data)`, the bytes don't go to disk. They go to the **kernel's page cache**[^3]: a region of RAM that the operating system uses to buffer I/O. The kernel will eventually flush those pages to the physical storage device, but "eventually" might mean seconds, minutes, or never (if the machine loses power first). Unless you call `f.Sync()`.
 
 Here's the stack, simplified:
 
@@ -97,7 +103,7 @@ This is fine for most programs. Log files, temp files, caches — who cares if y
 
 ### Enter `fsync`
 
-The `fsync(fd)`[^5] syscall tells the kernel: "flush all dirty pages for this file descriptor to stable storage, and don't return until it's done." After `fsync` returns, the data is on the physical device[^2].
+The `fsync(fd)`[^4] syscall tells the kernel: "flush all dirty pages for this file descriptor to stable storage, and don't return until it's done." After `fsync` returns, the data is on the physical device[^5].
 
 ```
 Your program
@@ -118,6 +124,7 @@ Here's how the updated `main()` function from earlier would look like with an `f
 
 ```go
 func main() {
+    // Create a new file and check the returned error value
     f, err := os.Create("/tmp/hello-fsync.txt")
     if err != nil {
         log.Fatal(err)
@@ -125,14 +132,18 @@ func main() {
     defer f.Close()
 
     data := []byte("Hello, world!")
+
+    // Write the data to the file
     if _, err := f.Write(data); err != nil {
         log.Fatal(err)
     }
 
+    // Call `fsync(fd)` to sync changes to disk
     if err := f.Sync(); err != nil {
         log.Fatal(err)
     }
 
+    // If a crash happens after the `f.Sync()` call succeeds, we're safe(-ish)!
     fmt.Println("Data was written and synced to disk.")
 }
 ```
@@ -147,9 +158,9 @@ func main() {
 | SATA SSD | 200-500 μs |
 | Spinning HDD | 5-15 ms (one disk rotation!) |
 
-For perspective: a `write()` to the page cache takes microseconds. An `fsync` to a spinning disk takes **milliseconds** — three orders of magnitude slower. This is why databases obsess over batching writes and minimizing fsync calls.
+For perspective: a `write()` to the page cache takes microseconds. An `fsync` to a spinning disk takes **milliseconds**, which is three orders of magnitude slower! This is why databases obsess over batching writes and minimizing `fsync` calls.
 
-### `fsync` vs. `fdatasync`
+### fsync vs. fdatasync
 
 There's a lighter-weight cousin to `fsync` and that's the `fdatasync(fd)`[^6] syscall. The difference:
 
@@ -158,7 +169,7 @@ There's a lighter-weight cousin to `fsync` and that's the `fdatasync(fd)`[^6] sy
 
 In practice, `fdatasync` can skip the directory entry update, saving one extra I/O on some filesystems. Many databases use `fdatasync` for WAL appends because the directory entry doesn't change (the file already exists; only its size grows). RocksDB [defaults to `fdatasync`](https://github.com/facebook/rocksdb/wiki/WAL-Performance) on Linux for this exact reason, and exposes a `use_fsync` option if you want the stronger guarantee. LevelDB uses `fdatasync` when available and [falls back to `fsync`](https://github.com/google/leveldb/blob/main/util/env_posix.cc) otherwise.
 
-Go's `(*os.File).Sync()` calls `fsync`, not `fdatasync`. If you want `fdatasync`, you need `syscall.Fdatasync(int(file.Fd()))` on Linux. For BeachDB v1, I use `Sync()` (plain `fsync`) because correctness over cleverness[^3] and simplicity.
+Go's `(*os.File).Sync()` calls `fsync`, not `fdatasync`. If you want `fdatasync`, you need `syscall.Fdatasync(int(file.Fd()))` on Linux. For BeachDB v1, I use `Sync()` (plain `fsync`) because correctness over cleverness[^7] and simplicity.
 
 ### What about `O_SYNC` and `O_DSYNC`?
 
@@ -171,32 +182,34 @@ These are convenient but inflexible, you can't batch multiple writes before flus
 
 ### The durability cheat sheet
 
+When thinking about the different options to write data to disk one can easily get confused. Below is a summary of the options discussed so far with a comparison on whether they help us survive crashes or not.
+
 | API | Data in page cache | Data on disk | Survives crash |
 |-----|-------------------|-------------|----------------|
 | `write()` alone | Yes | Maybe, eventually | **No** |
 | `write()` + `fsync()` | Yes | Yes | **Yes** |
 | `write()` + `fdatasync()` | Yes | Yes (data; metadata maybe) | **Yes** |
-| `O_SYNC` + `write()` | Yes | Yes (every write) | **Yes** |
-| `O_DSYNC` + `write()` | Yes | Yes (data; every write) | **Yes** |
+| `O_SYNC` flag + `write()` | Yes | Yes (every write) | **Yes** |
+| `O_DSYNC` flag + `write()` | Yes | Yes (data; every write) | **Yes** |
 | `mmap` + `msync` | Yes | Yes (after msync) | **Yes** (after msync) |
 | `mmap` without `msync` | Yes | Maybe | **No** |
 
 ### The lie that `write()` returns success
 
-This is the part that trips up people. `write()` returns the number of bytes written, but "written" here means "copied to kernel memory." The return value tells you nothing about durability. A program that does `write()` → check for error → tell the user "saved!" is making a promise it can't keep.
+This is the part that trips people up. `write()` returns the number of bytes written, but "written" here means "copied to kernel memory." The return value tells you nothing about durability. A program that does `write()` → check for error → tell the user "saved!" is making a promise it can't keep.
 
-BeachDB's contract is simple: the `db.Write()` method doesn't return until `fsync` completes. If `fsync` fails, the write fails. If the process dies before `fsync`, the write was never acknowledged, so there's no broken promise.
+BeachDB's contract is simple: the [`db.Write()`](https://github.com/aalhour/beachdb/blob/9c78234d73631abe102163c12c1c558c1c6b6055/engine/db.go#L91-L102) method doesn't return until `fsync` completes. If `fsync` fails, the write fails. If the process dies before `fsync`, the write was never acknowledged, so there's no broken promise.
 
 This is what I mean by "durability is a promise you can't hand-wave."
 
-### Demo: But what does it look like when it's in motion?
+### Demo time: Seeing is syncing!
 
-The write → page cache → fsync → disk flow is abstract until you *see* it. Static diagrams help, but watching bytes move through the stack makes the distinction between "written" and "durable" stick. So I built another `Anime.js` animation to animate the flow:
+The write → page cache → fsync → disk flow is abstract until you *see* it. Static diagrams help, but watching bytes move through the stack makes the distinction between "written" and "durable" stick. So I built another `Anime.js` animation to animate the flow.
+
+> I'm digging learning Anime.js while working on this project. Visualizing an idea is powerful, as it forces you to understand it well enough to teach it.
+{: .prompt-monologue }
 
 {% include animations/fsync.html %}
-
-> P.S. I'm digging learning Anime.js while working on this project. Visualizing an idea is powerful, as it forces you to understand it well enough to teach it.
-{: .prompt-monologue }
 
 If you want to learn more about coding for SSDs and their internals then you should check out CodeCapsule's blog post series on the topic: [Coding for SSDs, Part 1: Introduction and Table of Contents](https://codecapsule.com/2014/02/12/coding-for-ssds-part-1-introduction-and-table-of-contents/).
 
@@ -233,7 +246,7 @@ Let me walk through the fields:
 | `version` | Format version. Allows future changes without silent misinterpretation. |
 | `type` | Record type. v1 only uses `Full` (complete record). Reserved for future fragmentation. |
 | `length` | Payload size. Tells the reader exactly how many bytes to read after the header. |
-| `checksum` | CRC32C[^1] of the payload bytes. This catches silent bit flips and torn writes. |
+| `checksum` | CRC32C[^8] of the payload bytes. This catches silent bit flips and torn writes. |
 | `payload` | The encoded `Batch` containing the actual Put/Delete operations. |
 
 ## Design Decisions
@@ -410,9 +423,11 @@ Adios! ✌🏼
 
 ## Notes & references
 
-[^1]: CRC32C (Castagnoli) is a variant of CRC32 that uses a different polynomial (0x1EDC6F41) with better error detection properties. Modern CPUs have hardware instructions for CRC32C (Intel SSE 4.2, ARM CRC). Go's `hash/crc32` package automatically uses these when available. See: [CRC32C in Go](https://pkg.go.dev/hash/crc32).
-[^2]: "On the physical device" comes with a caveat: some disk controllers have their own write caches, and `fsync` returning doesn't always mean the data has reached the actual magnetic platters or NAND cells. Enterprise SSDs and battery-backed RAID controllers handle this correctly. Consumer drives may lie. This is a known issue in the database world; see the SQLite documentation on [write-ahead logging](https://www.sqlite.org/wal.html) for a pragmatic discussion.
-[^3]: Some databases (like PostgreSQL) default to `fdatasync` on Linux and `fsync` on macOS because macOS's `fcntl(F_FULLFSYNC)` is the only truly reliable flush on Apple hardware — even `fsync` on macOS doesn't guarantee data has hit stable storage. BeachDB doesn't worry about this yet. For RocksDB's handling, see the [WriteOptions::sync](https://github.com/facebook/rocksdb/wiki/Basic-Operations#synchronous-writes) documentation. LevelDB's approach is documented in its [write path implementation](https://github.com/google/leveldb/blob/main/doc/index.md). RocksDB also allows choosing between `fsync` and `fdatasync` via the [`use_fsync`](https://github.com/facebook/rocksdb/wiki/WAL-Performance) option, defaulting to `fdatasync` on Linux for better performance.
-[^4]: For more details on the Kernel Page Cache in Linux, see the [page cache entry](https://kernel-internals.org/mm/page-cache/) on kernel-internals.org.
-[^5]: For more details on the `fsync(fd)` syscall in the Linux kernel, see: [fsync(2)](https://www.man7.org/linux/man-pages/man2/fsync.2.html) man page.
+[^1]: LevelDB's WAL format: [github.com/google/leveldb/docs/log_format.md](https://github.com/google/leveldb/blob/main/doc/log_format.md)
+[^2]: RocksDB's WAL format: [github.com/facebook/rocksdb/wiki/Write Ahead Log (WAL)](https://github.com/facebook/rocksdb/wiki/Write-Ahead-Log-%28WAL%29)
+[^3]: For more details on the Kernel Page Cache in Linux, see the [page cache entry](https://kernel-internals.org/mm/page-cache/) on kernel-internals.org.
+[^4]: For more details on the `fsync(fd)` syscall in the Linux kernel, see: [fsync(2)](https://www.man7.org/linux/man-pages/man2/fsync.2.html) man page.
+[^5]: "On the physical device" comes with a caveat: some disk controllers have their own write caches, and `fsync` returning doesn't always mean the data has reached the actual magnetic platters or NAND cells. Enterprise SSDs and battery-backed RAID controllers handle this correctly. Consumer drives may lie. This is a known issue in the database world; see the SQLite documentation on [write-ahead logging](https://www.sqlite.org/wal.html) for a pragmatic discussion.
 [^6]: For more details on the `fdatasync(fd)` syscall in the Linux kernel, see: [fdatasync(2)](https://www.man7.org/linux/man-pages/man2/fdatasync.2.html) man page.
+[^7]: Some databases (like PostgreSQL) default to `fdatasync` on Linux and `fsync` on macOS because macOS's `fcntl(F_FULLFSYNC)` is the only truly reliable flush on Apple hardware — even `fsync` on macOS doesn't guarantee data has hit stable storage. BeachDB doesn't worry about this yet. For RocksDB's handling, see the [WriteOptions::sync](https://github.com/facebook/rocksdb/wiki/Basic-Operations#synchronous-writes) documentation. LevelDB's approach is documented in its [write path implementation](https://github.com/google/leveldb/blob/main/doc/index.md). RocksDB also allows choosing between `fsync` and `fdatasync` via the [`use_fsync`](https://github.com/facebook/rocksdb/wiki/WAL-Performance) option, defaulting to `fdatasync` on Linux for better performance.
+[^8]: CRC32C (Castagnoli) is a variant of CRC32 that uses a different polynomial (0x1EDC6F41) with better error detection properties. Modern CPUs have hardware instructions for CRC32C (Intel SSE 4.2, ARM CRC). Go's `hash/crc32` package automatically uses these when available. See: [CRC32C in Go](https://pkg.go.dev/hash/crc32).
