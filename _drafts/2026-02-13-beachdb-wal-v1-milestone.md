@@ -215,11 +215,13 @@ If you want to learn more about coding for SSDs and their internals then you sho
 
 ---
 
-## WAL Record Format
+## Designing WAL Record Format
 
-A WAL file is a sequence of records. Each record wraps one encoded `Batch` (a group of Put and Delete operations that are applied atomically).
+Now that we have `fsync` and durability primitives under our belts, we can move forward to the WAL record design and format.
 
-Here's the layout:
+A WAL file is a sequence of records. Each record wraps one encoded `Batch` (a group of Put and Delete operations that are applied atomically). There are no Create operations in BeachDB. The `Put` operation means: "update if exists or create".
+
+Here's the layout, please note that offset numbers denote indexes in byte arrays and sizes denote numbers of bytes:
 
 ```
 WAL Record Layout (v1)
@@ -238,7 +240,7 @@ Header size: 12 bytes
 Total record size: 12 + N bytes
 ```
 
-Let me walk through the fields:
+Let me walk you through the fields:
 
 | Field | Purpose |
 |-------|---------|
@@ -249,23 +251,25 @@ Let me walk through the fields:
 | `checksum` | CRC32C[^8] of the payload bytes. This catches silent bit flips and torn writes. |
 | `payload` | The encoded `Batch` containing the actual Put/Delete operations. |
 
+To read more about the WAL and Batch formats, I've uploaded the docs to `beachdb/docs/formats`, see: [WAL Format (v1)](https://github.com/aalhour/beachdb/blob/5c6d7d5c1085b1dd421b9f4ebfd309902bdc3cad/docs/formats/wal.md) and [Batch Encoding Format (v1)](https://github.com/aalhour/beachdb/blob/5c6d7d5c1085b1dd421b9f4ebfd309902bdc3cad/docs/formats/batch.md).
+
 ## Design Decisions
 
 When building the WAL, I had to make several choices. Here's my reasoning.
 
-### Why checksum in the header, not a trailer?
+### Decision #1: Why checksum in the header, not a trailer?
 
 I put the checksum in the header (before the payload) rather than as a trailing field. This means the reader can:
 
 1. Read 12 bytes (fixed header size).
-2. Know the payload length and expected checksum before reading the payload.
-3. Validate immediately after reading, without backtracking.
+2. Know the payload length and expected checksum before reading anything else.
+3. Reject obviously broken headers (bad magic, absurd length) without reading the payload at all.
 
-If the checksum were a trailer, I'd have to read the entire payload before I could validate it. With the checksum upfront, I can fail fast on corruption without wasting I/O on garbage bytes.
+To be clear: I still have to read the entire payload to compute the checksum and compare it. There's no magic here — CRC32 needs all the bytes. But with everything in the header, I read once (header), know exactly how much to read next (payload), and have the expected checksum ready for comparison. No backtracking, no extra read for a trailer.
 
 The tradeoff is that the writer must compute the checksum before writing the header, which means buffering the payload in memory first. For BeachDB's workload (small batches, fsync per batch), this is fine.
 
-### Why CRC32C specifically?
+### Decision #2: Why CRC32C specifically?
 
 CRC32C (Castagnoli) over plain CRC32 because:
 
@@ -273,7 +277,9 @@ CRC32C (Castagnoli) over plain CRC32 because:
 2. **Better error detection.** CRC32C has better hamming distance properties for certain error patterns.
 3. **Industry standard.** Used by RocksDB, LevelDB, Spanner, and others.
 
-### Why big-endian byte order?
+Also, CRC32C is supported in Go out of the box, see the [`beachdb/internal/util/checksum`](https://github.com/aalhour/beachdb/blob/9c78234d73631abe102163c12c1c558c1c6b6055/internal/util/checksum/checksum.go) package for the short implementation.
+
+### Decision #3: Why big-endian byte order?
 
 I chose big-endian (network byte order) for all multi-byte integers because hex dumps are readable. `0x00 0x00 0x00 0x2A` clearly reads as 42. Little-endian would be `0x2A 0x00 0x00 0x00`, which is harder to scan visually.
 
@@ -288,7 +294,7 @@ On startup, BeachDB replays the WAL to reconstruct state:
 3. For each valid record: decode the batch, apply to in-memory state.
 4. Open the WAL file for append (new writes go at the end).
 
-### Handling Truncation
+### Scenario #1: Handling Truncation
 
 A truncated record at the end of the WAL means the process crashed mid-write:
 
@@ -297,7 +303,7 @@ A truncated record at the end of the WAL means the process crashed mid-write:
 
 The incomplete record was never `fsync`'d, so the batch was never acknowledged to the caller. Discarding it is correct.
 
-### Handling Corruption
+### Scenario #2: Handling Corruption
 
 - **Bad magic**: Stop. Either file isn't a WAL, or we've hit garbage.
 - **Checksum mismatch**: Stop. Data is corrupted. Fail loudly.
@@ -310,11 +316,11 @@ v1 does not attempt repair. Corruption is surfaced, not hidden.
 
 ## Testing: Crash Loops and SIGKILL
 
-A durability promise is worthless if you can't prove it. I wrote two kinds of tests.
+A durability promise is worthless if you can't prove it, so I wrote two kinds of tests.
 
-### In-process Crash Tests
+### Type #1: In-process Crash Tests
 
-These tests simulate crashes by truncating or corrupting the WAL file, then reopening the database:
+These tests ([`engine/crash_test.go`](https://github.com/aalhour/beachdb/blob/main/engine/crash_test.go)) simulate crashes by truncating or corrupting the WAL file, then reopening the database:
 
 ```go
 // Write some data
@@ -341,9 +347,9 @@ I also wrote a randomized stress test that runs 50 cycles of:
 
 After 50 cycles, the database must still be able to open and recover at least some data.
 
-### Out-of-process SIGKILL Tests
+### Type #2: Out-of-process SIGKILL Tests
 
-The real durability test is SIGKILL. The `crash` utility spawns a writer subprocess that continuously writes data, then kills it with `SIGKILL` at random intervals:
+The real durability test is SIGKILL. The [`crash`](https://github.com/aalhour/beachdb/tree/main/cmd/crash) utility spawns a writer subprocess that continuously writes data, then kills it with `SIGKILL` at random intervals:
 
 ```bash
 $ ./crash --dbdir=/tmp/beachdb --cycles=20 --min-delay=50 --max-delay=200
@@ -359,30 +365,51 @@ Some data loss is acceptable — the writer might claim a key was committed but 
 
 ## The `wal_dump` Tool
 
-Every chapter ends with evidence. For the WAL, that evidence is `wal_dump`: a tool that decodes and prints WAL records.
+One of guiding principles I chose for BeachDB is **inspectability**: I don't trust a file format until I can dump it. The [`wal_dump`](https://github.com/aalhour/beachdb/tree/main/cmd/wal_dump) tool is my way of turning the WAL from an opaque binary blob into something I can read, debug, and reason about.
+
+Basic usage shows each record's size and checksum status:
 
 ```bash
 $ wal_dump /tmp/beachdb/beachdb.wal
-Record 0: 47 bytes, checksum OK
-Record 1: 23 bytes, checksum OK
-Record 2: 31 bytes, checksum OK
-End of WAL (3 records)
+Reading WAL: /tmp/beachdb/beachdb.wal
+
+Record 0: 47 bytes
+Record 1: 23 bytes
+Record 2: 31 bytes
+
+End of WAL (3 records, 101 bytes total)
 ```
 
-On corruption:
+With the `-decode` flag, it goes deeper and shows how many operations are in each batch:
+
+```bash
+$ wal_dump -decode /tmp/beachdb/beachdb.wal
+Reading WAL: /tmp/beachdb/beachdb.wal
+
+Record 0: 47 bytes (batch: 3 operations)
+Record 1: 23 bytes (batch: 1 operations)
+Record 2: 31 bytes (batch: 2 operations)
+
+End of WAL (3 records, 101 bytes total)
+```
+
+When something goes wrong, the tool tells you exactly where:
 
 ```bash
 $ wal_dump /tmp/beachdb/beachdb.wal
-Record 0: 47 bytes, checksum OK
-Record 1: checksum mismatch (expected 0xABCD1234, got 0xDEADBEEF)
-Stopped at record 1
+Reading WAL: /tmp/beachdb/beachdb.wal
+
+Record 0: 47 bytes
+Record 1: CORRUPTED (checksum mismatch)
+
+End of WAL (1 complete records, 1 incomplete)
 ```
 
-This tool has been invaluable for debugging. When something goes wrong, I can see exactly what's in the WAL file.
+I've lost count of how many times this tool saved me during development. When a test failed, I could immediately see: did the record get written? Was it truncated? Did the checksum pass? No guessing, no printf debugging — just evidence.
 
 ## Runnable Examples
 
-The release includes four runnable examples in the `examples/` directory:
+As pointed out to in the introductory section of this post, this release includes four runnable examples for the engine in the [`examples/engine/`](https://github.com/aalhour/beachdb/tree/5c6d7d5c1085b1dd421b9f4ebfd309902bdc3cad/examples/engine) directory:
 
 ```bash
 # Basic usage
@@ -398,7 +425,7 @@ go run examples/engine/crash_recovery/main.go
 go run examples/engine/options/main.go
 ```
 
-These are part of the test suite (`make examples`) and serve as documentation.
+These are also part of the test suite (you can run all of them with `make examples`) and serve as documentation.
 
 ## What's Next
 
@@ -409,11 +436,15 @@ The WAL is done. The database can now:
 - Detect corruption and truncation
 - Be inspected with `wal_dump`
 
-Next up: the **Memtable**. Right now, BeachDB uses a plain `map[string][]byte` for in-memory state. That's fine for proving the WAL works, but it's not sorted, doesn't support range scans, and doesn't handle tombstones properly for compaction.
+Next up: the **Memtable**. Right now, BeachDB uses a plain `map[string][]byte` for in-memory state. That's fine for proving the WAL works, but it's not sorted, doesn't support range scans, doesn't handle tombstones properly for compaction, and it's certainly only there for developmental purposes as it allowed me to build the spine of the database and focus on implementing the WAL without ballooning the scope of this milestone by including a Memtable implementation as well.
 
 The memtable will be a sorted structure (probably a skip list) that maintains insertion order for iteration and tracks tombstones for later deletion during compaction.
 
 After that: SSTables, flush, merge iterators, and the rest of the LSM tree.
+
+## Btw!
+
+I enabled comments on this blog and would love to hear from you below, let me know what you think!
 
 Until we meet again.
 
