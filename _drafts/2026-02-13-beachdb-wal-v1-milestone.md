@@ -1,13 +1,18 @@
 ---
-title: "Durability is a promise you can't hand-wave: Write-Ahead Log v1"
+title: "Durability is a promise you can't hand-wave: BeachDB's Write-Ahead Log (v1)"
 date: 2026-02-12
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, wal]
 toc: true
-track: https://soundcloud.com/silent-planet/trilogy?in=exixts/sets/3-ovens
+track: https://www.youtube.com/watch?v=lSHVMMfn3Js
 ---
 
-## The first milestone!
+> **If you're short on time**: BeachDB v0.0.1 is out, and it ships the Write-Ahead Log — the thing that makes durability real. This post walks through how `fsync` actually works (most tutorials skip this), explains the WAL record format, and shows how I tested crash recovery by killing the database repeatedly. [Code is here](https://github.com/aalhour/beachdb).
+{: .prompt-info }
+
+_This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
+
+## It's been a minute!
 
 In my [last post]({% post_url 2026-01-07-building-beachdb %}), I introduced [BeachDB](https://github.com/aalhour/beachdb): a distributed NoSQL database I'm building from scratch in Go to learn storage internals, durability, and eventually distributed consensus. I showed an interactive LSM-Tree visualization and talked about the architecture.
 
@@ -27,7 +32,7 @@ When a new `db.Put(key, value)` or `db.Delete(key)` comes in, the first thing th
 
 Before writing any code, I needed to define what durability means for BeachDB. Here's the contract:
 
-- **Commited = fsync'd**: A write is committed only after `fsync` returns.
+- **Committed = fsync'd**: A write is committed only after `fsync` returns.
 - **Acknowledged = durable**: If `db.Put()` or `db.Write()` returns success, the data survives restart.
 - **Crash before fsync**: The write is lost, but the caller never saw success.
 
@@ -38,9 +43,9 @@ This is the rule that matters. If the database says "OK, I saved your data," the
 
 ---
 
-## Prelude: Systems programming and the infamous **fsync** syscall
+## Prelude: Systems programming and why **fsync** matters
 
-There are many ways to write data to disk, and each programming language comes with its own `os` package. But unlike common wisdom, importing the `os` package DOES make you a systems programmer - joking! xD
+There are many ways to write data to disk, and each programming language comes with its own `os` package. But unlike common wisdom, importing the `os` package DOES make you a systems programmer... _joking!_
 
 Before I show the WAL code, let me explain the thing that makes durability possible, which is also the thing that most tutorials skip.
 
@@ -154,7 +159,7 @@ func main() {
 
 | Device | Typical fsync latency |
 |--------|----------------------|
-| NVMe SSD | 50-200 μs |
+| NVMe SSD | 50 μs – 1 ms (varies by drive) |
 | SATA SSD | 200-500 μs |
 | Spinning HDD | 5-15 ms (one disk rotation!) |
 
@@ -178,7 +183,7 @@ Instead of calling `fsync` after every write, you can open the file with `O_SYNC
 - **`O_SYNC`**: Every `write()` behaves as if followed by `fsync`. Data + metadata flushed on every write.
 - **`O_DSYNC`**: Every `write()` behaves as if followed by `fdatasync`. Data flushed on every write.
 
-These are convenient but inflexible, you can't batch multiple writes before flushing for example. For a WAL, I want to write the header *and* the payload *and then* fsync once. Using `O_SYNC` would fsync after each `write()` call, which is wasteful.
+These are convenient but inflexible, you can't batch multiple writes before flushing, for example. For a WAL, I want to write the header *and* the payload *and then* fsync once. Using `O_SYNC` would fsync after each `write()` call, which is wasteful.
 
 ### The durability cheat sheet
 
@@ -211,7 +216,7 @@ The write → page cache → fsync → disk flow is abstract until you *see* it.
 
 {% include animations/fsync.html %}
 
-If you want to learn more about coding for SSDs and their internals then you should check out CodeCapsule's blog post series on the topic: [Coding for SSDs, Part 1: Introduction and Table of Contents](https://codecapsule.com/2014/02/12/coding-for-ssds-part-1-introduction-and-table-of-contents/).
+If you want to go even deeper on SSD internals, I recommend checking out the Code Capsule blog. They have a series on the topic called: _"Coding for SSDs"_, here's a link: [Part 1: Introduction and Table of Contents](https://codecapsule.com/2014/02/12/coding-for-ssds-part-1-introduction-and-table-of-contents/).
 
 ---
 
@@ -283,7 +288,7 @@ Also, CRC32C is supported in Go out of the box, see the [`beachdb/internal/util/
 
 I chose big-endian (network byte order) for all multi-byte integers because hex dumps are readable. `0x00 0x00 0x00 0x2A` clearly reads as 42. Little-endian would be `0x2A 0x00 0x00 0x00`, which is harder to scan visually.
 
-Most binary file formats and network protocols use big-endian. It's what people expect when inspecting with `hexdump`.
+Network protocols and many binary file formats use big-endian. It's what people expect when inspecting with `hexdump`.
 
 ## Crash Recovery
 
@@ -409,7 +414,7 @@ I've lost count of how many times this tool saved me during development. When a 
 
 ## Runnable Examples
 
-As pointed out to in the introductory section of this post, this release includes four runnable examples for the engine in the [`examples/engine/`](https://github.com/aalhour/beachdb/tree/5c6d7d5c1085b1dd421b9f4ebfd309902bdc3cad/examples/engine) directory:
+As pointed out in the introductory section of this post, this release includes four runnable examples for the engine in the [`examples/engine/`](https://github.com/aalhour/beachdb/tree/5c6d7d5c1085b1dd421b9f4ebfd309902bdc3cad/examples/engine) directory:
 
 ```bash
 # Basic usage
@@ -441,6 +446,8 @@ Next up: the **Memtable**. Right now, BeachDB uses a plain `map[string][]byte` f
 The memtable will be a sorted structure (probably a skip list) that maintains insertion order for iteration and tracks tombstones for later deletion during compaction.
 
 After that: SSTables, flush, merge iterators, and the rest of the LSM tree.
+
+That's it for this milestone.
 
 ## Btw!
 
