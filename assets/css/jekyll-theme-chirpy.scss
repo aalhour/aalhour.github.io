@@ -153,14 +153,12 @@ html[data-mode="dark"] blockquote.prompt-monologue {
 
 .status-pill {
   display: inline-block;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 500;
   padding: 0.2rem 0.5rem;
-  border-radius: 10px;
-  text-transform: uppercase;
+  border-radius: 5px;
   letter-spacing: 0.03em;
   vertical-align: middle;
-  margin-left: 0.5rem;
 }
 
 .status-maintained {
@@ -183,14 +181,47 @@ html[data-mode="dark"] blockquote.prompt-monologue {
   color: #f87171;
 }
 
-/* ========== Projects Page Spacing ========== */
+/* ========== Projects Page Table ========== */
 
-.projects-page dt {
-  margin-top: 1.5rem;
+.projects-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.projects-table th,
+.projects-table td {
+  padding: 0.75rem 0.5rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--tb-border-color, #dee2e6);
+}
+.projects-table th { text-align: left; font-weight: 600; }
+.projects-table .col-project { 
+  width: 30%; 
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+}
+.projects-table .col-project a {
+  display: inline;
+}
+.projects-table .col-project .status-pill {
+  margin-top: 0.6rem;
+}
+.projects-table .col-description { 
+  width: 70%;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
-.projects-page dl dt:first-of-type {
-  margin-top: 0;
+/* Small screens (mobile) */
+@media (max-width: 768px) {
+  .projects-table .col-project { width: 35%; }
+  .projects-table .col-description { width: 65%; }
 }
 
 /* ========== Hide "Recently Updated" & "Trending Tags" on Post Pages ========== */
