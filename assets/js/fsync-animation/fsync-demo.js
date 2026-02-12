@@ -851,7 +851,7 @@
     clockHand.setAttribute('stroke-linecap', 'round');
     g.appendChild(clockHand);
 
-    addText(g, clockX + 40, schedY + 10, 'Merge/Reorder requests • Deadline: 500ms reads, 5s writes', c.textMuted, '11');
+    addText(g, clockX + 40, schedY + 10, 'Merge/Reorder requests • Enforces read/write deadlines', c.textMuted, '11');
     addText(g, queueX, schedY + 35, '🔄 struct bio → struct request → blk_mq_submit_bio()', c.textMuted, '11');
 
     parent.appendChild(g);
@@ -1167,7 +1167,7 @@
     const specsY = electronY + 30;
     
     addText(g, specsX, specsY, '📊 Performance:', c.text, '11', '600');
-    addText(g, specsX, specsY + 18, '• Read: ~25μs', c.textMuted, '11');
+    addText(g, specsX, specsY + 18, '• Read: ~75-100μs', c.textMuted, '11');
     addText(g, specsX, specsY + 34, '• Program: ~200μs', c.textMuted, '11');
     addText(g, specsX, specsY + 50, '• Block Erase: ~2ms', c.textMuted, '11');
     
