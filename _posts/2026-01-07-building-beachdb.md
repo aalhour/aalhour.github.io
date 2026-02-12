@@ -13,7 +13,7 @@ In my last blog post ["On Watershed Moments: Boredom, Growth, and Curiosity"]({%
 
 One of the most rewarding things I've been doing lately is working on technical products: systems and tools that help other engineers do their work.
 
-At HubSpot, that was building and operating the Apache HBase distributed database at massive scale (HubSpot's Data Infrastructure team). Now at Grafana Labs, it's building observability products in the cloud so other engineers get answers fast.
+At HubSpot, that's building and operating the Apache HBase distributed database at massive scale (HubSpot's Data Infrastructure team).
 
 Before all of this, I was on the other side of the table: using databases and observability tools to ship features to end users.
 
