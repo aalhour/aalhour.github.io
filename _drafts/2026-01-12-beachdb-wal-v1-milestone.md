@@ -9,7 +9,7 @@ track: https://soundcloud.com/silent-planet/trilogy?in=exixts/sets/3-ovens
 
 ## Milestone 1: Complete
 
-In my [last post]({% post_url 2026-01-07-building-beachdb %}), I introduced BeachDB: a toy database I'm building from scratch in Go to learn storage internals, durability, and eventually distributed consensus. I showed an interactive LSM-Tree visualization and talked about the architecture.
+In my [last post]({% post_url 2026-01-07-building-beachdb %}), I introduced [BeachDB](https://github.com/aalhour/beachdb): a distributed NoSQL database I'm building from scratch in Go to learn storage internals, durability, and eventually distributed consensus. I showed an interactive LSM-Tree visualization and talked about the architecture.
 
 Now it's time to show real code.
 
@@ -188,6 +188,17 @@ This is the part that trips up people. `write()` returns the number of bytes wri
 BeachDB's contract is simple: the `db.Write()` method doesn't return until `fsync` completes. If `fsync` fails, the write fails. If the process dies before `fsync`, the write was never acknowledged, so there's no broken promise.
 
 This is what I mean by "durability is a promise you can't hand-wave."
+
+### Demo: But what does it look like when it's in motion?
+
+The write → page cache → fsync → disk flow is abstract until you *see* it. Static diagrams help, but watching bytes move through the stack makes the distinction between "written" and "durable" stick. So I built another `Anime.js` animation to animate the flow:
+
+{% include animations/fsync.html %}
+
+> P.S. I'm digging learning Anime.js while working on this project. Visualizing an idea is powerful, as it forces you to understand it well enough to teach it.
+{: .prompt-monologue }
+
+If you want to learn more about coding for SSDs and their internals then you should check out CodeCapsule's blog post series on the topic: [Coding for SSDs, Part 1: Introduction and Table of Contents](https://codecapsule.com/2014/02/12/coding-for-ssds-part-1-introduction-and-table-of-contents/).
 
 ---
 
@@ -402,6 +413,6 @@ Adios! ✌🏼
 [^1]: CRC32C (Castagnoli) is a variant of CRC32 that uses a different polynomial (0x1EDC6F41) with better error detection properties. Modern CPUs have hardware instructions for CRC32C (Intel SSE 4.2, ARM CRC). Go's `hash/crc32` package automatically uses these when available. See: [CRC32C in Go](https://pkg.go.dev/hash/crc32).
 [^2]: "On the physical device" comes with a caveat: some disk controllers have their own write caches, and `fsync` returning doesn't always mean the data has reached the actual magnetic platters or NAND cells. Enterprise SSDs and battery-backed RAID controllers handle this correctly. Consumer drives may lie. This is a known issue in the database world; see the SQLite documentation on [write-ahead logging](https://www.sqlite.org/wal.html) for a pragmatic discussion.
 [^3]: Some databases (like PostgreSQL) default to `fdatasync` on Linux and `fsync` on macOS because macOS's `fcntl(F_FULLFSYNC)` is the only truly reliable flush on Apple hardware — even `fsync` on macOS doesn't guarantee data has hit stable storage. BeachDB doesn't worry about this yet. For RocksDB's handling, see the [WriteOptions::sync](https://github.com/facebook/rocksdb/wiki/Basic-Operations#synchronous-writes) documentation. LevelDB's approach is documented in its [write path implementation](https://github.com/google/leveldb/blob/main/doc/index.md). RocksDB also allows choosing between `fsync` and `fdatasync` via the [`use_fsync`](https://github.com/facebook/rocksdb/wiki/WAL-Performance) option, defaulting to `fdatasync` on Linux for better performance.
-[^4]: For more details on the Kernel Page Cache in Linux, see: https://kernel-internals.org/mm/page-cache/
+[^4]: For more details on the Kernel Page Cache in Linux, see the [page cache entry](https://kernel-internals.org/mm/page-cache/) on kernel-internals.org.
 [^5]: For more details on the `fsync(fd)` syscall in the Linux kernel, see: [fsync(2)](https://www.man7.org/linux/man-pages/man2/fsync.2.html) man page.
 [^6]: For more details on the `fdatasync(fd)` syscall in the Linux kernel, see: [fdatasync(2)](https://www.man7.org/linux/man-pages/man2/fdatasync.2.html) man page.
