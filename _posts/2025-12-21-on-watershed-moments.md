@@ -101,10 +101,6 @@ Writing clears up my head, and putting it out there creates this social pressure
 
 Databases and distributed systems have been my latest inspiration. The place I go to have _"new toys to play with, challenges to overcome and lessons to learn"_. Which is why I decided to re-learn database internals, tinker more with it, and write more about it.
 
-Since I started working at Grafana Labs, I’ve also been getting into the world of observability. Not just pretty dashboards, but the lower-level stuff too: measuring performance close to the system, understanding where the time actually goes, and turning “it feels slow” into something you can point at.
-
-Trends like eBPF (and the ecosystem around it) feel like a new kind of microscope. The kind that makes me want to learn how things work under the hood, not just how to scale them from the outside.
-
 Watershed moments, to me, are inflection points for growth. There's nothing wrong with maintaining your tools or keeping the fort running until the next beginning shows up.
 
 But now that I'm here, I want to make the most out of it.
