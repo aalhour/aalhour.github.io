@@ -5,7 +5,7 @@
   hidden: "false"
   status: "maintained"
   contribution_type: "owner"
-  description: "Distributed NoSQL databases written in Go and written about in this blog, see all posts tagged [#beachdb](/tags/beachdb/)."
+  description: "Distributed NoSQL database and storage-engine written in Go, and written about in this blog. See all posts tagged [#beachdb](/tags/beachdb/)."
 
 - title: "PyCOOLC"
   category: "learning"
