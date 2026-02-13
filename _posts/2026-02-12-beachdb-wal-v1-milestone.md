@@ -7,7 +7,7 @@ toc: true
 track: https://www.youtube.com/watch?v=lSHVMMfn3Js
 ---
 
-> **If you're short on time**: BeachDB v0.0.1 is out, and it ships the Write-Ahead Log — the thing that makes durability real. This post walks through how `fsync` actually works with an interactive demo (most tutorials skip this), explains the WAL record format, and shows how I tested crash recovery by killing the database repeatedly. [Code is here](https://github.com/aalhour/beachdb).
+> **TL;DR**: BeachDB v0.0.1 is out, and it ships the Write-Ahead Log — the thing that makes durability real. This post walks through how `fsync` actually works with an interactive demo (most tutorials skip this), explains the WAL record format, and shows how I tested crash recovery by killing the database repeatedly. [Code is here](https://github.com/aalhour/beachdb).
 {: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
