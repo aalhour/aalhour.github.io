@@ -17,7 +17,9 @@ _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/bea
 
 In my [last post]({% post_url 2026-02-12-beachdb-wal-v1-milestone %}), I walked through BeachDB's Write-Ahead Log: the record format, the crash recovery, the SIGKILL tests. I was feeling pretty good about durability. Then a Discord discussion on "Software Internals" pulled on a loose thread:
 
-> We ended up talking about something I completely missed: `fsync`-ing the WAL file isn't enough when the file is *new*. You also need to `fsync` the directory. Then people started sharing production horror stories of data loss from storage engines that forgot this.
+> We ended up talking about something I completely missed: `fsync`-ing the WAL file isn't enough when the file is *new*. You also need to `fsync` the directory.
+>
+> Then people started sharing production horror stories of data loss from storage engines that forgot this.
 
 I stared at the thread for a while. Then I stared at my code. Then I stared at the `fsync(2)` man page[^1]:
 
@@ -32,11 +34,24 @@ When you create a new file, two things happen at the filesystem level:
 1. The file's **inode** is allocated (its metadata, data blocks, etc.)
 2. A **directory entry** is added to the parent directory's inode — a mapping from filename to inode number
 
-These are two separate mutations, and they live independently in the kernel's page cache. Calling `fsync` on the WAL file flushes the file's data and metadata (inode) to disk — but the directory entry? That's the *directory's* metadata. It sits in the page cache until the kernel gets around to flushing it, or until someone fsyncs the directory itself.
+These are two separate mutations, and they live independently in the kernel's page cache. Calling `fsync` on the WAL file flushes the file's data and metadata to disk — but the directory entry? That's the *directory's* metadata. It sits in the page cache until the kernel gets around to flushing it, or until someone fsyncs the directory itself.
 
 So my WAL data was on disk. My WAL file's inode was on disk. But the directory might not know the file exists.
 
 A crash at the wrong moment, and the WAL becomes an orphan: data blocks on disk with no name, left orphaned until repair (or cleaned up by `fsck`). The database opens, sees no WAL, starts fresh. All your data, gone — despite every single `fsync` call succeeding.
+
+## When would this actually happen?
+
+The crash tests and SIGKILL tests that I've added to the project in [v0.0.1](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) only cover the case when the process hosting an instance of BeachDB in-process gets killed or crashes.
+
+In the tested cases the kernel survives and is assumed to still be online, but what happens if the kernel crashes?
+
+Imagine the following scenario: a process starts, opens a BeachDB database in an existing directory, and creates a new WAL file. Writes are synced to the WAL file. Moments later the machine crashes. That's when this bug would likely manifest, especially when the kernel itself dies before flushing the directory entry.
+
+Other examples include:
+- Actual power loss
+- Kernel panic
+- Hard reboot (`echo b > /proc/sysrq-trigger`)
 
 ## The fix
 
@@ -73,9 +88,29 @@ I had `fsync` everywhere. I had crash tests. I had SIGKILL tests. And I was stil
 
 Durability is a promise you keep in layers, and I'd missed a layer. The code is patched[^2], the tests are written, and I won't forget this one.
 
+### Durable file ops checklist (yes, it’s annoying)
+
+If you care about durability across **power loss / kernel panic / hard reset**, here’s the checklist I wish I had tattooed on my forehead:
+
+- **Appending to an existing file**:
+  - `write()` → `fsync(file)`
+  - This makes the *file* durable. It does **not** necessarily make the *name of the file* durable (directory entries are their own thing).[^1]
+
+- **Creating a new file** (or making it appear under a new name):
+  - create/write → `fsync(file)` → `fsync(dir)`
+  - `fsync(dir)` is what makes the filename → inode mapping survive the apocalypse.[^1][^3]
+
+- **Atomic replace (`tmp` → `rename`)**:
+  - write tmp → `fsync(tmp)` → `rename(tmp, final)` → `fsync(parent dir)`
+  - `rename()` is atomic in the namespace. Durability is still on you: sync the directory.[^3][^4]
+
+If this feels like overkill: it is. Until the day it isn't.
+
 ---
 
 ## Notes & references
 
-[^1]: The `fsync(2)` man page: [man7.org/linux/man-pages/man2/fsync.2.html](https://man7.org/linux/man-pages/man2/fsync.2.html)
-[^2]: The patch: [`engine/fs.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs.go), [`engine/fs_test.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs.go) with simple tests, and its call in [`engine/db.go`](https://github.com/aalhour/beachdb/blob/main/engine/db.go), full patch commit [here](https://github.com/aalhour/beachdb/commit/6d077f77e3670fc4ad99f58b8f08d7c5fa67c1ca)
+[^1]: `fsync(2)` explicitly notes that fsyncing a file does not necessarily persist the containing directory entry: [man2/fsync.2.html](https://man7.org/linux/man-pages/man2/fsync.2.html)
+[^2]: The patch: [`engine/fs.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs.go), [`engine/fs_test.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs_test.go) with simple tests, and its call in [`engine/db.go`](https://github.com/aalhour/beachdb/blob/main/engine/db.go), full patch commit [here](https://github.com/aalhour/beachdb/commit/6d077f77e3670fc4ad99f58b8f08d7c5fa67c1ca)
+[^3]: Jeff Moyer’s “Ensuring data reaches disk” (LWN) discusses the directory fsync requirement for newly created files and portable best practices: [lwn.net/Articles/457667](https://lwn.net/Articles/457667/)
+[^4]: `rename(2)` documents rename’s atomic namespace behavior; durability still requires syncing the directory for crash safety: [man2/rename.2.html](https://man7.org/linux/man-pages/man2/rename.2.html)
