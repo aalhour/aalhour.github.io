@@ -116,6 +116,34 @@ If you're playing with the demo, watch for two things:
 
 ---
 
+> **Update (2026-02-16): What is BeachDB *for*?**
+> 
+> Today a friend asked me what BeachDB is *for*. Is it tailored for bioinformatics? finance? some specific domain?
+> 
+> The honest answer is: **no**. BeachDB isn’t a domain database (at least not by design). It’s me trying to build the *core* pieces of a database system end-to-end, in public, and learn the parts we usually outsource to “the database.”
+> 
+> That said, the *shape* of BeachDB is a pretty standard one, and it points at real use cases:
+> 
+> - **As a storage engine (embedded library)**: a durable key-value store you can embed in a Go program (the “RocksDB-in-your-app” shape). Think “I need persistence and crash recovery, but I don’t want a separate database process yet.”
+> - **As a single-node server**: the same engine behind an API so multiple clients can read/write over the network (Redis-ish ergonomics, but with an LSM engine underneath).
+> - **As a cluster**: multiple nodes replicating state via Raft[^1] so the system can survive machine failures without lying about committed writes (closer to an etcd-style replication story, but serving application KV reads/writes).
+> 
+> So the use cases are mostly “anything that fits a key-value model”:
+> 
+> - **Metadata / state storage**: sessions, feature flags, rate-limit counters, “last seen” pointers, presence, small blobs, background job state. (Redis gets used for a lot of this in the real world.)
+> - **A chat app backend (some parts of it)**: not “store all messages forever” (that wants indexing/range scans), but the *stateful bits* like inbox pointers, room membership, per-user settings, and delivery/read receipts fit the KV shape nicely.
+> - **Ingestion pipelines**: checkpoints, offsets, and “what did I process last?” state (the kind of glue code that *really* wants to survive restarts).
+> - **Append-heavy workloads**: audit logs, event-ish data, write-heavy streams where sequential writes + durability matter.
+> - **Time-ish data**: storing things in time buckets (per user/device/service) becomes much nicer once I add iteration/range scans and lock down compaction semantics.
+> - **Domain-wise (bio/finance/etc.)**: not tailored to any vertical, but the same pattern shows up everywhere — pipeline metadata in bioinformatics, order/workflow state in finance, carts/sessions in e-commerce, and so on.
+> 
+> If you can model your problem as “key → bytes,” you can usually make it fit.
+> 
+> And the non-use-cases are just as important:
+> 
+> - It’s not meant to be production-ready (yet), not tuned for any specific vertical, and not competing with PostgreSQL, RocksDB, or the real grown-ups. It’s a learning project with receipts.
+{: .prompt-warning }
+
 ## If you want to go deeper
 
 I recommend watching the following lecture from the CMU Database course about LSM-Tree[^4] storage:
