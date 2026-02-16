@@ -13,6 +13,8 @@ _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/bea
 
 ---
 
+## Our first bug!
+
 In my [last post]({% post_url 2026-02-12-beachdb-wal-v1-milestone %}), I walked through BeachDB's Write-Ahead Log: the record format, the crash recovery, the SIGKILL tests. I was feeling pretty good about durability. Then a systems-internals Discord thread pulled on a loose thread:
 
 > We ended up talking about something I completely missed: `fsync`-ing the WAL file isn't enough when the file is *new*. You also need to `fsync` the directory. Then people started sharing production horror stories of data loss from storage engines that forgot this.
@@ -30,7 +32,7 @@ When you create a new file, two things happen at the filesystem level:
 1. The file's **inode** is allocated (its metadata, data blocks, etc.)
 2. A **directory entry** is added to the parent directory's inode — a mapping from filename to inode number
 
-These are two separate mutations, and they live independently in the kernel's page cache. Calling `fsync` on the WAL file flushes the file's data and inode to disk — but the directory entry? That's the *directory's* metadata. It sits in the page cache until the kernel gets around to flushing it, or until someone fsyncs the directory itself.
+These are two separate mutations, and they live independently in the kernel's page cache. Calling `fsync` on the WAL file flushes the file's data and metadata (inode) to disk — but the directory entry? That's the *directory's* metadata. It sits in the page cache until the kernel gets around to flushing it, or until someone fsyncs the directory itself.
 
 So my WAL data was on disk. My WAL file's inode was on disk. But the directory might not know the file exists.
 
@@ -53,7 +55,7 @@ func syncDir(path string) error {
 
 Open the directory, call `Sync()`, close it. One call in `engine.Open()`, right after the WAL file is created. That's it.
 
-In BeachDB, this happens when we create the WAL the first time (fresh DB dir), you can refer to [commit `6d077f7`](https://github.com/aalhour/beachdb/commit/6d077f77e3670fc4ad99f58b8f08d7c5fa67c1ca) to see the full patch.
+In BeachDB, this happens when we create the WAL the first time (fresh DB dir). If you're curious, here's [the patch commit](https://github.com/aalhour/beachdb/commit/6d077f77e3670fc4ad99f58b8f08d7c5fa67c1ca)[^2].
 
 You only need to sync the directory when its metadata changes: file creation, rename, or delete. Appending to an existing file doesn't touch the directory, so `db.Put()` doesn't need it.
 
@@ -76,4 +78,4 @@ Durability is a promise you keep in layers, and I'd missed a layer. The code is 
 ## Notes & references
 
 [^1]: The `fsync(2)` man page: [man7.org/linux/man-pages/man2/fsync.2.html](https://man7.org/linux/man-pages/man2/fsync.2.html)
-[^2]: The patch: [`engine/fs.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs.go) and its call in [`engine/db.go`](https://github.com/aalhour/beachdb/blob/main/engine/db.go), full patch commit [here](https://github.com/aalhour/beachdb/commit/6d077f77e3670fc4ad99f58b8f08d7c5fa67c1ca)
+[^2]: The patch: [`engine/fs.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs.go), [`engine/fs_test.go`](https://github.com/aalhour/beachdb/blob/main/engine/fs.go) with simple tests, and its call in [`engine/db.go`](https://github.com/aalhour/beachdb/blob/main/engine/db.go), full patch commit [here](https://github.com/aalhour/beachdb/commit/6d077f77e3670fc4ad99f58b8f08d7c5fa67c1ca)
