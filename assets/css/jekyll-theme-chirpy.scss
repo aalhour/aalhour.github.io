@@ -115,6 +115,19 @@ article .post-content + .d-flex > span:first-child,
   display: none !important;
 }
 
+/* ========== Prompt Headings Fix ========== */
+
+/* Remove top margin from headings inside prompt blocks */
+blockquote[class*="prompt-"] > h1:first-child,
+blockquote[class*="prompt-"] > h2:first-child,
+blockquote[class*="prompt-"] > h3:first-child,
+blockquote[class*="prompt-"] > h4:first-child,
+blockquote[class*="prompt-"] > h5:first-child,
+blockquote[class*="prompt-"] > h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 /* ========== Prompt: Monologue (Internal Thought) ========== */
 
 blockquote.prompt-monologue {
