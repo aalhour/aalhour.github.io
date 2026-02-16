@@ -15,7 +15,7 @@ _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/bea
 
 ## Our first bug!
 
-In my [last post]({% post_url 2026-02-12-beachdb-wal-v1-milestone %}), I walked through BeachDB's Write-Ahead Log: the record format, the crash recovery, the SIGKILL tests. I was feeling pretty good about durability. Then a systems-internals Discord thread pulled on a loose thread:
+In my [last post]({% post_url 2026-02-12-beachdb-wal-v1-milestone %}), I walked through BeachDB's Write-Ahead Log: the record format, the crash recovery, the SIGKILL tests. I was feeling pretty good about durability. Then a Discord discussion on "Software Internals" pulled on a loose thread:
 
 > We ended up talking about something I completely missed: `fsync`-ing the WAL file isn't enough when the file is *new*. You also need to `fsync` the directory. Then people started sharing production horror stories of data loss from storage engines that forgot this.
 
