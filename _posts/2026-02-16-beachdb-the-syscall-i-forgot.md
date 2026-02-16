@@ -3,7 +3,7 @@ title: "The syscall I forgot: directory fsync"
 date: 2026-02-16
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, fsync]
-toc: false
+toc: true
 ---
 
 > **TL;DR**: I fsynced the WAL file on every write. Crash tests passed. SIGKILL tests passed. Then someone asked: "What if the directory doesn't know the file exists?" I was one missing syscall away from losing (almost) everything.
