@@ -12,6 +12,8 @@ track: https://www.youtube.com/watch?v=lSHVMMfn3Js
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 
+---
+
 ## It's been a minute!
 
 In my [last post]({% post_url 2026-01-07-building-beachdb %}), I introduced [BeachDB](https://github.com/aalhour/beachdb): a distributed NoSQL database I'm building from scratch in Go to learn storage internals, durability, and eventually distributed consensus. I showed an interactive LSM-Tree visualization and talked about the architecture.
