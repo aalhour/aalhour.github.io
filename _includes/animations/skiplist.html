@@ -1,0 +1,30 @@
+{% comment %}
+  Skip List Animation Include
+  
+  Usage in any post/page:
+    {% include animations/skiplist.html %}
+  
+  Optional: Pass a custom id
+    {% include animations/skiplist.html id="my-custom-id" %}
+{% endcomment %}
+
+{% assign container_id = include.id | default: "skiplist-animation" %}
+
+<div id="{{ container_id }}" style="margin-bottom: 1.5rem;"></div>
+
+<script src="{{ '/assets/vendor/anime.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/skiplist-animation/skiplist-demo.js' | relative_url }}"></script>
+<script>
+(function() {
+  function initSkipList() {
+    if (typeof SkipListDemo !== 'undefined') {
+      SkipListDemo.init('{{ container_id }}');
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSkipList);
+  } else {
+    initSkipList();
+  }
+})();
+</script>

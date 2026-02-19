@@ -1,107 +1,188 @@
+# ==============================================================================
+# Project data template
+# ------------------------------------------------------------------------------
+# - title (string): Display title.
+# - kind (enum): "educational" or "production"
+# - link (string): Primary URL (repo, blog page, commits view, etc).
+# - link_title (string, optional): What the link points to (e.g. "github").
+# - hidden (string enum): "false" or "true"
+# - engagement (enum): "owner" or "contributor"
+# - activity (enum): My *current* involvement - "active", "inactive"
+# - maintenance (enum): Project state/health - "maintained", "archived" or "abandoned"
+# - description (string, markdown ok): One-paragraph description.
+#
+# Copy/paste starter:
+#
+# - title: "My Project"
+#   kind: "educational"
+#   link_title: "github"
+#   link: "https://github.com/..."
+#   hidden: "false"
+#   engagement: "owner"
+#   activity: "active"
+#   maintenance: "maintained"
+#   description: "..."
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Ordering (render order)
+# ------------------------------------------------------------------------------
+# The Projects page intentionally does **no sorting**; it renders projects in the
+# order they appear in this file.
+#
+# Order rules (stable, explicit):
+# - Active projects first:
+#   - owned projects
+#   - then upstream contributions/collaborations
+# - Previous work last:
+#   - owned projects
+#   - then contributions/collaborations
+# ------------------------------------------------------------------------------
+
+# === Active (owned) ===
+
 - title: "BeachDB"
-  category: "learning"
+  kind: "educational"
   link_title: "github"
   link: "https://github.com/aalhour/beachdb"
   hidden: "false"
-  status: "maintained"
-  contribution_type: "owner"
-  description: "Distributed NoSQL database and storage-engine written in Go, and written about in this blog. See all posts tagged [#beachdb](/tags/beachdb/)."
+  engagement: "owner"
+  activity: "active"
+  maintenance: "maintained"
+  description: "A distributed NoSQL database and storage-engine written in Go, and written about in this blog. See all posts tagged [#beachdb](/tags/beachdb/)."
 
 - title: "PyCOOLC"
-  category: "learning"
+  kind: "educational"
   link_title: "github"
   link: "https://github.com/aalhour/PyCOOLC"
   hidden: "false"
-  status: "maintained"
-  contribution_type: "owner"
+  engagement: "owner"
+  activity: "active"
+  maintenance: "maintained"
   description: "A compiler for the _Classroom Object Oriented Language_ (COOL), written in Python 3 and targeting the [MIPS 32-bit architecture](https://en.wikipedia.org/wiki/MIPS_architecture) (SPIM). Built while following the [Stanford Compilers course](https://online.stanford.edu/courses/soe-ycscs1-compilers) on edX."
 
-- title: "micro_kanren.py"
-  category: "learning"
-  link_title: "github"
-  link: "https://github.com/aalhour/micro_kanren.py"
-  hidden: "false"
-  status: "archived"
-  contribution_type: "owner"
-  description: "An object-oriented μKanren in Python 3: an embedded DSL for relational/declarative logic programming. Inspired by Tom Stuart's talk [\"Hello, declarative world!\" in 2015](https://www.infoq.com/presentations/declarative-programming/)."
-
-- title: "Assembler.hack"
-  category: "learning"
-  link_title: "github"
-  link: "https://github.com/aalhour/Assembler.hack"
-  hidden: "false"
-  status: "archived"
-  contribution_type: "owner"
-  description: "A 16-bit machine code assembler for the Hack assembly language, built while taking `nand2tetris` ([part 1](https://www.coursera.org/learn/build-a-computer), [part 2](https://www.coursera.org/learn/nand2tetris2#modules)). A fun way to connect computer architecture concepts to real bits."
-
-- title: "PyRocks"
-  category: "learning"
-  link_title: "github"
-  link: "https://gist.github.com/aalhour/97c4bf2c7c273a4d83c77489c2507547"
-  hidden: "false"
-  status: "archived"
-  contribution_type: "owner"
-  description: "A [RocksDB](https://rocksdb.org/)-inspired educational PoC, used in a workshop to teach LSM concepts: SSTables, WAL, memtables, and bloom filters."
-
-- title: "PBFI"
-  category: "learning"
-  link_title: "github"
-  link: "https://gist.github.com/aalhour/9a80c6f630df22351ce70a4a45ffea13"
-  hidden: "false"
-  status: "archived"
-  contribution_type: "owner"
-  description: "An educational interpreter for the [Brainfuck programming language](https://en.wikipedia.org/wiki/Brainfuck), written in Python 3. Definitely **not** the shortest one; the point is readability."
-
-- title: "C# Algorithms"
-  category: "learning"
-  link_title: "github"
-  link: "https://github.com/aalhour/c-sharp-algorithms"
-  hidden: "false"
-  status: "archived"
-  contribution_type: "owner"
-  description: "A library of reference implementations for known data structures and algorithms I built (circa ~2014) to go back to the fundamentals. It grew over time and eventually got contributions from others."
-
-- title: "awesome-compilers"
-  category: "learning"
-  link_title: "github"
-  link: "http://aalhour.com/awesome-compilers"
-  hidden: "false"
-  status: "archived"
-  contribution_type: "owner"
-  description: "A vertical list of \"awesome\" resources on compilers, interpreters, and runtimes."
-
 - title: "aiohttp web APIs template"
-  category: "production"
+  kind: "production"
   link_title: "github"
   link: "http://aalhour.com/cookiecutter-aiohttp-sqlalchemy"
   hidden: "false"
-  status: "maintained"
-  contribution_type: "owner"
+  engagement: "owner"
+  activity: "active"
+  maintenance: "maintained"
   description: "A modern, opinionated [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/) template for building async Python web APIs powered by Aiohttp, SQLAlchemy 2.0, and PostgreSQL. Built at [TrustYou](https://www.trustyou.com/) and used as a starter kit for many Python microservices."
 
+# === Active (upstream contributions) ===
+
+- title: "turso"
+  kind: "production"
+  link_title: "github"
+  link: "https://github.com/tursodatabase/turso/commits?author=aalhour"
+  hidden: "false"
+  engagement: "contributor"
+  activity: "active"
+  maintenance: "maintained"
+  description: "An edge database platform built around SQLite/libSQL. I’ve contributed fixes across the stack (CLI, core storage & transaction locking)."
+
+- title: "Apache HBase"
+  kind: "production"
+  link_title: "github"
+  link: "https://github.com/apache/hbase/commits?author=aalhour"
+  hidden: "false"
+  engagement: "contributor"
+  activity: "active"
+  maintenance: "maintained"
+  description: "A distributed, Bigtable-inspired NoSQL database on Hadoop. I’ve contributed small patches and improvements while operating HBase at HubSpot."
+
+# === Previous work (owned) ===
+
+- title: "micro_kanren.py"
+  kind: "educational"
+  link_title: "github"
+  link: "https://github.com/aalhour/micro_kanren.py"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "An object-oriented μKanren in Python 3: an embedded DSL for relational/declarative logic programming. Inspired by Tom Stuart's talk [\"Hello, declarative world!\" in 2015](https://www.infoq.com/presentations/declarative-programming/)."
+
+- title: "Assembler.hack"
+  kind: "educational"
+  link_title: "github"
+  link: "https://github.com/aalhour/Assembler.hack"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "A 16-bit machine code assembler for the Hack assembly language, built while taking `nand2tetris` ([part 1](https://www.coursera.org/learn/build-a-computer), [part 2](https://www.coursera.org/learn/nand2tetris2#modules)). A fun way to connect computer architecture concepts to real bits."
+
+- title: "PyRocks"
+  kind: "educational"
+  link_title: "github"
+  link: "https://gist.github.com/aalhour/97c4bf2c7c273a4d83c77489c2507547"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "A [RocksDB](https://rocksdb.org/)-inspired educational PoC, used in a workshop to teach LSM concepts: SSTables, WAL, memtables, and bloom filters."
+
+- title: "PBFI"
+  kind: "educational"
+  link_title: "github"
+  link: "https://gist.github.com/aalhour/9a80c6f630df22351ce70a4a45ffea13"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "An educational interpreter for the [Brainfuck programming language](https://en.wikipedia.org/wiki/Brainfuck), written in Python 3. Definitely **not** the shortest one; the point is readability."
+
+- title: "C# Algorithms"
+  kind: "educational"
+  link_title: "github"
+  link: "https://github.com/aalhour/c-sharp-algorithms"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "A library of reference implementations for known data structures and algorithms I built (circa ~2014) to go back to the fundamentals. It grew over time and eventually got contributions from others."
+
+- title: "awesome-compilers"
+  kind: "educational"
+  link_title: "github"
+  link: "http://aalhour.com/awesome-compilers"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "A vertical list of \"awesome\" resources on compilers, interpreters, and runtimes."
+
+# === Previous work (collaborations) ===
+
 - title: "kaos"
-  category: "production"
+  kind: "production"
   link_title: "github"
   link: "https://github.com/KI-labs/kaos"
   hidden: "false"
-  status: "abandoned"
-  contribution_type: "co-author/tester"
+  engagement: "contributor"
+  activity: "inactive"
+  maintenance: "abandoned"
   description: "A platform for deploying scalable, reproducible machine learning workflows in a private environment. Developed at [KI labs](https://www.ki.com/) (part of KI group); I helped test it and worked on features after its OSS launch."
 
 - title: "C# ORM"
-  category: "production"
+  kind: "production"
   link_title: "github"
   link: "https://github.com/rnd-projects/orm"
   hidden: "false"
-  status: "abandoned"
-  contribution_type: "co-author"
+  engagement: "contributor"
+  activity: "inactive"
+  maintenance: "abandoned"
   description: "A lightweight object-relational mapper in C# that maps table relations and generates SQL. Built at [CCC](https://www.ccc.net/) and used in production systems (see: iBill project)."
 
 - title: "iBill"
-  category: "production"
+  kind: "production"
   link_title: "github"
   link: "https://github.com/rnd-projects/ibill"
   hidden: "false"
-  status: "abandoned"
-  contribution_type: "co-author"
+  engagement: "contributor"
+  activity: "inactive"
+  maintenance: "abandoned"
   description: "Enterprise billing/invoicing/reporting app for telephony providers (MS Lync, Asterisk), built with C# and ASP.NET Web Forms. Developed at [CCC](https://www.ccc.net/) and deployed in production."
