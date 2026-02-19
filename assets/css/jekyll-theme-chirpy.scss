@@ -174,24 +174,52 @@ html[data-mode="dark"] blockquote.prompt-monologue {
   vertical-align: middle;
 }
 
-.status-maintained {
+.maintenance-maintained {
   background: rgba(34, 197, 94, 0.2);
   color: #4ade80;
 }
 
-.status-finished {
+.maintenance-finished {
   background: rgba(59, 130, 246, 0.2);
   color: #60a5fa;
 }
 
-.status-archived {
+.maintenance-archived {
   background: rgba(161, 161, 170, 0.2);
   color: #a1a1aa;
 }
 
-.status-abandoned {
+.maintenance-abandoned {
   background: rgba(239, 68, 68, 0.15);
   color: #f87171;
+}
+
+.kind-educational {
+  background: rgba(192, 132, 252, 0.18);
+  color: #c084fc;
+}
+
+.kind-production {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+}
+
+.me-maintaining,
+.me-contributing,
+.me-active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.me-personal {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60a5fa;
+}
+
+.me-contributed,
+.me-past {
+  background: rgba(161, 161, 170, 0.16);
+  color: #a1a1aa;
 }
 
 /* ========== Projects Page Table ========== */
@@ -219,8 +247,13 @@ html[data-mode="dark"] blockquote.prompt-monologue {
 .projects-table .col-project a {
   display: inline;
 }
-.projects-table .col-project .status-pill {
+
+.projects-table .col-project .project-meta {
   margin-top: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
 }
 .projects-table .col-description { 
   width: 70%;
