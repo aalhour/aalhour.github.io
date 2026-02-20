@@ -8,7 +8,7 @@ mermaid: true
 track: 
 ---
 
-> **TL;DR**: BeachDB v0.0.2 ships the memtable — a skip list that replaces the placeholder map. This post covers why maps don't work for LSM storage, how internal key ordering makes "newest version wins" fall out naturally, and why deletes are actually writes.
+> **TL;DR**: BeachDB v0.0.2 ships the memtable — a skip list that replaces the placeholder map. This post covers why maps don't work for LSM storage, how internal key ordering makes "newest version wins" fall out naturally, and why deletes are actually writes. [Code is here](https://github.com/aalhour/beachdb).
 >
 > This post includes: two interactive demos and a few diagrams to drive the current architecture home.
 {: .prompt-info }
@@ -334,6 +334,10 @@ Next milestone is the one that makes the “database” part feel real:
 Until then, BeachDB is basically an in-memory database with a durability log and crash recovery — which is a weirdly honest intermediate state.
 
 It’s also (accidentally) a **strongly consistent, in-memory-only** database right now: a single writer, serialized seqnos, and one lock to rule them all. The “disk database” part starts at SSTables.
+
+Until we meet again.
+
+Adios! ✌🏼
 
 ---
 
