@@ -1,6 +1,6 @@
 ---
 title: "The Memtable: Where Writes Go to Wait"
-date: 2026-02-20
+date: 2026-02-22
 categories: [Programming]
 tags: [beachdb, databases, storage, memtable, skip-list]
 toc: true
