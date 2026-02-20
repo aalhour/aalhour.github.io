@@ -1,5 +1,5 @@
 ---
-title: "Durability is a promise you can't hand-wave: BeachDB's Write-Ahead Log (v1)"
+title: "Durability is a promise you can't hand-wave: Write-Ahead Log (v1)"
 date: 2026-02-12
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, wal]
