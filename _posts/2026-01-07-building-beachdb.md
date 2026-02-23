@@ -7,6 +7,13 @@ toc: true
 track: https://soundcloud.com/silent-planet/antimatter?in=exixts/sets/3-ovens
 ---
 
+> **TL;DR**: I’m building [BeachDB](https://github.com/aalhour/beachdb) — a toy, inspectable LSM-based storage engine in Go — to stop hand-waving database internals and learn them by building them end-to-end, in public. This kickoff post explains why I’m going down the stateful-systems rabbit hole, lays out goals/non-goals + the “engine → server → Raft cluster” architecture, and includes an interactive LSM-tree visualization to make the write/read/compaction flow concrete.
+{: .prompt-info }
+
+_This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
+
+---
+
 ## A new rabbit hole
 
 In my last blog post ["On Watershed Moments: Boredom, Growth, and Curiosity"]({% post_url 2025-12-21-on-watershed-moments %}), I reflected on moments in my career when I hit a repeating pattern: productivity, then stability, then boredom. These moments led me to get out of my comfort zone, change roles, shed responsibilities and dig into new domains.
