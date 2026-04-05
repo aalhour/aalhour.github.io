@@ -17,7 +17,7 @@ _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/bea
 
 ## The disk plane finally gets real!
 
-This milestone took a while to ship, and I learned a ton about on-disk persistance in the process, but it's finally here!
+This milestone took a while to ship, and I learned a ton about on-disk persistence in the process, but it's finally here!
 
 [BeachDB v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing. The path to disk is now clear, writes and deletes no longer just live in the memory plane and get tracked in the WAL for durability, but they also get flushed to disk in a file format that allows for efficient indexing and reading. It also sets us up for implementing more cool read optimizations in the future - the Sorted-String Tables (SSTables) are here.
 
@@ -25,7 +25,7 @@ But before we dive deep into what an SSTable is, the file format and how BeachDB
 
 ## A quick recap
 
-In the [last post]({% post_url 2026-02-22-beachdb-memtable-v1 %}), I shipped [v0.0.2]((https://github.com/aalhour/beachdb/releases/tag/v0.0.2)) which implemented the Memtable part of the LSM-tree architecture and connected it to the WAL (see: interactive demo below).
+In the [last post]({% post_url 2026-02-22-beachdb-memtable-v1 %}), I shipped [v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) which implemented the Memtable part of the LSM-tree architecture and connected it to the WAL (see: interactive demo below).
 
 But, BeachDB still didn't persist data on-disk.
 
@@ -39,7 +39,7 @@ SSTables are the milestone where that promise starts cashing out.
 
 This release ships the first real on-disk table format in BeachDB, wires the engine to flush memtables into it, teaches the read path to consult those files, and ships a tiny `sst_dump` tool so I can inspect the resulting bytes from outside the database.
 
-If [`v0.0.1`]((https://github.com/aalhour/beachdb/releases/tag/v0.0.1)) was "durability is now real" and [`v0.0.2`]((https://github.com/aalhour/beachdb/releases/tag/v0.0.2)) was "the in-memory shape is now real", then [`v0.0.3`]((https://github.com/aalhour/beachdb/releases/tag/v0.0.3)) is: the first real database files now exist.
+If [`v0.0.1`](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) was "durability is now real" and [`v0.0.2`](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) was "the in-memory shape is now real", then [`v0.0.3`](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is: the first real database files now exist.
 
 Before this milestone, BeachDB could already:
 
@@ -75,9 +75,9 @@ Before v0.0.3, the memtable was the destination. After v0.0.3, it becomes what i
 
 ## So, what is an SSTable?
 
-The term "SSTable" is short for: Sorted-String Tables. It's a file format and a technique that storage engines use to write data, in a sorted manner, to files on disk. It comes from the Bigtable paper[^1], but the shape has escaped into a lot of other systems: LevelDB, RocksDB, Pebble, HBase/HFile, Cassandra, and a bunch of smaller LSM engines too.[^3][^4][^5]
+The term "SSTable" is short for Sorted String Table. It comes from Bigtable[^1], but the shape has escaped into a lot of other systems since then: LevelDB[^3], RocksDB[^4], Pebble[^5], HBase/HFile[^7], Cassandra[^8], and a bunch of smaller LSM engines too.
 
-In BeachDB, an SSTable is just an **immutable sorted file of key-value pairs** written from a sealed memtable.[^7]
+In BeachDB, an SSTable is just an **immutable sorted file of key-value pairs** written from a sealed memtable.
 
 That's the whole idea, minus the mysticism.
 
@@ -87,7 +87,7 @@ It is not a "table" in the SQL sense. It is not a schema object. It is not a use
 - write them to disk in sorted order
 - include enough structure that a reader can find things without scanning the whole file
 
-If you want the 10,000-ft storage-engine view, Martin Kleppmann's work is still the cleanest starting point I know: Chapter 3 of _Designing Data-Intensive Applications_ and his map of the data-systems landscape do a great job of situating log-structured storage engines in the bigger picture.[^2]
+If you want the 10,000-ft storage-engine view, Martin Kleppmann[^2] is still the cleanest starting point I know. Chapter 3 of _Designing Data-Intensive Applications_ and his map of the data-systems landscape do a great job of situating log-structured storage engines in the bigger picture.
 
 ### The plain-text version first
 
@@ -124,17 +124,257 @@ That is the part I think is easiest to miss when people hear "simple key-value s
 
 The binary format is just the concrete version of that story.
 
+If you want the bytes-on-disk deep dive, skip ahead to [What is the SSTable format in BeachDB?](#what-is-the-sstable-format-in-beachdb), [BeachDB's SSTable v1 in one screen](#beachdbs-sstable-v1-in-one-screen), or [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file). But first I want to stay top-down and follow what changed in the engine.
+
+## Back to the LSM picture
+
+In the intro post I used an LSM-tree demo to show the general shape of the system. It is still the right picture; the only thing that changed is that the `flush` arrow from the Memtable to disk (L0) has stopped being a promise and started being real code.
+
+{% include animations/lsm-tree.html %}
+<br>
+The old story was:
+
+- writes land in the WAL
+- writes land in the memtable
+- later, in theory, the memtable flushes to SSTables on disk
+
+`v0.0.3` is the milestone where that third bullet is no longer hypothetical.
+
+I do not want to re-explain the whole LSM story here because the earlier posts already did that job. I only want to re-anchor the reader in the architecture and highlight the one edge that became real in this milestone:
+
+- WAL: already real
+- memtable: already real
+- memtable -> SSTable flush: now real
+- compaction, bloom filters, block cache, manifest/versioning: still later
+
+Now let's follow that new journey from the API down into disk, and only later crack the file open.
+
+## Same APIs, new journey
+
+One thing I want to make explicit before the diagrams: the public API did **not** change in this milestone.
+
+BeachDB already had:
+
+- `Put`
+- `Get`
+- `Delete`
+
+The novelty in `v0.0.3` is not "new API surface." It is that the data now has a longer and more interesting route through the engine.
+
+There are now two new places state can live between "fresh write" and "old durable file":
+
+- an **immutable memtable** that is currently being flushed
+- one or more **SSTables** on disk
+
+So the story of this milestone is: same APIs, new journey.
+
+## Read path: the first place users feel the milestone
+
+The first place a caller actually feels `v0.0.3` is `Get()`.
+
+Before this milestone, a miss in the memtable was basically the end of the road. Now it is just the point where the search drops a level.
+
+Suppose the DB directory already contains the following files and their contents (key-value pairs):
+
+```text
+/path/to/database $ ls 
+000001.sst  -> apple@1 = "red"
+000002.sst  -> apple@3 = "green"
+```
+
+A `Get("apple")` can now miss the memtable, reach disk, and still return `"green"` because `000002.sst` is newer than `000001.sst`.
+
+Or suppose the directory contains:
+
+```text
+000001.sst  -> banana@2 = "yellow"
+000002.sst  -> banana@4 = tombstone
+```
+
+Now a `Get("banana")` stops at the newer tombstone and returns not found without caring that an older file still has a put underneath (with the value `"yellow"`).
+
+That is the read path in one sentence: **newest visible fact wins, and the search now knows how to reach disk.**
+
+Here's the current shape:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Client
+  participant DB as engine.DB
+  participant MEM as Active Memtable
+  participant IMM as Immutable Memtable
+  participant S0 as Newest SSTable
+  participant S1 as Older SSTable
+
+  C->>DB: Get(key)
+  DB->>MEM: Lookup
+  alt found
+    MEM-->>DB: value/tombstone
+    DB-->>C: result
+  else miss
+    DB->>IMM: Lookup (if flushing)
+    alt found
+      IMM-->>DB: value/tombstone
+      DB-->>C: result
+    else miss
+      DB->>S0: Get(key, seqno)
+      alt found
+        S0-->>DB: value/tombstone
+        DB-->>C: result
+      else miss
+        DB->>S1: Get(key, seqno)
+        S1-->>DB: value/tombstone/miss
+        DB-->>C: result
+      end
+    end
+  end
+```
+
+The search order is:
+
+1. active memtable
+2. immutable memtable, if a flush is in progress
+3. SSTables newest-first
+
+And that "newest-first" rule is load-bearing. Newer state shadows older state. Tombstones shadow older puts. The engine stops searching as soon as it finds the first visible answer.
+
+If you want to see how one SSTable answers that lookup internally, we'll get there in [What is the SSTable format in BeachDB?](#what-is-the-sstable-format-in-beachdb). For now I want to stay at the engine level.
+
+## Write path: same API, different destination
+
+Writes are still boring on purpose.
+
+`Put()` and `Delete()` still do the thing you'd expect:
+
+- append the batch to the WAL
+- `fsync` the WAL by default
+- apply the mutation to the active memtable
+
+The interesting part is that the active memtable is no longer the end of the road.
+
+Suppose the DB directory already has:
+
+```text
+000000.sst
+000001.sst
+```
+
+If the active memtable grows past the flush threshold, it is no longer just "recent in-memory state." It is about to become `000002.sst`, while new writes keep landing in a fresh memtable.
+
+Here's the write path now:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Client
+  participant DB as engine.DB
+  participant WAL as WAL
+  participant MEM as Active Memtable
+  participant IMM as Immutable Memtable
+  participant FL as Flush Goroutine
+
+  C->>DB: Put/Delete
+  DB->>WAL: Append batch
+  DB->>WAL: fsync (default)
+  DB->>MEM: Apply batch
+  alt below flush threshold
+    DB-->>C: OK
+  else threshold reached
+    DB->>IMM: Freeze current memtable
+    DB->>MEM: Install fresh memtable
+    DB->>FL: Signal flush worker
+    DB-->>C: OK
+  end
+```
+
+The API stays the same. The destination changes.
+
+Before this milestone, memory was effectively the destination. Now memory is a waiting room on the way to disk.
+
+## Flush path: how memory becomes a file
+
+This is the part that turns BeachDB from "WAL + memtable" into "an LSM engine with an actual disk plane."
+
+When the active memtable grows past the configured threshold, BeachDB does the following:
+
+1. seals the active memtable
+2. moves it into the immutable slot
+3. installs a fresh memtable for new writes
+4. wakes a background goroutine
+5. the goroutine writes the frozen memtable into a new SSTable file
+6. once the file is durable and openable, the engine publishes it to the read path
+
+That gives BeachDB the classic small-engine shape:
+
+- one active memtable for new writes
+- one immutable memtable being flushed
+- N immutable SSTables on disk
+
+Here is a concrete version of that story.
+
+Suppose the DB directory already contains `000000.sst` and `000001.sst`. The active memtable crosses the threshold, gets frozen, and starts flushing into `000002.sst`. While that is happening, a new `Put("mango", "...")` does **not** wait for `000002.sst` to finish. It lands in the fresh active memtable right away. A concurrent `Get()` may now have to check:
+
+1. the fresh active memtable
+2. the frozen immutable memtable
+3. `000002.sst` once it is published
+4. older SSTables underneath
+
+That is why the immutable memtable matters. It is not just implementation detail. It is part of the read story while the flush is in flight.
+
+### Why not flush inline?
+
+Because flushing is real I/O:
+
+- create a file
+- iterate the memtable
+- write blocks
+- write index
+- write footer
+- `fsync` the file
+- `fsync` the parent directory
+- reopen the file as an SSTable reader
+
+Doing all of that inline in `Write()` would turn every threshold crossing into "all writers stop and stare at the disk." That is not the kind of educational realism I was aiming for.
+
+The background flush goroutine keeps the write path from becoming a hostage to file creation and sync latency.
+
+### Why this design looks familiar
+
+While working through auto-flush, I spent some time reading how production LSM engines handle the same handoff from memory to disk.
+
+LevelDB[^3] is the cleanest reference point: one active memtable, one immutable slot, one condvar, one background worker. It is the canonical "freeze -> flush -> publish" story.
+
+Pebble[^5] keeps the same idea but generalizes it into a queue of flushable memtables. Same story, larger waiting room.
+
+RocksDB[^4] pushes the pattern much further with more concurrency, more backpressure machinery, and more moving parts. Useful as proof that the pattern scales; not something BeachDB needs to copy wholesale in `v0.0.3`.
+
+BadgerDB[^6] is the useful contrast here. It leans more into channels, which sounds Go-ish and nice until you remember that the read path still needs visible immutable memtables and the stall path still needs clean synchronization.
+
+BeachDB takes the LevelDB[^3] / Pebble[^5] line:
+
+- one immutable slot
+- `sync.Cond` for clean writer stalling
+- one background flush goroutine
+- readers still keep `RLock()` concurrency
+
+That keeps the story small enough to explain, while still being honest about what a real flush needs.
+
 ## What is the SSTable format in BeachDB?
+
+Now we can finally talk about the file the earlier flush path is producing.
 
 Every storage engine reaches this point and has to make a few decisions:
 
-1. Should data be stored in one giant sorted blob or in a file that has a block-based layout?
-1. Should the file has a header or a footer for bootstrapping the read process?
-1. Should the metadata live in a different file or should the data file be self-contained?
-1. Should we store full keys or compressed keys?
-1. Should we store the whole-file checksum or a per-block checksum in the file?
+1. Should data live in one giant sorted blob or in a blocked file layout?
+2. Should the reader bootstrap from a header or a footer?
+3. Should metadata live somewhere else or should the file be self-contained?
+4. Should the file store full keys or compressed keys?
+5. Should corruption be checked per file or per block?
 
-BeachDB's answers for v1 of the SSTable format are intentionally conservative, and they line up pretty well with how the grown-ups think about the problem.[^3][^4][^5][^6]
+BeachDB's answers for SSTable v1 are intentionally conservative. They sit comfortably in the LevelDB[^3] / RocksDB[^4] family on the file-format side, while staying much smaller and easier to inspect.
+
+If you only want the condensed map, skip ahead to [BeachDB's SSTable v1 in one screen](#beachdbs-sstable-v1-in-one-screen). This section is the slower guided walk.
 
 ### 1. Blocked file layout, not one giant sorted array
 
@@ -144,7 +384,7 @@ The file layout is:
 [data block 0][data block 1]...[data block N][index block][footer]
 ```
 
-That matches the core shape used by LevelDB and RocksDB-style table formats: blocked storage, an index to hop to the right block, and a small bootstrap record that tells the reader where the index lives.[^3][^4]
+That is the same broad shape you see in LevelDB[^3] and RocksDB[^4]: blocked data, an index to jump to the right neighborhood, and a small bootstrap record that tells the reader where the index lives.
 
 The reasons are pretty practical:
 
@@ -166,7 +406,7 @@ BeachDB's SSTable does **not** have a file header that the reader uses to bootst
 4. reads the index
 5. uses the index to locate data blocks
 
-This is very much in the LevelDB/RocksDB family of thinking: the footer is the trust anchor.[^3][^4] It gives the reader a fixed bootstrap point without having to scan or guess.
+That is very much in the LevelDB[^3] / RocksDB[^4] tradition: the footer is the trust anchor. It gives the reader a fixed bootstrap point without scanning or guessing.
 
 That also means the answer to "where is the header?" is: **there isn't one, at least not in the file-format-bootstrap sense.**
 
@@ -199,9 +439,7 @@ BeachDB v1 stores full internal keys in every data entry:
 - `seqno`
 - `kind`
 
-That is less space-efficient than what RocksDB eventually does, but much easier to inspect and reason about.
-
-This was a deliberate design decision in the milestone plan: if the point of v1 is to make the file format inspectable and easy to debug, compressed prefixes and restart arrays are complexity in exactly the wrong place.[^6]
+That is less space-efficient than what RocksDB[^4] eventually does, but much easier to inspect and reason about.
 
 Full keys are:
 
@@ -219,7 +457,7 @@ That buys a very useful invariant:
 
 > if the bytes are corrupt, the reader should complain loudly instead of hallucinating correctness.
 
-This is also standard storage-engine hygiene. The task notes I wrote before coding this explicitly called out checksum discipline as one of the core lessons of the milestone: you detect corruption at the granularity of your checksums, no finer.[^6]
+This is also standard storage-engine hygiene. The checksum granularity is the point: if something is broken, I want the reader to fail at the block/footer level, not politely improvise meaning from damaged bytes.
 
 ## BeachDB's SSTable v1 in one screen
 
@@ -289,7 +527,7 @@ That produced these files on my machine:
 
 That file list is worth pausing on.
 
-Even after the flush exists, the WAL is still there. That is intentional. WAL retirement and manifest-backed lifecycle management are later milestones. v0.0.3 is about teaching BeachDB how to write SSTables, not about finishing the metadata story around them.
+Even after the flush exists, the WAL is still there. That is intentional. WAL retirement and manifest-backed lifecycle management are later milestones. `v0.0.3` is about teaching BeachDB how to write SSTables, not about finishing the metadata story around them.
 
 ### `sst_dump` on a real BeachDB file
 
@@ -358,164 +596,11 @@ This is also why I chose big-endian for the binary formats. It is just nicer in 
 
 There is something deeply satisfying about being able to point at `BEACHSST` in raw bytes and say: yes, that is the file magic, yes, that offset is the index block, yes, the numbers line up with the dump tool, and no, I am not relying on optimism as a parsing strategy.
 
-## The flush path: how real engines do it, and what BeachDB copied
-
-Designing the file format was only half the milestone. The other half was figuring out how to move state from memory to disk without turning the write path into a deadlock or an I/O hostage situation.
-
-While working through auto-flush, I spent some time studying how a few production LSM engines handle the same problem: LevelDB, Pebble, RocksDB, and BadgerDB.[^5]
-
-The striking thing is how much they agree on the shape:
-
-1. writer notices the memtable is full
-2. current memtable becomes immutable
-3. a fresh memtable takes over for new writes
-4. a background worker flushes the immutable one to an SSTable
-5. if too many immutable memtables pile up, writers stall
-6. reads check memory first, then immutable memtables, then SSTables
-
-That's the universal pattern. The differences are mostly in queue depth, backpressure sophistication, and concurrency.
-
-### LevelDB: the canonical version
-
-LevelDB is the cleanest reference point for this milestone.[^3]
-
-Its shape is:
-
-- one active memtable
-- one immutable memtable slot (`imm_`)
-- one mutex
-- one condition variable
-- one background worker
-
-If the active memtable is full and `imm_` is already occupied, writers stall on the condition variable. If `imm_` is empty, the current memtable is rotated into that slot and the background worker is signaled.
-
-That design is boring in exactly the right way.
-
-### Pebble: same idea, but with a queue
-
-Pebble is CockroachDB's Go LSM engine, and it is especially relevant because it is both modern and in Go.[^5]
-
-It follows the same underlying pattern, but instead of one immutable slot it maintains a queue of flushable memtables. Writers stall only when that queue gets too deep.
-
-The interesting part isn't "Pebble is different." It's that Pebble is basically saying:
-
-> yes, the LevelDB story is right; I just want a larger waiting room before I start stalling writers.
-
-### RocksDB: same story, more machinery
-
-RocksDB generalizes the idea further:
-
-- multiple immutable memtables
-- thread pools
-- soft backpressure before hard stop
-- more concurrency overall
-
-This is great if you're Facebook and less compelling if you're me writing BeachDB in public on weekends.
-
-RocksDB's design is valuable here mostly as proof that the same pattern scales up, not as something BeachDB should copy wholesale right now.[^5]
-
-### BadgerDB: channels instead of condvars
-
-BadgerDB is the outlier in the research notes because it leans more into Go channels.[^5]
-
-That sounds attractive on paper, but the comparison actually pushed me away from it. The read path still needs a visible list/slice of immutable memtables, and channel-based stalling turns out to be more awkward than `cond.Wait()` because you end up manually dropping and reacquiring locks around channel operations.
-
-In other words: more Go-ish on the surface, more annoying in the important part.
-
-### What BeachDB chose
-
-BeachDB takes the LevelDB shape, keeps the single immutable slot, and combines it with `sync.RWMutex` plus `sync.Cond` on the write side.
-
-That gives me:
-
-- a background flush goroutine
-- clean writer stalling when needed
-- active memtable -> immutable memtable -> SSTable flow
-- readers still using `RLock()` independently
-
-This was also partly forced by correctness. The design notes caught an inline-flush deadlock in the original approach: calling flush directly from `Write()` while already holding the DB lock was going to re-enter the lock and wedge the whole thing.[^5]
-
-So the final v0.0.3 shape is:
-
-- writer appends to WAL
-- writer applies batch to memtable
-- if threshold crossed and no immutable memtable is being flushed:
-  - rotate current memtable into `immMem`
-  - install a fresh memtable
-  - signal background flush goroutine
-- if `immMem` is already occupied:
-  - stall writer on `sync.Cond`
-
-That is the first time BeachDB really behaves like an LSM engine instead of a WAL-centric demo.
-
-## The read path: memory first, disk after, newest wins
-
-Once SSTables exist, `Get()` changes shape too.
-
-Before the bullets, here's the mental model I keep in my head: **reads do a small scavenger hunt across time**. The newer the state, the cheaper it is to find.
-
-BeachDB's read path is now:
-
-1. active memtable
-2. immutable memtable (if flush is in progress)
-3. SSTables newest-first
-
-That is not just a BeachDB quirk. It is the same basic read story the auto-flush research surfaced across LevelDB, Pebble, RocksDB, and BadgerDB: recent state in memory, older immutable state after that, disk files after that.[^5]
-
-Here's the current shape:
-
-```mermaid
-sequenceDiagram
-  autonumber
-  participant C as Client
-  participant DB as engine.DB
-  participant MEM as Active Memtable
-  participant IMM as Immutable Memtable
-  participant S0 as Newest SSTable
-  participant S1 as Older SSTable
-
-  C->>DB: Get(key)
-  DB->>MEM: Lookup
-  alt found
-    MEM-->>DB: value/tombstone
-    DB-->>C: result
-  else miss
-    DB->>IMM: Lookup (if flushing)
-    alt found
-      IMM-->>DB: value/tombstone
-      DB-->>C: result
-    else miss
-      DB->>S0: Get(key, seqno)
-      alt found
-        S0-->>DB: value/tombstone
-        DB-->>C: result
-      else miss
-        DB->>S1: Get(key, seqno)
-        S1-->>DB: value/tombstone/miss
-        DB-->>C: result
-      end
-    end
-  end
-```
-
-Inside one SSTable, the read story is:
-
-1. read footer
-2. read index
-3. binary-search index for the earliest candidate block
-4. load that block
-5. scan entries in internal-key order
-6. continue to the next block if the same user key might span the boundary
-
-That last point is a deliberate v1 tradeoff from the format spec: the writer does **not** try to keep all versions of one user key inside one block. That keeps the writer simpler and lets the reader handle the rare continuation case.[^6]
-
-Again: a little more work on the read side, in exchange for a much simpler and more inspectable writer. I can live with that in v1.
-
 ## `sst_dump` is not optional tooling
 
-One thing the milestone plan says explicitly, and I think it is right, is that `sst_dump` is not "nice-to-have CLI sugar." It is core debugging capability.[^6]
+One thing I have learned while building BeachDB is that a storage format does not feel real until you can inspect it from outside the database.
 
-RocksDB ships `sst_dump` and `ldb`. LevelDB ships `leveldbutil`. These tools exist for a reason.
+RocksDB[^4] ships `sst_dump` and `ldb`. LevelDB[^3] ships `leveldbutil`. These tools exist for a reason.
 
 When something goes wrong in a storage engine, "well, the database API says X" is usually not enough. You want to know:
 
@@ -621,6 +706,7 @@ Adios! ✌🏼
 [^2]: For the wider storage-engine mental model, see Martin Kleppmann's book [_Designing Data-Intensive Applications_](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/), his map of the distributed/data systems landscape: [How to navigate the world of distributed data systems](https://martin.kleppmann.com/2017/03/15/map-distributed-data-systems.html), and his talk [Using logs to build a solid data infrastructure](https://martin.kleppmann.com/2015/06/05/logs-for-data-infrastructure-at-gds.html).
 [^3]: LevelDB references that were especially useful here: [table file format](https://github.com/google/leveldb/blob/main/doc/table_format.md), [implementation overview](https://github.com/google/leveldb/blob/main/doc/impl.md), and [`db/db_impl.cc`](https://github.com/google/leveldb/blob/main/db/db_impl.cc).
 [^4]: RocksDB references: [A Tutorial of RocksDB SST formats](https://github.com/facebook/rocksdb/wiki/A-Tutorial-of-RocksDB-SST-formats), [BlockBasedTable format](https://github.com/facebook/rocksdb/wiki/rocksdb-blockbasedtable-format), and [`db/db_impl/db_impl_write.cc`](https://github.com/facebook/rocksdb/blob/main/db/db_impl/db_impl_write.cc).
-[^5]: Useful public references for flush/read-path design here were LevelDB, Pebble, RocksDB, and BadgerDB. Relevant source entry points: [Pebble `db.go`](https://github.com/cockroachdb/pebble/blob/master/db.go), [Pebble `compaction.go`](https://github.com/cockroachdb/pebble/blob/master/compaction.go), [Badger `db.go`](https://github.com/dgraph-io/badger/blob/main/db.go), and [Badger `memtable.go`](https://github.com/dgraph-io/badger/blob/main/memtable.go).
-[^6]: BeachDB's public format/design docs for this milestone are [`docs/formats/sstable.md`](https://github.com/aalhour/beachdb/blob/main/docs/formats/sstable.md) and [`docs/architecture.md`](https://github.com/aalhour/beachdb/blob/main/docs/architecture.md).
-[^7]: [The Memtable: where writes go to wait]({% post_url 2026-02-22-beachdb-memtable-v1 %})
+[^5]: Pebble references: [`db.go`](https://github.com/cockroachdb/pebble/blob/master/db.go) and [`compaction.go`](https://github.com/cockroachdb/pebble/blob/master/compaction.go).
+[^6]: BadgerDB references: [`db.go`](https://github.com/dgraph-io/badger/blob/main/db.go) and [`memtable.go`](https://github.com/dgraph-io/badger/blob/main/memtable.go).
+[^7]: HBase/HFile references: [HFile API docs](https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/io/hfile/HFile.html), [HFileScanner API docs](https://hbase.apache.org/2.4/devapidocs/org/apache/hadoop/hbase/io/hfile/HFileScanner.html), and [HBase Book: StoreFile / HFile](https://hbase.apache.org/book.html#hfile).
+[^8]: Cassandra reference: [Apache Cassandra docs, “Storage Engine”](https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html).
