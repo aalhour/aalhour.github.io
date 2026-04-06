@@ -19,22 +19,20 @@ _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/bea
 
 It has been a while since the last milestone, and most of that time disappeared into the unglamorous but important question of what kind of file format I wanted to commit to. It felt like the moment I moved from memory to disk, every casual design choice started feeling a lot less casual.
 
-[BeachDB v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing.
+[BeachDB v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing about data on disk.
 
-BeachDB can now flush a full memtable into real immutable files on disk, reopen those files, and read through them. Before this, the WAL made new writes durable and the memtable made them readable, but the disk plane itself was still mostly a promise.
-
-SSTables are where that promise starts cashing out.
-
-In other words: BeachDB writes real database files now.
+BeachDB can now flush a full memtable into immutable sorted files on disk, reopen those files, and read through them. Those files have sparse indexes and fixed-size footers, so reads can binary-search candidate blocks instead of scanning the whole file. It writes real database files now.
 
 This post walks through what changed in the engine, what one of those files looks like on disk, why the format looks the way it does, and how I convinced myself the bytes were not lying.
 
+Before we dig deeper, it's worth reviewing what the project has shipped this far.
+
 ## A quick recap
 
-[In the last post]({% post_url 2026-02-22-beachdb-memtable-v1 %}), [v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) shipped the memtable and wired it to the WAL. BeachDB got to a weirdly honest intermediate state:
+[In the last post]({% post_url 2026-02-22-beachdb-memtable-v1 %}), [v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) shipped the memtable and wired it to the WAL. BeachDB got to a weirdly honest intermediate state that made it look like an in-memory database with a WAL:
 
-- new writes were durable because of the WAL
-- new writes were readable because of the memtable
+- new writes were durable because of the WAL (on disk)
+- new writes were readable because of the memtable (in memory)
 - but the disk plane itself was still mostly a promise
 
 Crash recovery worked. Tombstones existed. Internal keys existed. The engine could behave like an LSM in memory while still not producing any actual sorted files on disk.
@@ -55,7 +53,7 @@ flowchart LR
 
 Those memtable -> SSTable paths are what this milestone makes real.
 
-The public API did not change. `Put`, `Get`, and `Delete` are the same. What changed is the journey data takes after it enters the engine:
+The public API did not change. `Put`, `Get`, and `Delete` are the same. What changed is the journey that the data takes after it enters the engine:
 
 ```text
 WAL -> active memtable -> immutable memtable -> SSTable(s)
@@ -69,9 +67,12 @@ This is point-lookups-through-SSTables, not yet full version-set or compaction m
 
 ## So, what is an SSTable?
 
-The term "SSTable" is short for Sorted String Table. It comes from Bigtable[^1], but the shape escaped into a lot of other systems after that: LevelDB[^3], RocksDB[^4], Pebble[^5], HBase/HFile[^7], Cassandra[^8], and plenty of smaller LSM engines too.
+The term "SSTable" is short for Sorted String Table. It comes from the Bigtable paper[^1], but the shape escaped into a lot of other systems after that: LevelDB[^3], RocksDB[^4], Pebble[^5], HBase/HFile[^7], Cassandra[^8], and plenty of smaller LSM engines too.
 
-In BeachDB, an SSTable is an **immutable sorted file of key-value entries** written from a full memtable.
+> SSTables are immutable sorted files that storage engines write to disk once in-memory state graduates out of the memtable. They are how “a bunch of writes in memory” turns into durable, searchable on-disk state.
+{: .prompt-tip }
+
+In BeachDB, an SSTable is an **immutable sorted file of key-value entries** written from a full memtable (a skiplist) to disk.
 
 It is not a table in the SQL sense. It is not a schema object. It is just a storage-engine file with one job:
 
@@ -79,11 +80,11 @@ It is not a table in the SQL sense. It is not a schema object. It is just a stor
 - write them to disk in sorted order
 - carry enough structure that a reader can find things without scanning the whole file
 
-If you want the 10,000-ft version of why storage engines end up looking like this, Martin Kleppmann[^2] is still the cleanest guide I know.
+If you want the 10,000-ft version of why storage engines end up looking like this, Chapter 3 of Martin Kleppmann's Designing Data Intensive Applications[^2] is still the cleanest guide I know.
 
 ### The plain-text version first
 
-Before bytes and checksums, the idea looks like this:
+Before bytes and checksums, the idea looks like this. Suppose the database directory already contains two SSTables:
 
 ```text
 # 000001.sst  (older)
@@ -103,18 +104,18 @@ Now a `Get("apple")` does not mean "open one file." It means:
 
 So:
 
-- `Get("apple")` returns `"green"` because the newer file shadows the older one
+- `Get("apple")` returns `"green"` because the newer file (`2.sst`) shadows the older one (`1.sst`)
 - `Get("banana")` returns "not found" because the newer tombstone shadows the older put
 
 That is the part I think is easiest to miss when people hear "simple key-value store." Even a tiny LSM-ish engine stops being "one map on disk" pretty quickly. It becomes a few sorted files, ordered newest-to-oldest, plus a couple of rules about shadowing and tombstones.
 
 In BeachDB, a new SSTable appears when the active memtable fills up, gets frozen, and is flushed in the background into the next `.sst` file.
 
-We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format), [Why BeachDB's SSTable v1 looks like this](#why-beachdbs-sstable-v1-looks-like-this), and [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
+We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format), move to [Why BeachDB's SSTable v1 looks like this](#why-beachdbs-sstable-v1-looks-like-this), and finally dig into the bytes in [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
 
 ## Write path: same API, different destination
 
-`Put()` and `Delete()` are still boring on purpose:
+`Put()` and `Delete()` are still boring on purpose, they:
 
 - append the batch to the WAL
 - `fsync` the WAL by default
@@ -169,7 +170,7 @@ When the active memtable crosses the threshold, BeachDB does this:
 
 1. seal the active memtable
 2. move it into the immutable slot
-3. install a fresh active memtable
+3. install a fresh active memtable (to unblock new writes)
 4. wake the background flush goroutine
 5. write the frozen memtable into a new SSTable
 6. publish that SSTable to the read path once it is durable and openable
@@ -219,7 +220,9 @@ Now that the immutable memtable exists for a reason, the read path makes sense.
 
 Before this milestone, a miss in the memtable was basically the end of the road. Now it is just the point where the search drops a level.
 
-Example one:
+### Example #1:
+
+Assume the database directory has the following two SSTable files with two `Put` operations and the key is not in the memtable:
 
 ```text
 000001.sst  -> apple@1 Put = "red"
@@ -228,14 +231,16 @@ Example one:
 
 `Get("apple")` returns `"green"` because the newer file shadows the older one.
 
-Example two:
+### Example #2:
+
+Now assume that the two files are slightly different, the older one has a `Put` operation and the newer one has a `Delete`, the key is still not in the memtable:
 
 ```text
 000001.sst  -> banana@2 Put    = "yellow"
 000002.sst  -> banana@4 Delete = tombstone
 ```
 
-`Get("banana")` returns not found because the newer tombstone wins.
+`Get("banana")` returns not found because the newer tombstone (on-disk) wins.
 
 That is the whole rule: **newest visible fact wins, and reads now know how to reach disk.**
 
@@ -281,7 +286,7 @@ The search order is:
 
 That newest-first rule is load-bearing. Newer state shadows older state. Tombstones shadow older puts. The engine stops as soon as it finds the first visible answer.
 
-If you want the inside of one SSTable, the next stop is [What is the SSTable format in BeachDB?](#what-is-the-sstable-format-in-beachdb) or [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
+If you want the inside of one SSTable, the next stop is [The SSTable format](#the-sstable-format) or [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
 
 ## The SSTable format
 
@@ -307,13 +312,13 @@ In a slightly more expanded view, one SSTable looks like this:
 [footer]
 ```
 
-Each data entry is:
+Each data entry (inside a data block) is:
 
 ```text
 [internal_key_len:4][internal_key_bytes][value_len:4][value_bytes]
 ```
 
-Each index entry is:
+Each index entry (inside the single pre-footer index block) is:
 
 ```text
 [last_internal_key_len:4][last_internal_key_bytes][block_offset:8][block_size:4]
@@ -510,7 +515,7 @@ There is something deeply satisfying about being able to point at `BEACHSST` in 
 
 A storage format does not feel real until you can inspect it from outside the database.
 
-RocksDB[^4] ships `sst_dump` and `ldb`. LevelDB[^3] ships `leveldbutil`. Those tools exist for a reason.
+RocksDB[^4] ships `sst_dump` and `ldb`. LevelDB[^3] ships `leveldbutil`. Those tools exist for a reason. For BeachDB, I built a simple `sst_dump` tool that takes an SSTable path and prints what the file actually contains: [beachdb/cmd/sst_dump](https://github.com/aalhour/beachdb/tree/main/cmd/sst_dump).
 
 When something goes wrong in a storage engine, "the API says X" is usually not enough. You want to know:
 
@@ -528,11 +533,11 @@ That is also philosophically on-brand for BeachDB. The point is not just to prod
 
 I ended up convincing myself in three layers.
 
-First: package-level tests around the SSTable writer, reader, and iterator. Can one file be written, reopened, iterated, and rejected when blocks, index entries, or the footer are corrupt?
+**First:** package-level tests around the SSTable writer, reader, and iterator. Can one file be written, reopened, iterated, and rejected when blocks, index entries, or the footer are corrupt?
 
-Second: engine-level tests around the actual milestone behavior. Does a full memtable flush into a real SSTable? Does reopen find that file again? Do newer tables shadow older ones correctly? Do tombstones survive the trip to disk? Does `Close()` wait for the background flush to finish instead of quietly sawing off the branch it is sitting on?
+**Second:** engine-level tests around the actual milestone behavior. Does a full memtable flush into a real SSTable? Does reopen find that file again? Do newer tables shadow older ones correctly? Do tombstones survive the trip to disk? Does `Close()` wait for the background flush to finish instead of quietly sawing off the branch it is sitting on?
 
-Third: outside-the-engine inspection. `sst_dump` and the hex dump above are not replacements for tests, but they are a very good way to cross-check that the bytes on disk agree with the code and the mental model.
+**Third:** outside-the-engine inspection. `sst_dump` and the hex dump above are not replacements for tests, but they are a very good way to cross-check that the bytes on disk agree with the code and the mental model.
 
 There are benchmarks and allocation guards around the hot paths too, but the bigger point is simpler: this is still a toy project, not a toy testing posture.
 
@@ -540,7 +545,7 @@ There are benchmarks and allocation guards around the hot paths too, but the big
 
 ## If you want to go deeper
 
-I recommend watching John Schulz's _"What is in All of Those SSTable Files"_ tech talk about Apache Cassandra's SSTable internals:
+I recommend watching John Schulz's _"What is in All of Those SSTable Files"_ tech talk about Apache Cassandra's SSTable internals. It's always good to see how a battle-tested system looks on the inside:
 
 {% include embed/youtube.html id='5z-EMVjf_Qg' %}
 
@@ -562,11 +567,7 @@ After that, the next steps get much clearer: merge iteration across memtables an
 
 BeachDB can now create immutable sorted files, read through them, and open them from the outside. That is enough surface area for one release and, frankly, enough opportunities to embarrass myself with a bug in public.
 
-Until then, I'm happy with this milestone for a very simple reason:
-
-BeachDB writes real database files now.
-
-And I can open them.
+Until then, I'm happy with this milestone for a very simple reason: BeachDB writes real database files now, and I can open them.
 
 Until we meet again.
 
