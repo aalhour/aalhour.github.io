@@ -536,6 +536,16 @@ Third: outside-the-engine inspection. `sst_dump` and the hex dump above are not 
 
 There are benchmarks and allocation guards around the hot paths too, but the bigger point is simpler: this is still a toy project, not a toy testing posture.
 
+---
+
+## If you want to go deeper
+
+I recommend watching John Schulz's _"What is in All of Those SSTable Files"_ tech talk about Apache Cassandra's SSTable internals:
+
+{% include embed/youtube.html id='5z-EMVjf_Qg' %}
+
+---
+
 ## Where do we go from here?
 
 The next milestone is **Manifest**.
