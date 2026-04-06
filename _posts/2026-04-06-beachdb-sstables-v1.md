@@ -1,6 +1,6 @@
 ---
 title: "Making the on-disk state real: SSTables (v1)"
-date: 2026-04-05
+date: 2026-04-06
 categories: [Programming]
 tags: [beachdb, databases, storage, sstable, durability]
 toc: true
@@ -15,47 +15,31 @@ _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/bea
 
 ---
 
-## The disk plane finally gets real!
+## The disk plane finally gets real
 
-This milestone took a while to ship, and I learned a ton about on-disk persistence in the process, but it's finally here!
+It has been a while since the last milestone, and most of that time disappeared into the unglamorous but important question of what kind of file format I wanted to commit to. It felt like the moment I moved from memory to disk, every casual design choice started feeling a lot less casual.
 
-[BeachDB v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing. The path to disk is now clear, writes and deletes no longer just live in the memory plane and get tracked in the WAL for durability, but they also get flushed to disk in a file format that allows for efficient indexing and reading. It also sets us up for implementing more cool read optimizations in the future - the Sorted-String Tables (SSTables) are here.
+[BeachDB v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing.
 
-But before we dive deep into what an SSTable is, the file format and how BeachDB implements this part of the LSM-Tree architecture, let's do a quick recap of what we've built so far.
+BeachDB can now flush a full memtable into real immutable files on disk, reopen those files, and read through them. Before this, the WAL made new writes durable and the memtable made them readable, but the disk plane itself was still mostly a promise.
+
+SSTables are where that promise starts cashing out.
+
+In other words: BeachDB writes real database files now.
+
+This post walks through what changed in the engine, what one of those files looks like on disk, why the format looks the way it does, and how I convinced myself the bytes were not lying.
 
 ## A quick recap
 
-In the [last post]({% post_url 2026-02-22-beachdb-memtable-v1 %}), I shipped [v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) which implemented the Memtable part of the LSM-tree architecture and connected it to the WAL (see: interactive demo below).
+[In the last post]({% post_url 2026-02-22-beachdb-memtable-v1 %}), [v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) shipped the memtable and wired it to the WAL. BeachDB got to a weirdly honest intermediate state:
 
-But, BeachDB still didn't persist data on-disk.
+- new writes were durable because of the WAL
+- new writes were readable because of the memtable
+- but the disk plane itself was still mostly a promise
 
-That gap matters more than it sounds. A memtable plus a WAL is already useful, but it is still a strange intermediate creature:
+Crash recovery worked. Tombstones existed. Internal keys existed. The engine could behave like an LSM in memory while still not producing any actual sorted files on disk.
 
-- new writes are durable because of the WAL
-- new writes are readable because of the memtable
-- but the disk plane itself is still mostly a promise
-
-SSTables are the milestone where that promise starts cashing out.
-
-This release ships the first real on-disk table format in BeachDB, wires the engine to flush memtables into it, teaches the read path to consult those files, and ships a tiny `sst_dump` tool so I can inspect the resulting bytes from outside the database.
-
-If [`v0.0.1`](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) was "durability is now real" and [`v0.0.2`](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) was "the in-memory shape is now real", then [`v0.0.3`](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is: the first real database files now exist.
-
-Before this milestone, BeachDB could already:
-
-- append committed writes to a WAL and `fsync` them
-- recover state after restart by replaying that WAL
-- maintain a sorted memtable using internal keys
-- represent deletes as tombstones instead of pretending delete means "remove from a map"
-
-What it could not do yet was just as important:
-
-- flush memtable contents into immutable sorted files on disk
-- answer `Get()` by falling through to on-disk files
-- reopen the database and discover SSTables as part of normal startup
-- inspect a table file, because table files did not exist yet
-
-That missing edge in the architecture is basically this:
+That missing edge looked like this:
 
 ```mermaid
 flowchart LR
@@ -69,9 +53,19 @@ flowchart LR
   R -. "3) check sstables on disk" .-> SST
 ```
 
-That memtable -> SSTable arrows are what this milestone is about.
+Those memtable -> SSTable paths are what this milestone makes real.
+
+The public API did not change. `Put`, `Get`, and `Delete` are the same. What changed is the journey data takes after it enters the engine:
+
+```text
+WAL -> active memtable -> immutable memtable -> SSTable(s)
+```
 
 Before v0.0.3, the memtable was the destination. After v0.0.3, it becomes what it was always supposed to be: a staging area.
+
+If [`v0.0.1`](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) made durability real and [`v0.0.2`](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) made the in-memory shape real, then [`v0.0.3`](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) makes the on-disk state real.
+
+This is point-lookups-through-SSTables, not yet full version-set or compaction machinery. Those parts are still later.
 
 ## So, what is an SSTable?
 
@@ -116,39 +110,7 @@ That is the part I think is easiest to miss when people hear "simple key-value s
 
 In BeachDB, a new SSTable appears when the active memtable fills up, gets frozen, and is flushed in the background into the next `.sst` file.
 
-We'll follow that engine path first, then crack the file open in [What is the SSTable format in BeachDB?](#what-is-the-sstable-format-in-beachdb), [Why BeachDB's SSTable v1 looks like this](#why-beachdbs-sstable-v1-looks-like-this), and [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
-
-## Back to the LSM picture
-
-In the intro post I used an LSM-tree demo to show the general shape of the system. It is still the right picture; the only thing that changed is that the `flush` arrow from the Memtable to disk (L0) has stopped being a promise and started being real code.
-
-{% include animations/lsm-tree.html %}
-<br>
-
-That is really the whole milestone:
-
-- WAL: already real
-- memtable: already real
-- memtable -> SSTable flush: now real
-- compaction, bloom filters, block cache, manifest/versioning: still later
-
-I do not want to re-teach LSM trees here. I only want to re-anchor the story before following the new route through the engine.
-
-## Same APIs, new journey
-
-The public API did **not** change in this milestone. BeachDB already had:
-
-- `Put`
-- `Get`
-- `Delete`
-
-What changed is the route data takes after it enters the engine:
-
-```text
-WAL -> active memtable -> immutable memtable -> SSTable(s)
-```
-
-That extra middle step is the important one. It is how BeachDB writes SSTables without turning every flush into "all writers stop and stare at the disk."
+We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format), [Why BeachDB's SSTable v1 looks like this](#why-beachdbs-sstable-v1-looks-like-this), and [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
 
 ## Write path: same API, different destination
 
@@ -249,7 +211,7 @@ RocksDB[^4] scales the pattern up with more concurrency and more backpressure ma
 
 BadgerDB[^6] is the useful contrast. It leans more into channels, but the underlying problem is the same: writers need to keep moving, readers need old state to stay visible, and the handoff to disk needs clear synchronization.
 
-BeachDB takes the small LevelDB[^3]-ish path: one immutable slot, one flush goroutine, `sync.Cond` for writer stalling, and read visibility preserved while the flush is in flight.
+BeachDB takes the small LevelDB-ish path for now: one immutable slot, one flush goroutine, `sync.Cond` for writer stalling, and read visibility preserved while the flush is in flight.
 
 ## Read path: now reads can reach disk
 
@@ -321,11 +283,11 @@ That newest-first rule is load-bearing. Newer state shadows older state. Tombsto
 
 If you want the inside of one SSTable, the next stop is [What is the SSTable format in BeachDB?](#what-is-the-sstable-format-in-beachdb) or [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
 
-## What is the SSTable format in BeachDB?
+## The SSTable format
 
 So that's the engine story. Now let's look at the file the flush is actually producing.
 
-The formal spec lives in [`docs/formats/sstable.md`](https://github.com/aalhour/beachdb/blob/main/docs/formats/sstable.md), but the shape is:
+The formal spec lives in [`docs/formats/sstable.md`](https://github.com/aalhour/beachdb/blob/main/docs/formats/sstable.md), but what follows is the shape of a single SSTable file on-disk:
 
 ```text
 [data block 0][data block 1]...[data block N][index block][footer]
@@ -368,7 +330,7 @@ The two rules that matter most are:
 - entries are sorted by `(user_key ASC, seqno DESC)`
 - the index stores **only the last internal key of each data block**
 
-That second rule is the important one for the read path. The index is sparse: one record per block, not one record per entry. Because the last key is an upper bound for everything inside that block, the reader can construct a synthetic "maximum possible version" for the target user key, binary-search those upper bounds, and jump straight to the earliest block that could still contain the answer. Then it only scans that block, or at worst the next relevant block if the boundary is tight, instead of wandering through the entire file.
+That second rule is the important one for the read path. The index is sparse: one record per block, not one record per entry. Because the last key is an upper bound for everything inside that block, the reader can construct a synthetic "maximum possible version" for the target user key, binary-search those upper bounds, and jump straight to the first block that could still contain the answer. From there, the on-disk scan stays local instead of wandering through the entire file.
 
 So the index is small, the lookup is logarithmic over blocks, and the on-disk scan stays local. That is the efficiency story in one paragraph.
 
