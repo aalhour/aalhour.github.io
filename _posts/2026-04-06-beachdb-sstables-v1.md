@@ -80,11 +80,36 @@ It is not a table in the SQL sense. It is not a schema object. It is just a stor
 - write them to disk in sorted order
 - carry enough structure that a reader can find things without scanning the whole file
 
+The reason they are called Sorted-Strings Tables is because:
+
+1. They represent key-value pairs as sorted strings lexicographically
+2. They have a loose tabular format where every entry is a key followed by a value with some form of sequence number that the database may or may not use to track "versioning": new vs. old entries
+3. They usually come with sparse-indexes either inside the file itself or outside of it that is used to lookup the file offset for given keys which speeds up reads (instead of having to scan the entire file)
+
 If you want the 10,000-ft version of why storage engines end up looking like this, Chapter 3 of Martin Kleppmann's Designing Data Intensive Applications[^2] is still the cleanest guide I know.
 
 ### The plain-text version first
 
-Before bytes and checksums, the idea looks like this. Suppose the database directory already contains two SSTables:
+Before bytes and checksums, the idea looks like this. Suppose you have the following Go program that uses BeachDB to store some keys and values:
+
+```go
+db, err := engine.Open("~/myproject")
+
+if err != nil {
+    log.Fatal(err)
+}
+
+ctx := context.Background()
+
+_ = db.Put(ctx, []byte("apple"), []byte("red"))
+_ = db.Put(ctx, []byte("banana"), []byte("yellow"))
+_ = db.Put(ctx, []byte("apple"), []byte("green"))
+_ = db.Delete(ctx, []byte("banana"))
+
+_ = db.Close()
+```
+
+And suppose that the above program resulted in two flushes to disk, the first two operations would land in a file called `01.sst` and the second two operations would land into a second file called `02.sst`. Then the files would roughly contain the following sorted contents (sorted by key first, sequence number second):
 
 ```text
 # 000001.sst  (older)
@@ -183,22 +208,22 @@ That gives BeachDB the classic small-engine shape:
 
 Suppose the DB directory already contains `000000.sst` and `000001.sst`. The active memtable crosses the threshold and starts flushing into `000002.sst`. While that happens, a new `Put("mango", "...")` lands in the fresh active memtable immediately. Reads can still consult the frozen immutable memtable until `000002.sst` is fully written and published.
 
-That is why `immMem` exists. It is not just a convenience variable. It is how BeachDB keeps old state visible during a flush without blocking the whole write path.
+In terms of code, that is why [`immMem` on the `DB` struct](https://github.com/aalhour/beachdb/blob/6c48d44b10c00c7a478095a141e1c082ee374f1a/engine/db.go#L47-L48) exists. It is not just a convenience variable. It is how BeachDB keeps old state visible during a flush without blocking the whole write path.
 
 There is one catch: BeachDB only has one immutable slot right now. If another flush threshold is hit before the first flush finishes, writers wait on a `sync.Cond` until the slot clears. That is deliberate. Small story, real behavior.
 
 ### Why not flush inline?
 
-Because a flush is real I/O:
+Because a flush is real I/O, it constitutes the follwoing:
 
-- create the file
-- iterate the memtable
-- write data blocks
-- write the index block
-- write the footer
-- `fsync` the file
-- `fsync` the parent directory
-- reopen the file as an SSTable reader
+- creates a new SSTable file
+- iterates over the frozen memtable
+- writes the data blocks
+- writes the index block
+- writes the footer
+- calls `fsync` on the file
+- calls `fsync` on the parent directory
+- reopens the file as an SSTable reader and adds it to the engine's struct (so new reads can consult this file if need be)
 
 Doing all of that inline in `Write()` would turn every threshold crossing into "everybody pause while the filesystem has a moment." The background flush keeps the common write path boring and pushes the expensive part out of the hot lane.
 
@@ -418,10 +443,11 @@ This is still my favorite part of the milestone.
 
 It is one thing to draw a format. It is another to run the database locally, create an actual `.sst` file, and open it from outside the engine.
 
-While writing this post, I ran a tiny demo program locally that does exactly four mutations:
+Now let's revisit our first Go example program from earlier:
 
 ```go
 db, err := engine.Open("/tmp/beachdb-sst-post-demo", engine.WithMemtableFlushSize(200))
+
 if err != nil {
     log.Fatal(err)
 }
