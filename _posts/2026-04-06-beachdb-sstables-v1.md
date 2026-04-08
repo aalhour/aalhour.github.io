@@ -23,7 +23,7 @@ It has been a while since the last milestone, and most of that time disappeared 
 
 BeachDB can now flush a full memtable into immutable sorted files on disk, reopen those files, and read through them. Those files have sparse indexes and fixed-size footers, so reads can binary-search candidate blocks instead of scanning the whole file. It writes real database files now.
 
-This post walks through what changed in the engine, what one of those files looks like on disk, why the format looks the way it does, and how I convinced myself the bytes were not lying.
+This post walks through what changed in the engine, what one of those files [looks like on disk](#the-sstable-format), [why the format looks the way it does](#design-notes-five-format-decisions), and how I [convinced myself the bytes were not lying](#testing-or-how-i-convinced-myself-this-isnt-lying).
 
 Before we dig deeper, it's worth reviewing what the project has shipped this far.
 
@@ -65,11 +65,13 @@ If [`v0.0.1`](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) made durab
 
 This is point-lookups-through-SSTables, not yet full version-set or compaction machinery. Those parts are still later.
 
+---
+
 ## So, what is an SSTable?
 
 The term "SSTable" is short for Sorted String Table. It comes from the Bigtable paper[^1], but the shape escaped into a lot of other systems after that: LevelDB[^3], RocksDB[^4], Pebble[^5], HBase/HFile[^7], Cassandra[^8], and plenty of smaller LSM engines too.
 
-> SSTables are immutable sorted files that storage engines write to disk once in-memory state graduates out of the memtable. They are how “a bunch of writes in memory” turns into durable, searchable on-disk state.
+> SSTables are immutable sorted files that storage engines write to disk once in-memory state graduates out of the memtable. They are how "a bunch of writes in memory" turns into durable, searchable on-disk state.
 {: .prompt-tip }
 
 In BeachDB, an SSTable is an **immutable sorted file of key-value entries** written from a full memtable (a skiplist) to disk.
@@ -80,11 +82,11 @@ It is not a table in the SQL sense. It is not a schema object. It is just a stor
 - write them to disk in sorted order
 - carry enough structure that a reader can find things without scanning the whole file
 
-The reason they are called Sorted-Strings Tables is because:
+They're called tables because they:
 
-1. They represent key-value pairs as sorted strings lexicographically
-2. They have a loose tabular format where every entry is a key followed by a value with some form of sequence number that the database may or may not use to track "versioning": new vs. old entries
-3. They usually come with sparse-indexes either inside the file itself or outside of it that is used to lookup the file offset for given keys which speeds up reads (instead of having to scan the entire file)
+- represent key-value pairs as sorted strings lexicographically very well
+- have a loose tabular format where every entry is a key followed by a value with some form of sequence number that the database may or may not use to track "versioning": new vs. old entries
+- usually come with sparse-indexes either inside the file itself or outside of it that is used to lookup the file offset for given keys which speeds up reads (instead of having to scan the entire file) since they are immutable
 
 If you want the 10,000-ft version of why storage engines end up looking like this, Chapter 3 of Martin Kleppmann's Designing Data Intensive Applications[^2] is still the cleanest guide I know.
 
@@ -136,7 +138,7 @@ That is the part I think is easiest to miss when people hear "simple key-value s
 
 In BeachDB, a new SSTable appears when the active memtable fills up, gets frozen, and is flushed in the background into the next `.sst` file.
 
-We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format), move to [Why BeachDB's SSTable v1 looks like this](#why-beachdbs-sstable-v1-looks-like-this), and finally dig into the bytes in [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
+We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format) — including a real file inspected byte by byte — and close with [why the format looks the way it does](#why-beachdbs-sstable-v1-looks-like-this).
 
 ## Write path: same API, different destination
 
@@ -191,14 +193,32 @@ That still does not explain the frozen memtable part, so let's zoom into the flu
 
 The immutable memtable exists for one reason: flushing is slow enough that old visible state needs somewhere to wait while new writes keep moving.
 
-When the active memtable crosses the threshold, BeachDB does this:
+When the active memtable crosses the threshold, the writer and the background flush goroutine coordinate through a single immutable slot and a `sync.Cond`:
 
-1. seal the active memtable
-2. move it into the immutable slot
-3. install a fresh active memtable (to unblock new writes)
-4. wake the background flush goroutine
-5. write the frozen memtable into a new SSTable
-6. publish that SSTable to the read path once it is durable and openable
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '14px'}}}%%
+flowchart TD
+    W["Put / Delete"] --> WAL["Append to WAL + fsync"]
+    WAL --> MEM["Apply to active memtable"]
+    MEM --> CHECK{"Memtable size ≥\nflush threshold?"}
+
+    CHECK -- "no" --> DONE["Return OK"]
+
+    CHECK -- "yes" --> SLOT{"Is immutable\nmemtable free?"}
+    SLOT -- "no" --> WAIT["Wait on `sync.Cond`\n\n(writer stalls until current flush goroutine finishes)"]
+    WAIT -- "now it's free" --> SLOT
+
+    SLOT -- "yes" --> FREEZE["1. Seal active memtable\n2. Move to immutable slot\n3. Install fresh memtable"]
+    FREEZE --> SIGNAL["Signal flush goroutine"]
+    SIGNAL --> DONE
+
+    SIGNAL -.-> BG_WAKE["Flush goroutine wakes"]
+    BG_WAKE --> BG_WRITE["1. Create new .sst file\n2. Write data blocks\n3. Write index block\n4. Write footer\n5. fsync file + parent dir"]
+    BG_WRITE --> BG_PUBLISH["1. Open file as SSTable reader\n2. Add to engine read path"]
+    BG_PUBLISH --> BG_CLEAR["1. Clear immutable slot\n2. Broadcast `sync.Cond`"]
+    BG_CLEAR -.-> BG_SLEEP["Sleep until next signal"]
+    BG_CLEAR -. "unblocks stalled writers" .-> WAIT
+```
 
 That gives BeachDB the classic small-engine shape:
 
@@ -311,7 +331,9 @@ The search order is:
 
 That newest-first rule is load-bearing. Newer state shadows older state. Tombstones shadow older puts. The engine stops as soon as it finds the first visible answer.
 
-If you want the inside of one SSTable, the next stop is [The SSTable format](#the-sstable-format) or [Running it locally and opening a real file](#running-it-locally-and-opening-a-real-file).
+If you want the inside of one SSTable, the next stop is [The SSTable format](#the-sstable-format).
+
+---
 
 ## The SSTable format
 
@@ -364,7 +386,273 @@ That second rule is the important one for the read path. The index is sparse: on
 
 So the index is small, the lookup is logarithmic over blocks, and the on-disk scan stays local. That is the efficiency story in one paragraph.
 
-## Why BeachDB's SSTable v1 looks like this
+### A human-reable file example
+
+Suppose the engine writes five entries into a single SSTable with a 60-byte target block size. The entries arrive pre-sorted from the memtable:
+
+```text
+apple@1      Put    = "red"
+banana@2     Put    = "yellow"
+cherry@3     Put    = "dark red"
+date@4       Delete = <tombstone>
+elderberry@5 Put    = "blue"
+```
+
+The writer fills each block until the next entry would push it past 60 bytes, then flushes and starts a new one. Here is what the file looks like laid out section by section:
+
+```text
+[ data block 0 ]                    offset=0    size=58
+  apple@1      Put    = "red"       (25 bytes)
+  banana@2     Put    = "yellow"    (29 bytes)
+  ────────────────────────────────────────────────
+  data payload                       54 bytes
+  crc32c trailer                      4 bytes
+  last key: banana@2
+
+[ data block 1 ]                    offset=58   size=56
+  cherry@3     Put    = "dark red"  (31 bytes)
+  date@4       Delete = <tombstone> (21 bytes)
+  ────────────────────────────────────────────────
+  data payload                       52 bytes
+  crc32c trailer                      4 bytes
+  last key: date@4
+
+[ data block 2 ]                    offset=114  size=35
+  elderberry@5 Put    = "blue"      (31 bytes)
+  ────────────────────────────────────────────────
+  data payload                       31 bytes
+  crc32c trailer                      4 bytes
+  last key: elderberry@5
+
+[ index block ]                     offset=149  size=99
+  "banana@2"      -> block_offset=0,   block_size=58
+  "date@4"        -> block_offset=58,  block_size=56
+  "elderberry@5"  -> block_offset=114, block_size=35
+  ────────────────────────────────────────────────
+  index payload                      95 bytes
+  crc32c trailer                      4 bytes
+
+[ footer ]                          offset=248  size=40
+  magic            = "BEACHSST"
+  version          = 1
+  index_offset     = 149
+  index_size       = 99
+  data_block_count = 3
+  entry_count      = 5
+  checksum         = <crc32c of above 36 bytes>
+```
+
+The index records one entry per flushed block — the last internal key of that block plus the block's file offset and size. That is all the reader needs for a binary search.
+
+To look up the key `"cherry"` in this file, the reader constructs a synthetic maximum key `cherry@MaxUint64` and binary-searches those three last-key upper bounds:
+
+```text
+"banana@2"      — cherry > banana, skip
+"date@4"        — cherry < date, stop here  <- first candidate block
+"elderberry@5"  — no need to look further
+```
+
+The reader jumps straight to block 1 at offset 58, scans its entries, finds `cherry@3`, and returns `"dark red"`. One index binary search, one block read. No full-file scan.
+
+### Running it locally and opening a real file
+
+It is one thing to draw a format. It is another to run the database locally, create an actual `.sst` file, and open it from outside the engine. This is still my favorite part of the milestone.
+
+While writing this post, I wrote the same five entries from the example above using BeachDB's public API with a 60-byte SSTable block size, small enough to force three data blocks:
+
+```go
+dir := "/tmp/beachdb-sst-post-demo"
+
+db, err := engine.Open(dir, engine.WithSSTBlockSize(60), engine.WithSync(false))
+if err != nil {
+    log.Fatal(err)
+}
+
+ctx := context.Background()
+
+// Five mutations — the memtable sorts them into internal key order
+// (user_key ASC, seqno DESC) before flushing.
+_ = db.Put(ctx, []byte("apple"), []byte("red"))
+_ = db.Put(ctx, []byte("banana"), []byte("yellow"))
+_ = db.Put(ctx, []byte("cherry"), []byte("dark red"))
+_ = db.Delete(ctx, []byte("date"))
+_ = db.Put(ctx, []byte("elderberry"), []byte("blue"))
+
+// Flush the memtable to disk — produces a single SSTable.
+if err := db.Flush(); err != nil {
+    log.Fatal(err)
+}
+
+if err := db.Close(); err != nil {
+    log.Fatal(err)
+}
+```
+
+That produced a single file on my machine:
+
+```text
+/tmp/beachdb-sst-post-demo/000000.sst  288 bytes
+```
+
+Then I pointed `sst_dump` at it:
+
+```text
+$ sst_dump -entries /tmp/beachdb-sst-post-demo/000000.sst
+SSTable: /tmp/beachdb-sst-post-demo/000000.sst
+  Version: 1
+  Entries: 5
+  Data blocks: 3
+  Index block: offset=149 size=99
+
+Blocks:
+  Block 0: offset=0   size=58  last_key="banana"      seqno=2
+  Block 1: offset=58  size=56  last_key="date"         seqno=4
+  Block 2: offset=114 size=35  last_key="elderberry"   seqno=5
+
+Entries:
+  [0] Put    key="apple"       seqno=1 value=3 bytes
+  [1] Put    key="banana"      seqno=2 value=6 bytes
+  [2] Put    key="cherry"      seqno=3 value=8 bytes
+  [3] Delete key="date"        seqno=4 value=0 bytes
+  [4] Put    key="elderberry"  seqno=5 value=4 bytes
+```
+
+And the full hex dump of the 288-byte file:
+
+```text
+$ xxd -g 1 /tmp/beachdb-sst-post-demo/000000.sst
+00000000: 00 00 00 0e 61 70 70 6c 65 00 00 00 00 00 00 00  ....apple.......
+00000010: 01 01 00 00 00 03 72 65 64 00 00 00 0f 62 61 6e  ......red....ban
+00000020: 61 6e 61 00 00 00 00 00 00 00 02 01 00 00 00 06  ana.............
+00000030: 79 65 6c 6c 6f 77 33 be 3f 14 00 00 00 0f 63 68  yellow3.?.....ch
+00000040: 65 72 72 79 00 00 00 00 00 00 00 03 01 00 00 00  erry............
+00000050: 08 64 61 72 6b 20 72 65 64 00 00 00 0d 64 61 74  .dark red....dat
+00000060: 65 00 00 00 00 00 00 00 04 02 00 00 00 00 29 c2  e.............).
+00000070: 3a 9a 00 00 00 13 65 6c 64 65 72 62 65 72 72 79  :.....elderberry
+00000080: 00 00 00 00 00 00 00 05 01 00 00 00 04 62 6c 75  .............blu
+00000090: 65 2b 43 19 5f 00 00 00 0f 62 61 6e 61 6e 61 00  e+C._....banana.
+000000a0: 00 00 00 00 00 00 02 01 00 00 00 00 00 00 00 00  ................
+000000b0: 00 00 00 3a 00 00 00 0d 64 61 74 65 00 00 00 00  ...:....date....
+000000c0: 00 00 00 04 02 00 00 00 00 00 00 00 3a 00 00 00  ............:...
+000000d0: 38 00 00 00 13 65 6c 64 65 72 62 65 72 72 79 00  8....elderberry.
+000000e0: 00 00 00 00 00 00 05 01 00 00 00 00 00 00 00 72  ...............r
+000000f0: 00 00 00 23 08 ee 71 23 42 45 41 43 48 53 53 54  ...#..q#BEACHSST
+00000100: 00 00 00 01 00 00 00 00 00 00 00 95 00 00 00 63  ...............c
+00000110: 00 00 00 03 00 00 00 00 00 00 00 05 89 f9 81 2f  .............../
+```
+
+Working through it region by region:
+
+**Data block 0** — bytes `0x00`–`0x39` (apple, banana):
+
+| Bytes | Field | Value |
+|-------|-------|-------|
+| `00 00 00 0e` | internal key length | 14 (`apple`=5 + seqno:8 + kind:1) |
+| `61 70 70 6c 65` | user key | `"apple"` |
+| `00 00 00 00 00 00 00 01` | seqno | 1 |
+| `01` | kind | Put |
+| `00 00 00 03` | value length | 3 |
+| `72 65 64` | value | `"red"` |
+| | _(banana entry follows in the same layout)_ | |
+| `33 be 3f 14` | CRC32C checksum | block 0 |
+
+**Data block 1** — bytes `0x3a`–`0x71` (cherry, date):
+
+| Bytes | Field | Value |
+|-------|-------|-------|
+| `00 00 00 0f` | internal key length | 15 (`cherry`=6 + 9) |
+| `63 68 65 72 72 79` | user key | `"cherry"` |
+| `00 00 00 00 00 00 00 03` | seqno | 3 |
+| `01` | kind | Put |
+| `00 00 00 08` | value length | 8 |
+| `64 61 72 6b 20 72 65 64` | value | `"dark red"` |
+| `00 00 00 0d` | internal key length | 13 (`date`=4 + 9) |
+| `64 61 74 65` | user key | `"date"` |
+| `00 00 00 00 00 00 00 04` | seqno | 4 |
+| `02` | kind | Delete |
+| `00 00 00 00` | value length | 0 (tombstone) |
+| `29 c2 3a 9a` | CRC32C checksum | block 1 |
+
+**Data block 2** — bytes `0x72`–`0x94` (elderberry):
+
+| Bytes | Field | Value |
+|-------|-------|-------|
+| `00 00 00 13` | internal key length | 19 (`elderberry`=10 + 9) |
+| `65 6c 64 65 72 62 65 72 72 79` | user key | `"elderberry"` |
+| `00 00 00 00 00 00 00 05` | seqno | 5 |
+| `01` | kind | Put |
+| `00 00 00 04` | value length | 4 |
+| `62 6c 75 65` | value | `"blue"` |
+| `2b 43 19 5f` | CRC32C checksum | block 2 |
+
+**Index block** — bytes `0x95`–`0xf7`:
+
+| Bytes | Field | Value |
+|-------|-------|-------|
+| `00 00 00 0f` | last key length | 15 (`banana`=6 + 9) |
+| `62 61 6e 61 6e 61 ... 01` | last key | `"banana"` seqno=2 kind=Put |
+| `00 00 00 00 00 00 00 00` | block offset | 0 |
+| `00 00 00 3a` | block size | 58 |
+| | _(date and elderberry index entries follow in the same layout)_ | |
+| `08 ee 71 23` | CRC32C checksum | index block |
+
+**Footer** — bytes `0xf8`–`0x11f`:
+
+| Bytes | Field | Value |
+|-------|-------|-------|
+| `42 45 41 43 48 53 53 54` | magic | ASCII `BEACHSST` |
+| `00 00 00 01` | version | 1 |
+| `00 00 00 00 00 00 00 95` | index offset | 149 |
+| `00 00 00 63` | index size | 99 |
+| `00 00 00 03` | data block count | 3 |
+| `00 00 00 00 00 00 00 05` | entry count | 5 |
+| `89 f9 81 2f` | checksum | CRC32C of above 36 bytes |
+
+The footer is always the last 40 bytes. The reader seeks to EOF minus 40, validates the magic and checksum, reads `index_offset=149` and `index_size=99`, loads the index block, and is ready to binary-search without touching a data block until a lookup actually needs one.
+
+Three quick things to notice:
+
+- entries are sorted by internal key, not mutation order
+- the index has three entries, one per block, each recording the last key and the block's offset
+- the index block starts at offset `149`, exactly where the last data block ends
+
+That is the memtable ordering story surviving the trip to disk.
+
+This is also why I chose big-endian for the binary formats. It is just nicer in a hex dump.
+
+There is something deeply satisfying about being able to point at `BEACHSST` in raw bytes and say: yes, that is the file magic, yes, those offsets land on block boundaries, yes, the index entries match the data blocks, and no, I am not relying on optimism as a parsing strategy.
+
+## `sst_dump` is not optional tooling
+
+A storage format does not feel real until you can inspect it from outside the database.
+
+RocksDB[^4] ships `sst_dump` and `ldb`. LevelDB[^3] ships `leveldbutil`. Those tools exist for a reason. For BeachDB, I built a simple `sst_dump` tool that takes an SSTable path and prints what the file actually contains: [beachdb/cmd/sst_dump](https://github.com/aalhour/beachdb/tree/main/cmd/sst_dump).
+
+When something goes wrong in a storage engine, "the API says X" is usually not enough. You want to know:
+
+- did the file get created?
+- how many entries are in it?
+- where does the index start?
+- what is the last key per block?
+- did the checksum fail?
+
+The tool is the shortest path from "this test failed in a confusing way" to "here is what the file actually contains."
+
+That is also philosophically on-brand for BeachDB. The point is not just to produce code that passes tests. It is to produce artifacts I can inspect, explain, and reason about from the outside.
+
+## Testing, or how I convinced myself this isn't lying
+
+I ended up convincing myself in three layers.
+
+**First:** package-level tests around the SSTable writer, reader, and iterator. Can one file be written, reopened, iterated, and rejected when blocks, index entries, or the footer are corrupt?
+
+**Second:** engine-level tests around the actual milestone behavior. Does a full memtable flush into a real SSTable? Does reopen find that file again? Do newer tables shadow older ones correctly? Do tombstones survive the trip to disk? Does `Close()` wait for the background flush to finish instead of quietly sawing off the branch it is sitting on?
+
+**Third:** outside-the-engine inspection. `sst_dump` and the hex dump above are not replacements for tests, but they are a very good way to cross-check that the bytes on disk agree with the code and the mental model.
+
+There are benchmarks and allocation guards around the hot paths too, but the bigger point is simpler: this is still a toy project, not a toy testing posture.
+
+## Design notes: five format decisions
 
 Now that the concrete shape is on the table, the more interesting question is why it looks like this.
 
@@ -437,136 +725,6 @@ That buys a simple invariant:
 
 The checksum granularity is the point. If something is broken, I want the failure to be local and obvious.
 
-## Running it locally and opening a real file
-
-This is still my favorite part of the milestone.
-
-It is one thing to draw a format. It is another to run the database locally, create an actual `.sst` file, and open it from outside the engine.
-
-Now let's revisit our first Go example program from earlier:
-
-```go
-db, err := engine.Open("/tmp/beachdb-sst-post-demo", engine.WithMemtableFlushSize(200))
-
-if err != nil {
-    log.Fatal(err)
-}
-
-ctx := context.Background()
-
-_ = db.Put(ctx, []byte("apple"), []byte("red"))
-_ = db.Put(ctx, []byte("banana"), []byte("yellow"))
-_ = db.Put(ctx, []byte("apple"), []byte("green"))
-_ = db.Delete(ctx, []byte("banana"))
-
-_ = db.Close()
-```
-
-That produced these files on my machine:
-
-```text
-/tmp/beachdb-sst-post-demo/000000.sst 183 bytes
-/tmp/beachdb-sst-post-demo/beachdb.wal 227 bytes
-```
-
-The WAL still being there is intentional. WAL retirement and manifest-backed file lifecycle are later milestones. This one is about teaching BeachDB how to write SSTables at all.
-
-### `sst_dump` on a real BeachDB file
-
-Then I pointed `sst_dump` at the generated SSTable:
-
-```text
-$ sst_dump -entries /tmp/beachdb-sst-post-demo/000000.sst
-SSTable: /tmp/beachdb-sst-post-demo/000000.sst
-  Version: 1
-  Entries: 4
-  Data blocks: 1
-  Index block: offset=108 size=35
-
-Blocks:
-  Block 0: offset=0 size=108 last_key="banana" seqno=2
-
-Entries:
-  [0] Put    key="apple" seqno=3 value=5 bytes
-  [1] Put    key="apple" seqno=1 value=3 bytes
-  [2] Delete key="banana" seqno=4 value=0 bytes
-  [3] Put    key="banana" seqno=2 value=6 bytes
-```
-
-This makes me unreasonably happy.
-
-Three quick things to notice:
-
-- entries are sorted by internal key, not mutation order
-- newer versions appear before older ones for the same user key
-- the index block starts at offset `108`, exactly where the one data block ends
-
-That is the memtable ordering story surviving the trip to disk.
-
-### Looking at the raw bytes
-
-And now the footer and index in a hex dump:
-
-```text
-$ xxd -g 1 -s 0x6c -l 80 /tmp/beachdb-sst-post-demo/000000.sst
-0000006c: 00 00 00 0f 62 61 6e 61 6e 61 00 00 00 00 00 00  ....banana......
-0000007c: 00 02 01 00 00 00 00 00 00 00 00 00 00 00 6c 61  ..............la
-0000008c: 24 d0 c0 42 45 41 43 48 53 53 54 00 00 00 01 00  $..BEACHSST.....
-0000009c: 00 00 00 00 00 00 6c 00 00 00 23 00 00 00 01 00  ......l...#.....
-000000ac: 00 00 00 00 00 00 04 c7 ea 8f 42                 ..........B
-```
-
-This slice starts at offset `0x6c`, which is where the index block begins in this file.
-
-Here's how to read it:
-
-- `00 00 00 0f` -> index key length = 15 bytes
-- `62 61 6e 61 6e 61 ... 00 02 01` -> last internal key in the only data block: `"banana"` with `seqno=2`, `kind=Put`
-- `00 00 00 00 00 00 00 00` -> block offset = `0`
-- `00 00 00 6c` -> block size = `108`
-- `61 24 d0 c0` -> index block checksum
-- `42 45 41 43 48 53 53 54` -> ASCII `BEACHSST`
-- `00 00 00 01` -> version 1
-- `00 00 00 00 00 00 00 6c` -> index offset = `108`
-- `00 00 00 23` -> index size = `35`
-- `00 00 00 01` -> data block count = `1`
-- `00 00 00 00 00 00 00 04` -> entry count = `4`
-- `c7 ea 8f 42` -> footer checksum
-
-This is also why I chose big-endian for the binary formats. It is just nicer in a hex dump.
-
-There is something deeply satisfying about being able to point at `BEACHSST` in raw bytes and say: yes, that is the file magic, yes, that offset is the index block, yes, the numbers line up with the dump tool, and no, I am not relying on optimism as a parsing strategy.
-
-## `sst_dump` is not optional tooling
-
-A storage format does not feel real until you can inspect it from outside the database.
-
-RocksDB[^4] ships `sst_dump` and `ldb`. LevelDB[^3] ships `leveldbutil`. Those tools exist for a reason. For BeachDB, I built a simple `sst_dump` tool that takes an SSTable path and prints what the file actually contains: [beachdb/cmd/sst_dump](https://github.com/aalhour/beachdb/tree/main/cmd/sst_dump).
-
-When something goes wrong in a storage engine, "the API says X" is usually not enough. You want to know:
-
-- did the file get created?
-- how many entries are in it?
-- where does the index start?
-- what is the last key per block?
-- did the checksum fail?
-
-The tool is the shortest path from "this test failed in a confusing way" to "here is what the file actually contains."
-
-That is also philosophically on-brand for BeachDB. The point is not just to produce code that passes tests. It is to produce artifacts I can inspect, explain, and reason about from the outside.
-
-## Testing, or how I convinced myself this isn't lying
-
-I ended up convincing myself in three layers.
-
-**First:** package-level tests around the SSTable writer, reader, and iterator. Can one file be written, reopened, iterated, and rejected when blocks, index entries, or the footer are corrupt?
-
-**Second:** engine-level tests around the actual milestone behavior. Does a full memtable flush into a real SSTable? Does reopen find that file again? Do newer tables shadow older ones correctly? Do tombstones survive the trip to disk? Does `Close()` wait for the background flush to finish instead of quietly sawing off the branch it is sitting on?
-
-**Third:** outside-the-engine inspection. `sst_dump` and the hex dump above are not replacements for tests, but they are a very good way to cross-check that the bytes on disk agree with the code and the mental model.
-
-There are benchmarks and allocation guards around the hot paths too, but the bigger point is simpler: this is still a toy project, not a toy testing posture.
-
 ---
 
 ## If you want to go deeper
@@ -610,4 +768,4 @@ Adios! ✌🏼
 [^5]: Pebble references: [`db.go`](https://github.com/cockroachdb/pebble/blob/master/db.go) and [`compaction.go`](https://github.com/cockroachdb/pebble/blob/master/compaction.go).
 [^6]: BadgerDB references: [`db.go`](https://github.com/dgraph-io/badger/blob/main/db.go) and [`memtable.go`](https://github.com/dgraph-io/badger/blob/main/memtable.go).
 [^7]: HBase/HFile references: [HFile API docs](https://hbase.apache.org/devapidocs/org/apache/hadoop/hbase/io/hfile/HFile.html), [HFileScanner API docs](https://hbase.apache.org/2.4/devapidocs/org/apache/hadoop/hbase/io/hfile/HFileScanner.html), and [HBase Book: StoreFile / HFile](https://hbase.apache.org/book.html#hfile).
-[^8]: Cassandra reference: [Apache Cassandra docs, “Storage Engine”](https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html).
+[^8]: Cassandra reference: [Apache Cassandra docs, "Storage Engine"](https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html).
