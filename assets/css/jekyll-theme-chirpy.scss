@@ -328,3 +328,14 @@ body:has(article[data-toc]) #panel-wrapper .access {
 //     color: rgb(175, 176, 177);
 //   }
 // }
+
+/* ========== Dark Mode: Dim Sidebar Avatar ========== */
+
+html[data-mode="dark"] #avatar img {
+  filter: brightness(0.7);
+  transition: filter 0.3s ease;
+}
+
+html[data-mode="dark"] #avatar:hover img {
+  filter: brightness(0.85);
+}
