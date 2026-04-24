@@ -1,14 +1,14 @@
 ---
-title: "Crash testing BeachDB, Part 1: from random kills to exact boundaries"
-date: 2026-04-19
+title: "Crash testing BeachDB, part 1: from random kills to exact boundaries"
+date: 2026-04-24
 categories: [Programming]
-tags: [beachdb, databases, storage, durability, testing]
+tags: [beachdb, databases, testing]
 toc: true
 mermaid: true
 track:
 ---
 
-> **TL;DR**: BeachDB v0.0.4 ships a controller/worker crash harness, an internal failpoint framework, and seven failpoints across the WAL and flush paths. This is the milestone where crash testing stops being random `SIGKILL`s and starts targeting exact engine boundaries with deterministic replay. [Code is here](https://github.com/aalhour/beachdb).
+> **TL;DR**: BeachDB v0.0.4 ships a controller/worker crash harness, a tiny `crashhook` layer, and seven failpoints across the WAL and flush paths. Crash testing stops being random `SIGKILL`s and starts targeting exact engine boundaries with deterministic replay. [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.4).
 {: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
@@ -37,7 +37,7 @@ sequenceDiagram
 
   O->>W: Spawn writer
   loop Until kill lands
-    W->>DB: Put/Delete in a loop
+    W->>DB: Put in a loop
     DB-->>W: Success
     W->>S: Append committed key(s)
   end
@@ -54,7 +54,7 @@ Not useless. Just fuzzy in exactly the places I now cared about.
 
 At some point I stopped wanting "more random kills" and started wanting one very specific answer.
 
-Suppose a `Put()` crosses the WAL `fsync` boundary, and then the worker dies before the normal write path finishes.
+Suppose a `Put()` crosses the WAL `fsync` boundary, and then the process dies before the normal write path finishes.
 
 What should happen on reopen?
 
@@ -62,10 +62,10 @@ For that boundary, the answer should be: the write comes back.
 
 If the WAL append happened, the `fsync` returned, and the process dies before it gets to finish the rest of the path, recovery should replay that WAL record and rebuild the state. That is the whole point of the log in the first place.
 
-> Scope note: this harness models **process death in a surviving kernel**. That distinction matters. This is not a power-loss / kernel-panic / "the machine fell into the sea" test harness. In a process-crash test, bytes that reached the kernel page cache may still hit disk later even if they were not `fsync`'d yet.
+> Scope note: this harness models **process death in a surviving kernel**. That distinction matters. This is not a power-loss / kernel-panic / "the machine fell into the sea" test harness. In a process-crash test, buffered bytes, kernel page cache state, and already-`fsync`'d data all behave differently. The harness needs to keep those boundaries honest.
 {: .prompt-warning }
 
-That may sound obvious written out like this, but the old crash loop could only exercise that boundary accidentally. It could kill the worker _around_ the `fsync`. It could not tell me, with a straight face, that the kill landed _after_ the `fsync` and _before_ the rest of the write path.
+That may sound obvious written out like this, but the old crash loop could only exercise that boundary accidentally. It could kill the process _around_ the `fsync`. It could not tell me, with a straight face, that the kill landed _after_ the `fsync` and _before_ the rest of the write path.
 
 That was the itch.
 
@@ -73,7 +73,7 @@ That was the itch.
 
 Once I looked at the problem through that one boundary, the limitations of the old harness became painfully obvious.
 
-Random wall-clock `SIGKILL`s are realistic, but they are also sloppy. They tell you that the worker died sometime during the write path. They do not tell you whether it died before the WAL append, after the WAL append, after the WAL `fsync`, or while the flush path was halfway through building an SSTable.
+Random wall-clock `SIGKILL`s are realistic, but they are also sloppy. They tell you that the process died sometime during the write path. They do not tell you whether it died before the WAL append, after the WAL append, after the WAL `fsync`, or while the flush path was halfway through building an SSTable.
 
 The old setup also had three practical problems I kept tripping over:
 
@@ -84,11 +84,47 @@ The old setup also had three practical problems I kept tripping over:
 So the new harness had to buy me four things:
 
 1. A deterministic workload I can replay exactly.
-2. A protocol that tells me, for each operation, whether the worker started it, acked it, or failed it.
+2. A protocol that tells me, for each operation, whether the subprocess started it, acked it, or failed it.
 3. The ability to crash or inject faults at named internal engine boundaries.
 4. An artifact from each run that I can inspect, replay, and diff.
 
+## The new architecture: controller/worker
+
+The new harness splits cleanly into two processes with boring, explicit jobs.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Controller
+  participant W as Worker (subprocess)
+  participant DB as BeachDB
+
+  C->>C: Generate deterministic workload from seed
+  C->>W: Spawn subprocess (optional failpoint env)
+  W->>DB: Open database
+  W-->>C: ready
+  loop For each operation
+    C->>W: {op: put/delete/batch, ...}
+    W-->>C: start
+    W->>DB: Execute operation
+    W-->>C: ack (or fail)
+  end
+  C->>W: SIGKILL after planned delay
+  C->>DB: Reopen database
+  C->>C: Verify recovered state against oracle
+```
+
+The **controller** owns the workload, the crash/fault schedule, the oracle, and the artifact written at the end of the run. It does not participate in the write path itself. It only touches BeachDB directly when it reopens the database after a kill or an injected failure.
+
+The **worker** is intentionally thin: receive one operation at a time on stdin, call the BeachDB API, emit lifecycle events on stdout. The protocol between them is NDJSON with base64-encoded keys and values, so binary payloads survive the round trip without text-parser nonsense.
+
+And yes, the harness is deliberately slow.
+
+The old writer generated its own keys in a loop, which meant the controller had no precise idea which operation was in flight when the kill landed. The new one does one operation at a time on purpose: one op, one `start`, one `ack`/`fail`, then move on. Throughput goes down. Signal goes up. For a crash harness, that trade is not exactly heartbreaking.
+
 ## The contract the harness now enforces
+
+That architecture gives the harness a protocol, and the protocol gives the harness a contract.
 
 The worker emits four lifecycle events:
 
@@ -105,9 +141,13 @@ From those events, the controller enforces a conservative harness-wide contract:
 
 That "single ambiguous operation" rule is the big upgrade over the old harness. The commit frontier is no longer fuzzy.
 
-There is one important nuance, though: this is the harness's default contract, not the strongest claim we can make at every failpoint.
+There is one important nuance, though: this is the harness's default contract, not a separate proof rule for every failpoint.
 
-Some boundaries imply stronger expectations. `wal_after_sync` is one of those: once the WAL `fsync` boundary is crossed, I expect recovery to bring the write back. `wal_after_append` is different. In a process-crash test, the append reached the kernel, but not the durable boundary, so the write must **not** be treated as acknowledged durable, and after reopen it may or may not be present. That is one of those annoying little details that becomes much less annoying once it saves you from lying in a blog post.
+Some boundaries give me stronger questions to inspect. `wal_after_sync` is one of those: once the WAL `fsync` boundary is crossed, I expect recovery to bring the write back. But in v0.0.4, the oracle still stays conservative: a started-but-not-acked operation is allowed to be present or absent. The artifact tells me exactly where the process died; the oracle does not yet encode a custom rule for each failpoint.
+
+`wal_after_append` is different. In BeachDB, `wal.Writer.Append` writes into a `bufio.Writer`, so the record may still be sitting in process memory when this crash point fires. It has not crossed the durable boundary, and it may not even have reached the kernel yet. That operation must **not** be treated as acknowledged durable, and after reopen it may or may not be present.
+
+That is one of those annoying little details that becomes much less annoying once it saves you from lying in a blog post.
 
 In the engine, that write-path boundary looks like this:
 
@@ -145,41 +185,7 @@ if err := db.wal.Sync(); err != nil {
 crashhook.CrashIfArmed(crashhook.PointWALAfterSync)
 ```
 
-That is basically the whole story in code form: append, optional crash, sync, optional crash, then move on with the write path.
-
-## Controller/worker design
-
-The new harness splits cleanly into two processes with boring, explicit jobs.
-
-```mermaid
-sequenceDiagram
-  autonumber
-  participant C as Controller
-  participant W as Worker (subprocess)
-  participant DB as BeachDB
-
-  C->>C: Generate deterministic workload from seed
-  C->>W: Spawn subprocess (optional failpoint env)
-  W->>DB: Open database
-  W-->>C: ready
-  loop For each operation
-    C->>W: {op: put, key: ..., value: ...}
-    W-->>C: start
-    W->>DB: db.Put(key, value)
-    W-->>C: ack (or fail)
-  end
-  C->>W: SIGKILL after planned delay
-  C->>DB: Reopen database
-  C->>C: Verify recovered state against oracle
-```
-
-The **controller** owns the workload, the crash/fault schedule, the oracle, and the artifact written at the end of the run. It does not participate in the write path itself. It only touches BeachDB directly when it reopens the database after a kill or an injected failure.
-
-The **worker** is intentionally thin: receive one operation at a time on stdin, call the BeachDB API, emit lifecycle events on stdout. The protocol between them is NDJSON with base64-encoded keys and values, so binary payloads survive the round trip without text-parser nonsense.
-
-And yes, the harness is deliberately slow.
-
-The old writer generated its own keys in a loop, which meant the controller had no precise idea which operation was in flight when the kill landed. The new one does one operation at a time on purpose: one op, one `start`, one `ack`/`fail`, then move on. Throughput goes down. Signal goes up. For a crash harness, that trade is not exactly heartbreaking.
+That is basically the whole story in code form: append into the WAL writer, optional crash, flush + sync, optional crash, then move on with the write path.
 
 ## Replayable artifacts
 
@@ -244,16 +250,20 @@ The controller/worker split solves the "what was in flight?" problem. It does **
 
 An external `SIGKILL` is still subject to scheduler timing. Useful, realistic, but imprecise.
 
-That is what the failpoint framework is for.
+That is what BeachDB's tiny internal `crashhook` layer is for. It is not the crash harness itself; the harness lives under `cmd/crash`.[^1] The hook package is just the small internal layer that lets the harness aim at named engine boundaries.[^2]
 
-The general pattern is old and battle-tested:
+The shape is very much modeled after RocksDB's test-only kill points: named hooks in the engine, disabled in normal builds or normal runs, armed by the stress/crash harness when you want the process to die at a particular edge.[^3][^4] BeachDB's version is smaller, less general, and wearing floaties in the shallow end. But the idea is the same.
 
-1. put named hooks in production code paths
+Other storage engines poke at the same class of bugs from different angles: LevelDB has fault-injection and corruption/recovery tests, Pebble models crashable filesystems directly, and Badger keeps a Jepsen-inspired bank workload around its transactional invariants.[^5][^6][^7]
+
+BeachDB keeps the implementation intentionally boring:
+
+1. put named hooks in engine code paths
 2. leave them dormant by default
-3. arm them from tests
+3. arm them through the worker process environment
 4. when triggered, either crash the process or return a synthetic error
 
-BeachDB's version lives in `internal/crashhook` and exposes two primitives:
+The hook layer lives in `internal/crashhook` and exposes two primitives:
 
 - `CrashIfArmed(point)` - if the named point is armed, call `os.Exit(86)` immediately
 - `MaybeFault(point)` - if the named point is armed, return a synthetic error
@@ -300,7 +310,7 @@ func MaybeFault(point string) error {
 }
 ```
 
-I like this shape a lot because it keeps the framework boring on purpose: environment variables arm the point, atomics make it one-shot per process, and the engine code gets tiny, readable hook sites.
+I like this shape a lot because it keeps the hook layer boring on purpose: environment variables arm the point, atomics make it one-shot per process, and the engine code gets tiny, readable hook sites.
 
 There are seven hook sites in the engine right now, and every one is marked with a `// FAILPOINT:` comment so I can find them all with one grep:
 
@@ -309,17 +319,17 @@ $ grep -rn "// FAILPOINT:" engine/
 engine/db.go:191:  // FAILPOINT: wal_after_append
 engine/db.go:411:  // FAILPOINT: wal_sync_error
 engine/db.go:420:  // FAILPOINT: wal_after_sync
-engine/db.go:647:  // FAILPOINT: sst_publish_error
-engine/db.go:656:  // FAILPOINT: flush_after_publish
-engine/db.go:671:  // FAILPOINT: sst_write_error
-engine/db.go:719:  // FAILPOINT: flush_after_file_sync
+engine/db.go:652:  // FAILPOINT: sst_publish_error
+engine/db.go:662:  // FAILPOINT: flush_after_publish
+engine/db.go:677:  // FAILPOINT: sst_write_error
+engine/db.go:726:  // FAILPOINT: flush_after_file_sync
 ```
 
 They fall into two buckets.
 
 **Crash points** simulate process death:
 
-- `wal_after_append` - crash after the WAL append succeeds, but before `fsync`
+- `wal_after_append` - crash after the WAL writer accepts the record into its buffer, before flush and `fsync`
 - `wal_after_sync` - crash after the WAL `fsync` boundary
 - `flush_after_file_sync` - crash after the SSTable file and parent directory are durable on disk
 - `flush_after_publish` - crash after the SSTable is published into the engine's in-memory state
@@ -332,11 +342,11 @@ They fall into two buckets.
 
 That distinction matters.
 
-`wal_after_sync` is a crash point. The process dies at a very specific durable boundary, and on reopen I expect WAL replay to recover the write.
+`wal_after_sync` is a crash point. The process dies at a very specific durable boundary, and on reopen I expect WAL replay to recover the write. The current oracle does not enforce that as a special case yet, but the artifact makes that boundary visible enough to inspect and replay.
 
 `sst_publish_error` is **not** a crash point. It is a synthetic error path. The interesting question there is: if the SSTable file is already durable on disk but publish fails, does reopen still recover correctly by rediscovering that file from the directory? Different failure class, different invariant.
 
-`wal_after_append` is the sneaky one. The process dies after the append reached the kernel but before the durable boundary. In this harness, that operation is not acknowledged as durable, and after reopen it may or may not be present. That is not a contradiction. That is the process-crash model doing what it does.
+`wal_after_append` is the sneaky one. The process dies after the WAL writer accepted the record into its buffer, before the flush and before the durable boundary. In this harness, that operation is not acknowledged as durable, and after reopen it may or may not be present. That is not a contradiction. That is the process-crash model doing what it does.
 
 The flush path has the same shape:
 
@@ -393,10 +403,12 @@ Instead, the oracle builds the final expected visible state from the ordered str
 After reopening the database, the controller reads the relevant keys back and checks:
 
 1. the visible state derived from acked operations matches what the database returns
-2. the single started-but-not-acked operation is allowed to be present or absent unless the targeted failpoint implies a stronger expectation
+2. the single started-but-not-acked operation is allowed to be present or absent
 3. keys that were never started do not magically appear with values they were never given
 
 That is basically reference-model testing stretched across a process boundary. BeachDB already uses the same idea in `internal/testutil.Model` for unit tests. Here I am just applying it to crash cycles instead of in-process data structures.
+
+The obvious next step is to teach the oracle about boundary-specific expectations. For example, `wal_after_sync` should eventually be able to say: "this pending operation crossed the durable WAL boundary, so missing after recovery is a failure." v0.0.4 gives me the artifact and exact crash point first; stricter per-failpoint assertions can grow on top of that.
 
 ## Running it
 
@@ -429,7 +441,7 @@ And replaying a failure:
 
 The biggest lesson was not about crash testing specifically. It was about the gap between "tests pass" and "I trust this."
 
-The old harness gave me green tests and a general sense that the durability story was probably fine. The new one lets me make boundary-specific claims and verify them with deterministic evidence.
+The old harness gave me green tests and a general sense that the durability story was probably fine. The new one lets me target exact boundaries, inspect the evidence, and grow the oracle toward sharper boundary-specific claims.
 
 That is a different kind of confidence.
 
@@ -453,9 +465,10 @@ Adios! ✌🏼
 
 ## Notes & references
 
-[^1]: BeachDB crash harness implementation: [`cmd/crash/`](https://github.com/aalhour/beachdb/tree/main/cmd/crash)
-[^2]: BeachDB failpoint framework: [`internal/crashhook/crashhook.go`](https://github.com/aalhour/beachdb/blob/main/internal/crashhook/crashhook.go)
-[^3]: TiKV's fail-rs crate, the Rust failpoint library: [github.com/tikv/fail-rs](https://github.com/tikv/fail-rs)
-[^4]: etcd's gofail, the Go failpoint library that inspired BeachDB's approach: [github.com/etcd-io/gofail](https://github.com/etcd-io/gofail)
-[^5]: TiDB's failpoint package for Go: [github.com/pingcap/failpoint](https://github.com/pingcap/failpoint)
-[^6]: FreeBSD's failpoint framework, the original: [FreeBSD fail(9) man page](https://man.freebsd.org/cgi/man.cgi?query=fail&sektion=9)
+[^1]: BeachDB v0.0.4 crash harness implementation: [`cmd/crash/`](https://github.com/aalhour/beachdb/tree/v0.0.4/cmd/crash)
+[^2]: BeachDB v0.0.4 crash hook layer: [`internal/crashhook/crashhook.go`](https://github.com/aalhour/beachdb/blob/v0.0.4/internal/crashhook/crashhook.go)
+[^3]: RocksDB's crash-test driver: [`tools/db_crashtest.py`](https://github.com/facebook/rocksdb/blob/main/tools/db_crashtest.py). The whitebox mode runs `db_stress` with `kill_random_test`, which is the closest ancestor of the shape I wanted.
+[^4]: RocksDB's test hook machinery: [`test_util/sync_point.h`](https://github.com/facebook/rocksdb/blob/main/test_util/sync_point.h). The `TEST_KILL_RANDOM` and `TEST_SYNC_POINT` macros are the important bits for this post.
+[^5]: LevelDB has smaller but still useful recovery/fault-injection examples in [`db/fault_injection_test.cc`](https://github.com/google/leveldb/blob/main/db/fault_injection_test.cc) and [`db/corruption_test.cc`](https://github.com/google/leveldb/blob/main/db/corruption_test.cc).
+[^6]: Pebble's current test filesystem has a nice explicit crash model in [`vfs/mem_fs.go`](https://github.com/cockroachdb/pebble/blob/master/vfs/mem_fs.go), especially `NewCrashableMem` and `CrashClone`.
+[^7]: Badger is a less direct failpoint reference, but a useful adjacent example: its README calls out filesystem-anomaly testing, and its Jepsen-inspired bank workload lives in [`badger/cmd/bank.go`](https://github.com/dgraph-io/badger/blob/main/badger/cmd/bank.go), with a nightly workflow in [`ci-badger-bank-tests-nightly.yml`](https://github.com/dgraph-io/badger/blob/main/.github/workflows/ci-badger-bank-tests-nightly.yml).
