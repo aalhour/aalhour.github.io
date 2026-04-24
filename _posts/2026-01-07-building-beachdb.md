@@ -4,6 +4,7 @@ date: 2026-01-07
 categories: [Programming]
 tags: [beachdb, databases, storage, lsm-tree]
 toc: true
+image: /assets/images/posts/2026-01-07-building-beachdb.webp
 track: https://soundcloud.com/silent-planet/antimatter?in=exixts/sets/3-ovens
 ---
 

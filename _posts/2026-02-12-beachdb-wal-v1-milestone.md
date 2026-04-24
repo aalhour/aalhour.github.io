@@ -4,6 +4,7 @@ date: 2026-02-12
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, wal]
 toc: true
+image: /assets/images/posts/2026-02-12-beachdb-wal-v1-milestone.webp
 track: https://www.youtube.com/watch?v=lSHVMMfn3Js
 ---
 

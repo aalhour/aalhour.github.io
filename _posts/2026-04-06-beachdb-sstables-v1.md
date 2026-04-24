@@ -5,6 +5,7 @@ categories: [Programming]
 tags: [beachdb, databases, storage, sstable, durability]
 toc: true
 mermaid: true
+image: /assets/images/posts/2026-04-06-beachdb-sstables-v1.webp
 track:
 ---
 
