@@ -8,7 +8,7 @@ mermaid: true
 track: 
 ---
 
-> **TL;DR**: BeachDB v0.0.2 ships the memtable — a skip list that replaces the placeholder map. This post covers why maps don't work for LSM storage, how internal key ordering makes "newest version wins" fall out naturally, and why deletes are actually writes. [Code is here](https://github.com/aalhour/beachdb).
+> **TL;DR**: BeachDB v0.0.2 ships the memtable — a skip list that replaces the placeholder map. This post covers why maps don't work for LSM storage, how internal key ordering makes "newest version wins" fall out naturally, and why deletes are actually writes. [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.2).
 >
 > This post includes: two interactive demos and a few diagrams to drive the current architecture home.
 {: .prompt-info }
