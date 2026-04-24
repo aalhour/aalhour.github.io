@@ -5,6 +5,7 @@ categories: [Programming]
 tags: [beachdb, databases, storage, memtable, skip-list]
 toc: true
 mermaid: true
+image: /assets/images/posts/2026-02-22-beachdb-memtable-v1.webp
 track: 
 ---
 
