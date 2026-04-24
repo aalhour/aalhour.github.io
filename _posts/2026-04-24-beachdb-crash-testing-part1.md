@@ -5,6 +5,7 @@ categories: [Programming]
 tags: [beachdb, databases, testing, crash-testing, fault-injection]
 toc: true
 mermaid: true
+image: /assets/images/posts/2026-04-24-beachdb-crash-testing-part1.webp
 track:
 ---
 
@@ -318,7 +319,8 @@ They fall into two buckets: **crash points**, which simulate process death, and 
 
 The important thing to remember is that the "current oracle rule" column describes what `v0.0.4` enforces automatically, not necessarily the strongest claim I eventually want the engine to prove.
 
-⚠️ Wide table ahead: scroll right
+> Wide table ahead, make sure to scroll right to see all columns!
+{: .prompt-warning }
 
 | Failpoint | Type | Boundary | Current oracle rule | Future stricter rule |
 |---|---|---|---|---|
