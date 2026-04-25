@@ -1,12 +1,31 @@
-<!-- fsync() Durability Animation -->
-<div id="fsync-animation-container" style="margin-bottom: 1.5rem;"></div>
+{% comment %}
+fsync() Durability Animation Include
 
-<script src="/assets/vendor/anime.min.js"></script>
-<script src="/assets/js/fsync-animation/fsync-demo.js"></script>
+Usage in any post/page:
+{% include animations/fsync.html %}
+
+Optional: Pass a custom id
+{% include animations/fsync.html id="my-custom-id" %}
+{% endcomment %}
+
+{% assign container_id = include.id | default: "fsync-animation-container" %}
+
+<!-- animation: animations/fsync.html -->
+<div id="{{ container_id }}" style="margin-bottom: 1.5rem;"></div>
+
+<script src="{{ '/assets/vendor/anime.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/fsync-animation/fsync-demo.js' | relative_url }}"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof FsyncDemo !== 'undefined') {
-      FsyncDemo.init('fsync-animation-container');
+  (function () {
+    function initFsync() {
+      if (typeof FsyncDemo !== 'undefined') {
+        FsyncDemo.init('{{ container_id }}');
+      }
     }
-  });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFsync);
+    } else {
+      initFsync();
+    }
+  })();
 </script>
