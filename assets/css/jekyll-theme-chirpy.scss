@@ -329,6 +329,242 @@ body:has(article[data-toc]) #panel-wrapper .access {
 //   }
 // }
 
+/* ========== Animations Gallery ========== */
+
+.animation-gallery {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.animation-card {
+  border: 1px solid var(--main-border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--card-bg);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.animation-card:hover {
+  border-color: var(--link-color);
+  transform: translateY(-2px);
+}
+
+.animation-card-main {
+  display: grid;
+  grid-template-columns: minmax(11rem, 34%) 1fr;
+  color: inherit;
+  text-decoration: none;
+}
+
+.animation-card-main:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.animation-card-preview {
+  position: relative;
+  min-height: 12rem;
+  overflow: hidden;
+  border-right: 1px solid var(--main-border-color);
+  background:
+    linear-gradient(rgba(125, 125, 125, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 125, 125, 0.08) 1px, transparent 1px);
+  background-size: 1.25rem 1.25rem;
+}
+
+.animation-card-copy {
+  padding: 1.1rem 1.25rem;
+}
+
+.animation-card-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.animation-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.animation-card-usage {
+  display: block;
+  padding: 0.85rem 1.25rem 1rem;
+  border-top: 1px solid var(--main-border-color);
+}
+
+.animation-card-desc {
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.animation-card-posts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.animation-posts-label {
+  font-size: 0.75rem;
+  opacity: 0.55;
+  margin-bottom: 0.35rem;
+}
+
+.animation-card-posts-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.animation-card-posts-list li + li {
+  margin-top: 0.25rem;
+}
+
+.preview-node {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  min-width: 4.2rem;
+  min-height: 2rem;
+  padding: 0 0.55rem;
+  border: 1px solid rgba(125, 125, 125, 0.35);
+  border-radius: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--card-bg);
+  box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
+}
+
+.animation-preview-lsm .preview-memory {
+  top: 1.5rem;
+  left: 1.3rem;
+  color: #22c55e;
+}
+
+.animation-preview-lsm .preview-level {
+  right: 1.3rem;
+}
+
+.animation-preview-lsm .preview-level:nth-of-type(3) {
+  top: 1.6rem;
+  color: #60a5fa;
+}
+
+.animation-preview-lsm .preview-level:nth-of-type(4) {
+  top: 4.8rem;
+  color: #c084fc;
+}
+
+.animation-preview-lsm .preview-level:nth-of-type(5) {
+  top: 8rem;
+  color: #f59e0b;
+}
+
+.animation-preview-lsm .preview-arrow,
+.animation-preview-fsync .preview-sync-line {
+  position: absolute;
+  height: 2px;
+  background: var(--link-color);
+  opacity: 0.65;
+}
+
+.animation-preview-lsm .preview-arrow {
+  top: 5.9rem;
+  left: 35%;
+  width: 30%;
+  transform: rotate(18deg);
+}
+
+.preview-lane {
+  position: absolute;
+  left: 1.3rem;
+  right: 1.3rem;
+  height: 2px;
+  background: rgba(125, 125, 125, 0.38);
+}
+
+.lane-top { top: 2.6rem; width: 45%; }
+.lane-mid { top: 5.4rem; width: 68%; }
+.lane-base { top: 8.2rem; }
+
+.preview-dot {
+  position: absolute;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--link-color);
+  box-shadow: 0 0 0 0.35rem rgba(59, 130, 246, 0.12);
+}
+
+.dot-a { left: 18%; top: 7.7rem; }
+.dot-b { left: 39%; top: 4.9rem; }
+.dot-c { left: 61%; top: 2.1rem; }
+.dot-d { left: 79%; top: 7.7rem; }
+
+.animation-preview-fsync .preview-app {
+  top: 1.5rem;
+  left: 1.25rem;
+  color: #22c55e;
+}
+
+.animation-preview-fsync .preview-cache {
+  top: 4.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #60a5fa;
+}
+
+.animation-preview-fsync .preview-disk {
+  right: 1.25rem;
+  bottom: 1.5rem;
+  color: #f59e0b;
+}
+
+.animation-preview-fsync .preview-sync-line {
+  left: 28%;
+  right: 28%;
+  top: 6.1rem;
+  transform: rotate(20deg);
+}
+
+.animation-detail-intro {
+  margin-bottom: 1.5rem;
+}
+
+.animation-detail-usage {
+  display: block;
+  margin-top: 0.9rem;
+}
+
+.animation-detail-stage {
+  width: 100%;
+  max-width: 100%;
+}
+
+.animation-detail-stage > div {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .animation-card-main {
+    grid-template-columns: 1fr;
+  }
+
+  .animation-card-preview {
+    min-height: 9rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--main-border-color);
+  }
+
+}
+
 /* ========== Dark Mode: Dim Sidebar Avatar ========== */
 
 html[data-mode="dark"] #avatar img {

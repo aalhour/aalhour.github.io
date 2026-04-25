@@ -1,0 +1,29 @@
+- slug: "lsm-tree"
+  title: "LSM-Tree"
+  kind: "data structure"
+  include_path: "animations/lsm-tree.html"
+  url: "/animations/lsm-tree/"
+  summary: "An interactive demo of a simple LSM-based key-value storage engine: Put, Get, Delete, memtable flushes, and compaction across SSTable levels."
+  detail: "This animation is a compact, educational model of a log-structured merge tree backing a simple key-value storage engine. It covers Put, Get, Delete, memtable flushes, and compaction so the moving pieces are easier to reason about. It is not a production-accurate RocksDB, Cassandra, or HBase simulator: bloom filters, block indexes, concurrent background work, write stalls, and real compaction strategies are deliberately left out."
+  preview:
+    variant: "lsm"
+
+- slug: "skiplist"
+  title: "Skip List"
+  kind: "data structure"
+  include_path: "animations/skiplist.html"
+  url: "/animations/skiplist/"
+  summary: "A visual walkthrough of search, insert, and delete operations in a probabilistic sorted structure with fast lanes over a linked list."
+  detail: "This animation focuses on the skip list mechanics behind BeachDB's memtable: ordered nodes at the base level, randomly promoted express lanes above them, and operation traces that move forward and downward through those levels. It is not a benchmark or a proof of the exact random distribution used in the storage engine; it is a teaching model for the shape and behavior of the data structure."
+  preview:
+    variant: "skiplist"
+
+- slug: "fsync"
+  title: "fsync() Durability"
+  kind: "syscall"
+  include_path: "animations/fsync.html"
+  url: "/animations/fsync/"
+  summary: "A journey of fsync() from a Go goroutine through a Unix-like system, down the storage stack, and toward NAND gates on an SSD."
+  detail: "This animation shows why a successful write call is not the same thing as a durable write. It follows fsync() from a Go goroutine through a Unix-like system such as Linux: application memory, kernel page cache, device-side buffering, the SSD controller, and toward NAND gates where data becomes durable. It is not an exhaustive model of every filesystem, drive cache, barrier, or operating-system edge case; it is the mental model needed for a WAL durability contract."
+  preview:
+    variant: "fsync"
