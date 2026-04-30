@@ -1,5 +1,5 @@
 ---
-title: "Making the on-disk state real: SSTables (v1)"
+title: "Making the on-disk state real: Sorted-String Tables (SSTables)"
 date: 2026-04-06
 categories: [Programming]
 tags: [beachdb, databases, storage, sstable, durability]
