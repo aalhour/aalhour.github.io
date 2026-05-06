@@ -11,7 +11,7 @@
 {% if usage_count > 0 %}
   <div class="animation-posts-label">Used in:</div>
   <ul class="animation-card-posts-list">
-    {% for post in site.posts %}
+    {% for post in site.posts reversed %}
       {% if post.content contains usage_marker %}
         <li><a href="{{ post.url | relative_url }}">{{ post.title }}</a></li>
       {% endif %}
