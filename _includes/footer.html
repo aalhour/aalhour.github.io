@@ -1,18 +1,34 @@
-<footer>
-  <div class="page__footer-follow">
-      <ul class="social-icons">
-          <center>
-              {% for link in site.footer.links %}
-                  {% if link.url %}
-                      <li>
-                          <a href="{{ link.url }}" rel="nofollow noopener noreferrer">
-                          <i class="{{ link.icon }}"></i>
-                          {{ link.label }}
-                          </a>
-                      </li>
-                  {% endif %}
-              {% endfor %}
-          </center>
-      </ul>
-  </div>
+<!-- Site footer -->
+
+<footer
+  id="site-footer"
+  aria-label="Site footer"
+  class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center text-muted"
+>
+  <ul class="footer-social list-unstyled d-flex mb-2 mb-lg-0" aria-label="Social links">
+    <li>
+      <a href="https://github.com/aalhour" aria-label="GitHub" rel="noopener noreferrer">
+        <i class="fab fa-github fa-fw"></i>
+      </a>
+    </li>
+    <li>
+      <a href="https://www.linkedin.com/in/aalhour" aria-label="LinkedIn" rel="noopener noreferrer">
+        <i class="fab fa-linkedin-in fa-fw"></i>
+      </a>
+    </li>
+    <li>
+      <a href="https://twitter.com/ahmad_alhour" aria-label="X (Twitter)" rel="noopener noreferrer">
+        <i class="fab fa-x-twitter fa-fw"></i>
+      </a>
+    </li>
+    <li>
+      <a href="{{ '/feed.xml' | relative_url }}" aria-label="RSS feed">
+        <i class="fas fa-rss fa-fw"></i>
+      </a>
+    </li>
+  </ul>
+
+  <p class="footer-copy mb-0">
+    © 2015–<time>{{ 'now' | date: '%Y' }}</time> Ahmad Alhour. All rights reserved.
+  </p>
 </footer>

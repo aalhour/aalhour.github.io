@@ -6,20 +6,71 @@ layout: page
 permalink: /talks/
 ---
 
-_Talks, podcasts, and workshops I've done over the years._
+Talks, podcasts, and workshops I've done over the years.
 
+<ul class="row-list talks-list">
+  {% for item in site.data.talks_trainings %}
+    {% assign primary_url = '' %}
+    {% assign primary_label = '' %}
+    {% if item.video_link and item.video_link != '' %}
+      {% assign primary_url = item.video_link %}
+      {% assign primary_label = 'watch' %}
+    {% elsif item.speakerdeck_link and item.speakerdeck_link != '' %}
+      {% assign primary_url = item.speakerdeck_link %}
+      {% assign primary_label = 'slides' %}
+    {% elsif item.slides_link and item.slides_link != '' %}
+      {% assign primary_url = item.slides_link %}
+      {% assign primary_label = 'slides' %}
+    {% endif %}
 
-{% for item in site.data.talks_trainings %}
-#### {{ item.title }}
+    <li class="row-list-item">
+      <div class="row-list-meta">
+        {{ item.date | default: item.type }}
+        <span class="status muted">{{ item.type }}</span>
+      </div>
 
-**{{ item.type | capitalize }}** — {{ item.location }}
+      <div class="row-list-body">
+        {% if primary_url != '' %}
+          <a class="row-list-title" href="{{ primary_url }}">{{ item.title }}</a>
+        {% else %}
+          <span class="row-list-title">{{ item.title }}</span>
+        {% endif %}
 
-![{{ item.title }}]({{ item.thumbnail }}){: .left w="120" h="60" }
+        {% if item.subtitle and item.subtitle != '' %}
+          <p class="row-list-subtitle">{{ item.subtitle }}</p>
+        {% endif %}
 
-{{ item.description }}
+        <p class="row-list-subtitle">{{ item.description }}</p>
 
-{% if item.video_link and item.video_link != "" %}<a href="{{ item.video_link }}"><i class="fas fa-play"></i> Watch recording</a>{% endif %}{% if item.video_link and item.video_link != "" and item.speakerdeck_link and item.speakerdeck_link != "" %} · {% endif %}{% if item.speakerdeck_link and item.speakerdeck_link != "" %}<a href="{{ item.speakerdeck_link }}"><i class="fas fa-file-alt"></i> View slides</a>{% endif %}
+        <div class="row-list-usage">
+          <span class="row-list-usage-label">{{ item.type | capitalize }} at:</span>
+          {{ item.location }}
+        </div>
 
----
+        {% if item.video_link != '' or item.speakerdeck_link != '' or item.slides_link != '' %}
+          <div class="row-list-usage">
+            <span class="row-list-usage-label">Resources:</span>
+            {% assign first = true %}
+            {% if item.video_link and item.video_link != '' %}
+              <a class="row-list-usage-link" href="{{ item.video_link }}">recording</a>
+              {% assign first = false %}
+            {% endif %}
+            {% if item.speakerdeck_link and item.speakerdeck_link != '' %}
+              {% unless first %}<span class="row-list-usage-sep">·</span>{% endunless %}
+              <a class="row-list-usage-link" href="{{ item.speakerdeck_link }}">slides</a>
+              {% assign first = false %}
+            {% elsif item.slides_link and item.slides_link != '' %}
+              {% unless first %}<span class="row-list-usage-sep">·</span>{% endunless %}
+              <a class="row-list-usage-link" href="{{ item.slides_link }}">slides</a>
+              {% assign first = false %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
 
-{% endfor %}
+      {% if primary_url != '' %}
+        <a class="row-list-link" href="{{ primary_url }}">{{ primary_label }} →</a>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

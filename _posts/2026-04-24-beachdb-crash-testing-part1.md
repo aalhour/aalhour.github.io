@@ -5,8 +5,6 @@ categories: [Programming]
 tags: [beachdb, databases, testing, crash-testing, fault-injection]
 toc: true
 mermaid: true
-image: /assets/images/posts/2026-04-24-beachdb-crash-testing-part1.webp
-track:
 ---
 
 > **TL;DR**: BeachDB v0.0.4 turns crash testing from random `SIGKILL`s into crashes aimed at named engine boundaries. It ships a controller/worker harness, replayable artifacts, and a tiny `crashhook` layer with failpoints across the WAL and flush paths. The goal is simple: stop asking "did it survive?" and start asking "what exactly survived, at which boundary, and why?"

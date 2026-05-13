@@ -1,11 +1,11 @@
 {% comment %}
-  LSM-Tree Animation Include
-  
-  Usage in any post/page:
-    {% include animations/lsm-tree.html %}
-  
-  Optional: Pass a custom id
-    {% include animations/lsm-tree.html id="my-custom-id" %}
+LSM-Tree Animation Include
+
+Usage in any post/page:
+{% include animations/lsm-tree.html %}
+
+Optional: Pass a custom id
+{% include animations/lsm-tree.html id="my-custom-id" %}
 {% endcomment %}
 
 {% assign container_id = include.id | default: "lsm-animation" %}
@@ -16,16 +16,16 @@
 <script src="{{ '/assets/vendor/anime.min.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/lsm-animation/lsm-tree-demo.js' | relative_url }}"></script>
 <script>
-(function() {
-  function initLSM() {
-    if (typeof LSMTreeDemo !== 'undefined') {
-      LSMTreeDemo.init('{{ container_id }}');
+  (function () {
+    function initLSM() {
+      if (typeof LSMTreeDemo !== 'undefined') {
+        LSMTreeDemo.init('{{ container_id }}');
+      }
     }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLSM);
-  } else {
-    initLSM();
-  }
-})();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLSM);
+    } else {
+      initLSM();
+    }
+  })();
 </script>

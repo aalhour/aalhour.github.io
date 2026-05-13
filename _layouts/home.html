@@ -1,0 +1,117 @@
+---
+layout: default
+---
+
+{% include lang.html %}
+
+{% assign featured_posts = site.posts | where: 'pin', true %}
+{% assign all_unpinned = site.posts | where_exp: 'p', 'p.pin != true' %}
+{% assign recent_posts = all_unpinned | slice: 0, 5 %}
+{% assign recent_talks = site.data.talks_trainings | slice: 0, 3 %}
+
+<div class="home-hub">
+
+  <!-- ============ HERO ============ -->
+  <header class="home-hero">
+    <div class="home-photo">
+      <img src="{{ '/assets/images/me-bazaar.webp' | relative_url }}" alt="Portrait of Ahmad Alhour">
+    </div>
+    <div class="home-hero-text">
+      <h1 class="home-title">Ahmad Alhour</h1>
+      <p class="home-lede">A notebook on systems internals, the craft of writing software, and the curiosity that pulls
+        me toward both.</p>
+    </div>
+  </header>
+
+  <!-- ============ CURRENT EXPERIMENT CALLOUT ============ -->
+  <aside class="home-now">
+    <span class="home-now-label">Current experiment</span>
+    building <a href="https://github.com/aalhour/beachdb" target="_blank">BeachDB</a>: a distributed NoSQL database from
+    scratch, in Go, to see what storage engines actually do when you stop hand-waving them. Notes arrive when something
+    clicks, in <a href="{{ '/tags/beachdb/' | relative_url }}">the BeachDB series</a>.
+  </aside>
+
+  <!-- ============ SELECTED ESSAYS ============ -->
+  {% if featured_posts.size > 0 %}
+  <section class="home-section">
+    <header class="home-section-h">
+      <h2>Selected Essays</h2>
+    </header>
+    <ul class="home-list">
+      {% for post in featured_posts %}
+      <li class="home-list-item">
+        <time class="home-list-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y-%m-%d'
+          }}</time>
+        <a class="home-list-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        {% if post.categories.first %}
+        <span class="home-list-tag">{{ post.categories.first | downcase }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <!-- ============ RECENT WRITING ============ -->
+  <section class="home-section">
+    <header class="home-section-h">
+      <h2>Recent writing</h2>
+      <a class="home-section-arrow" href="{{ '/writings/' | relative_url }}">all →</a>
+    </header>
+    <ul class="home-list">
+      {% for post in recent_posts %}
+      <li class="home-list-item">
+        <time class="home-list-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y-%m-%d'
+          }}</time>
+        <a class="home-list-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        {% if post.categories.first %}
+        <span class="home-list-tag">{{ post.categories.first | downcase }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <!-- ============ RECENT TALKS ============ -->
+  <section class="home-section">
+    <header class="home-section-h">
+      <h2>Recent talks</h2>
+      <a class="home-section-arrow" href="{{ '/talks/' | relative_url }}">all →</a>
+    </header>
+    <ul class="home-list">
+      {% for talk in recent_talks %}
+      {% assign link = talk.video_link | default: talk.slides_link | default: talk.speakerdeck_link %}
+      <li class="home-list-item">
+        {% if talk.date %}
+        <time class="home-list-date">{{ talk.date }}</time>
+        {% endif %}
+        {% if link != '' and link %}
+        <a class="home-list-link" href="{{ link }}">{{ talk.title }}</a>
+        {% else %}
+        <span class="home-list-link">{{ talk.title }}</span>
+        {% endif %}
+        {% if talk.location %}
+        <span class="home-list-venue">{{ talk.location }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <!-- ============ CLOSING ============ -->
+  <p class="home-closing">
+    More wandering:
+    <a href="{{ '/animations/' | relative_url }}">animations</a>
+    of the data structures and syscalls behind the writing,
+    <a href="{{ '/projects/' | relative_url }}">projects</a>
+    I've built or contributed to over the years, and the long version of who I am on the
+    <a href="{{ '/about/' | relative_url }}">about page</a>.
+    Or find me on
+    <a href="https://github.com/aalhour">github</a>,
+    <a href="https://twitter.com/ahmad_alhour">twitter</a>,
+    <a href="https://www.linkedin.com/in/aalhour">linkedin</a>,
+    <a href="https://hachyderm.io/@aalhour" rel="me">mastodon</a>,
+    or via <a href="{{ '/feed.xml' | relative_url }}">rss</a>.
+  </p>
+
+</div>

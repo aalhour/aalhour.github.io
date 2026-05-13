@@ -5,8 +5,6 @@ categories: [Programming]
 tags: [beachdb, databases, storage, memtable, skip-list]
 toc: true
 mermaid: true
-image: /assets/images/posts/2026-02-22-beachdb-memtable-v1.webp
-track: 
 ---
 
 > **TL;DR**: BeachDB v0.0.2 ships the memtable — a skip list that replaces the placeholder map. This post covers why maps don't work for LSM storage, how internal key ordering makes "newest version wins" fall out naturally, and why deletes are actually writes. [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.2).

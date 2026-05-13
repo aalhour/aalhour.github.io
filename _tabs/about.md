@@ -1,10 +1,12 @@
 ---
-title: About me
+title: Hi, there!
 icon: fas fa-info-circle
 order: 5
 layout: page
 permalink: /about/
 ---
+
+![Portrait of Ahmad Alhour](/assets/images/me-bazaar.webp){: .about-portrait width="240" height="240" }
 
 I’m Ahmad Alhour, a computer scientist by education and a software engineer by trade, currently living in Munich, Germany.
 
@@ -16,6 +18,6 @@ This is my digital spot where I [write about](/archives/) software, books, philo
 
 I build [interactive animations](/animations/) when words need a moving picture, publish some of my [talks](/talks/), and sometimes lose myself in [mathematical puzzles](https://projecteuler.net/).
 
-When I’m not building or debugging things, I’m usually reading something. Recent favorites include *The Beginning of Infinity*, *The Optimistic Child*, and *What If?*... which is probably a fair summary of my reading taste: scientific explanation, parenting, and ridiculous hypotheticals! You can find more of that trail on my [Goodreads](https://www.goodreads.com/aalhour).
+When I’m not building or debugging things, I’m usually reading something. Recent favorites include **The Beginning of Infinity**, **The Optimistic Child**, and **What If?**... which is probably a fair summary of my reading taste: scientific explanation, parenting, and ridiculous hypotheticals! You can find more of that trail on my [Goodreads](https://www.goodreads.com/aalhour).
 
 **Find me:** [GitHub](https://github.com/aalhour), [LinkedIn](https://www.linkedin.com/in/aalhour). Or subscribe to the blog: [RSS](/feed.xml).

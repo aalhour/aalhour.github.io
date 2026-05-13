@@ -117,6 +117,55 @@
 
   <!-- Scripts -->
 
+  <!-- localStorage bridge: Chirpy uses sessionStorage("mode"), plan locks localStorage persistence -->
+  <script>
+    (function () {
+      var KEY = 'mode';
+
+      function isMode(value) {
+        return value === 'light' || value === 'dark';
+      }
+
+      try {
+        var saved = localStorage.getItem(KEY);
+        if (isMode(saved)) {
+          sessionStorage.setItem(KEY, saved);
+          document.documentElement.setAttribute('data-mode', saved);
+        }
+
+        var proto = window.Storage && window.Storage.prototype;
+        if (!proto || proto.__modeLocalStorageBridge) return;
+
+        var nativeSet = proto.setItem;
+        var nativeRemove = proto.removeItem;
+
+        Object.defineProperty(proto, '__modeLocalStorageBridge', { value: true });
+
+        Object.defineProperty(proto, 'setItem', {
+          configurable: true,
+          writable: true,
+          value: function (key, value) {
+            nativeSet.call(this, key, value);
+            if (this === sessionStorage && key === KEY && isMode(value)) {
+              nativeSet.call(localStorage, KEY, value);
+            }
+          }
+        });
+
+        Object.defineProperty(proto, 'removeItem', {
+          configurable: true,
+          writable: true,
+          value: function (key) {
+            nativeRemove.call(this, key);
+            if (this === sessionStorage && key === KEY) {
+              nativeRemove.call(localStorage, KEY);
+            }
+          }
+        });
+      } catch (_) {}
+    })();
+  </script>
+
   <script src="{{ '/assets/js/dist/theme.min.js' | relative_url }}"></script>
 
   {% include js-selector.html lang=lang %}

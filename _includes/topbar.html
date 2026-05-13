@@ -1,82 +1,145 @@
 <!-- The Top Bar -->
 
-<header id="topbar-wrapper" class="flex-shrink-0" aria-label="Top Bar">
-  <div
-    id="topbar"
-    class="d-flex align-items-center justify-content-between px-lg-3 h-100"
-  >
-    <nav id="breadcrumb" aria-label="Breadcrumb">
-      {% assign paths = page.url | split: '/' %}
+<header id="topbar-wrapper" aria-label="Top Bar">
+  <div id="topbar">
 
-      {% if paths.size == 0 or page.layout == 'home' %}
-        <!-- index page -->
-        <span>{{ site.data.locales[include.lang].tabs.home | capitalize }}</span>
+    <!-- Brand -->
+    <a class="topbar-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
 
-      {% else %}
-        {% for item in paths %}
-          {% if forloop.first %}
-            <span>
-              <a href="{{ '/' | relative_url }}">
-                {{- site.data.locales[include.lang].tabs.home | capitalize -}}
-              </a>
-            </span>
+    <!-- Desktop nav (hidden on mobile via Bootstrap d-none d-lg-flex) -->
+    <nav class="topbar-nav" aria-label="Main Navigation">
+      <a href="{{ '/writings/' | relative_url }}" class="nav-link{% if page.url == '/writings/' %} active{% endif %}">
+        writings
+      </a>
 
-          {% elsif forloop.last %}
-            {% if page.collection == 'tabs' %}
-              <span>{{ site.data.locales[include.lang].tabs[item] | default: page.title }}</span>
-            {% else %}
-              <span>{{ page.title }}</span>
-            {% endif %}
+      <a href="{{ '/talks/' | relative_url }}" class="nav-link{% if page.url == '/talks/' %} active{% endif %}">
+        talks
+      </a>
 
-          {% elsif page.url contains '/animations/' and item == 'animations' %}
-            <span>
-              <a href="{{ '/animations/' | relative_url }}">Animations</a>
-            </span>
+      <a href="{{ '/projects/' | relative_url }}" class="nav-link{% if page.url == '/projects/' %} active{% endif %}">
+        projects
+      </a>
 
-          {% elsif page.layout == 'category' or page.layout == 'tag' %}
-            <span>
-              <a href="{{ item | append: '/' | relative_url }}">
-                {{- site.data.locales[include.lang].tabs[item] | default: page.title -}}
-              </a>
-            </span>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
+      <a href="{{ '/animations/' | relative_url }}" class="nav-link{% if page.url == '/animations/' %} active{% endif %}">
+        animations
+      </a>
+
+      <a href="{{ '/about/' | relative_url }}" class="nav-link{% if page.url == '/about/' %} active{% endif %}">
+        about
+      </a>
     </nav>
-    <!-- endof #breadcrumb -->
 
-    <button type="button" id="sidebar-trigger" class="btn btn-link" aria-label="Sidebar">
-      <i class="fas fa-bars fa-fw"></i>
-    </button>
+    <!-- Right controls -->
+    <div class="topbar-controls">
 
-    <div id="topbar-title">
-      {% if page.layout == 'home' %}
-        {{- site.data.locales[include.lang].title | default: site.title -}}
-      {% elsif page.collection == 'tabs' or page.layout == 'page' %}
-        {%- capture tab_key -%}{{ page.url | split: '/' }}{%- endcapture -%}
-        {{- site.data.locales[include.lang].tabs[tab_key] | default: page.title -}}
-      {% else %}
-        {{- site.data.locales[include.lang].layout[page.layout] | default: page.layout | capitalize -}}
-      {% endif %}
-    </div>
+      <!-- Topbar title: shown by Chirpy search JS during search mode -->
+      <span id="topbar-title" class="topbar-title-label" aria-hidden="true">
+        {%- if page.layout == 'home' -%}
+          {{- site.data.locales[include.lang].title | default: site.title -}}
+        {%- elsif page.collection == 'tabs' or page.layout == 'page' -%}
+          {%- capture tab_key -%}{{ page.url | split: '/' }}{%- endcapture -%}
+          {{- site.data.locales[include.lang].tabs[tab_key] | default: page.title -}}
+        {%- else -%}
+          {{- page.title | default: site.title -}}
+        {%- endif -%}
+      </span>
 
-    <button type="button" id="search-trigger" class="btn btn-link" aria-label="Search">
-      <i class="fas fa-search fa-fw"></i>
-    </button>
+      <!-- Search trigger -->
+      <button type="button" id="search-trigger" class="btn btn-link topbar-btn" aria-label="Search">
+        <i class="fas fa-search fa-fw"></i>
+      </button>
 
-    <search id="search" class="align-items-center ms-3 ms-lg-0">
-      <i class="fas fa-search fa-fw"></i>
-      <input
-        class="form-control"
-        id="search-input"
-        type="search"
-        aria-label="search"
-        autocomplete="off"
-        placeholder="{{ site.data.locales[include.lang].search.hint | capitalize }}..."
+      <!-- Mode toggle (Chirpy JS needs id="mode-toggle") -->
+      {% unless site.theme_mode %}
+      <button type="button" id="mode-toggle" class="btn btn-link topbar-btn" aria-label="Switch Mode">
+        <i class="fas fa-adjust fa-fw"></i>
+      </button>
+      {% endunless %}
+
+      <!-- Inline search bar (Chirpy JS shows/hides via class) -->
+      <search id="search" class="topbar-search" aria-label="Search site">
+        <i class="fas fa-search fa-fw topbar-search-icon"></i>
+        <input
+          class="form-control"
+          id="search-input"
+          type="search"
+          aria-label="search"
+          autocomplete="off"
+          placeholder="{{ site.data.locales[include.lang].search.hint | default: 'Search' | capitalize }}..."
+        >
+      </search>
+      <button type="button" class="btn btn-link topbar-btn" id="search-cancel">
+        {{- site.data.locales[include.lang].search.cancel | default: 'Cancel' | downcase -}}
+      </button>
+
+      <!-- Hamburger: mobile nav toggle -->
+      <button
+        type="button"
+        id="hamburger"
+        class="btn btn-link topbar-btn"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
       >
-    </search>
-    <button type="button" class="btn btn-link text-decoration-none" id="search-cancel">
-      {{- site.data.locales[include.lang].search.cancel -}}
-    </button>
+        <i class="fas fa-bars fa-fw"></i>
+      </button>
+
+      <!-- Hidden sidebar-trigger: required by Chirpy commons.min.js (pn.onclick) -->
+      <button id="sidebar-trigger" hidden aria-hidden="true"></button>
+    </div>
   </div>
+
+  <!-- Mobile drawer (anchored below topbar) -->
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile Navigation" hidden>
+    <a href="{{ '/writings/' | relative_url }}" class="nav-link{% if page.url == '/writings/' %} active{% endif %}">
+      writings
+    </a>
+
+    <a href="{{ '/talks/' | relative_url }}" class="nav-link{% if page.url == '/talks/' %} active{% endif %}">
+      talks
+    </a>
+
+    <a href="{{ '/projects/' | relative_url }}" class="nav-link{% if page.url == '/projects/' %} active{% endif %}">
+      projects
+    </a>
+
+    <a href="{{ '/animations/' | relative_url }}" class="nav-link{% if page.url == '/animations/' %} active{% endif %}">
+      animations
+    </a>
+
+    <a href="{{ '/about/' | relative_url }}" class="nav-link{% if page.url == '/about/' %} active{% endif %}">
+      about
+    </a>
+  </nav>
 </header>
+
+<script>
+  (function () {
+    var btn = document.getElementById('hamburger');
+    var menu = document.getElementById('mobile-menu');
+    if (!btn || !menu) return;
+
+    function closeMenu() {
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function () {
+      var open = !menu.hidden;
+      menu.hidden = open;
+      btn.setAttribute('aria-expanded', String(!open));
+    });
+
+    menu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeMenu();
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 992) closeMenu();
+    });
+  })();
+</script>

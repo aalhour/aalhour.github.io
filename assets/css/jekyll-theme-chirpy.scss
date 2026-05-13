@@ -7,6 +7,13 @@
   .bundle
 {%- endif -%}
 ';
+@use 'addon/variables';
+@use 'addon/rouge';
+@use 'addon/topbar';
+@use 'addon/home';
+@use 'addon/footer';
+@use 'addon/row-list';
+@use 'addon/writings';
 
 /* append your custom style below */
 
@@ -36,15 +43,94 @@
   src: url('/assets/fonts/SpaceGrotesk-Bold.woff2') format('woff2');
 }
 
-/* ========== Apply Space Grotesk ========== */
-/* Using higher specificity selectors to override Chirpy's hardcoded fonts */
-
-$font-stack: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-html body {
-  font-family: $font-stack;
+@font-face {
+  font-family: 'Space Grotesk Bold';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/SpaceGrotesk-Bold.woff2') format('woff2');
 }
 
+/* ========== Inter Font (body) ========== */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/Inter-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/assets/fonts/Inter-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/assets/fonts/Inter-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/Inter-Bold.woff2') format('woff2');
+}
+
+/* ========== JetBrains Mono Font (code) ========== */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/assets/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+/* ========== Apply Typography ========== */
+
+$font-body:    'Inter', system-ui, -apple-system, sans-serif;
+$font-display: 'Space Grotesk', system-ui, sans-serif;
+$font-display-bold: 'Space Grotesk Bold', $font-display;
+$font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+/* Body — Inter */
+html body {
+  font-family: $font-body;
+  font-feature-settings: "cv01", "cv02", "cv11"; // Inter stylistic alternates
+}
+
+html .post-content,
+html .page-content {
+  font-family: $font-body;
+  line-height: 1.75;
+}
+
+/* Display — Space Grotesk */
 html h1,
 html h2,
 html h3,
@@ -56,35 +142,85 @@ html .site-subtitle,
 html .nav-link,
 html .post-title,
 html .page-title,
+html .card-title,
 html header .post-desc,
 html #toc-bar .label,
-html #search-results a {
-  font-family: $font-stack;
-}
-
+html #search-results a,
 html #sidebar .site-title,
 html #sidebar .site-subtitle,
-html #sidebar .nav-link {
-  font-family: $font-stack;
+html #sidebar .nav-link,
+html .section-num,
+html .panel-heading {
+  font-family: $font-display;
+  letter-spacing: -0.01em;
 }
 
-html .post-content,
-html .page-content {
-  font-family: $font-stack;
-  line-height: 1.7;
+html h1,
+html h2,
+html h3,
+html h4,
+html h5,
+html h6,
+html .post-title,
+html .page-title,
+html .card-title,
+html .section-num,
+html .panel-heading {
+  font-family: $font-display-bold;
+  font-weight: 400;
 }
 
-/* Additional elements that Chirpy styles with Lato */
+/* Chirpy sets this with an ID selector, so match that specificity. */
+html #panel-wrapper .panel-heading {
+  font-family: $font-display-bold;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+html .post-content h2,
+html .page-content h2 {
+  font-size: 1.85rem;
+  line-height: 1.3;
+}
+
+html .post-content h3,
+html .page-content h3 {
+  font-size: 1.55rem;
+  line-height: 1.35;
+}
+
+html .post-content h4,
+html .page-content h4 {
+  font-size: 1.35rem;
+  line-height: 1.4;
+}
+
+html .post-content h5,
+html .page-content h5 {
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+
+html .post-content h6,
+html .page-content h6 {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+/* Mono — JetBrains Mono with ligatures */
+html code,
+html pre,
 html kbd,
+html samp,
 html .pagination,
+html .footnotes,
 html #toc-popup-content,
 html #toc-popup .header .label,
-html .footnotes,
-html #panel-wrapper .panel-heading,
 html #notification .toast-body,
 html #toc-solo-trigger .label,
 html #archives .date.day {
-  font-family: $font-stack;
+  font-family: $font-mono;
+  font-feature-settings: "calt" 1, "liga" 1; // JetBrains Mono ligatures
 }
 
 /* ========== Sidebar Separator ========== */
@@ -223,6 +359,7 @@ html[data-mode="dark"] blockquote.prompt-monologue {
 }
 
 /* ========== Projects Page Table ========== */
+/* DEPRECATED — remove in Step 8 card-grid migration */
 
 .projects-table {
   width: 100%;
@@ -277,57 +414,6 @@ html[data-mode="dark"] blockquote.prompt-monologue {
 body:has(article[data-toc]) #panel-wrapper .access {
   display: none !important;
 }
-
-// /* ========== Dark Mode Text Color Override ========== */
-
-// /* Reference: Original Chirpy dark mode text color (for comparison) */
-// .chirpy-text-original {
-//   --text-color-original: rgb(175, 176, 177); /* #AFB0B1 - default dark mode */
-// }
-
-// /* Override: Lightened text color for better readability in dark mode */
-// html[data-mode="dark"] {
-//   --text-color: rgb(210, 212, 214); /* #D2D4D6 - lightened ~20% */
-// }
-
-// /* Apply override to body text in dark mode */
-// html[data-mode="dark"] body {
-//   color: rgb(210, 212, 214) !important;
-// }
-
-// html[data-mode="dark"] .post-content,
-// html[data-mode="dark"] .page-content,
-// html[data-mode="dark"] p,
-// html[data-mode="dark"] li {
-//   color: rgb(210, 212, 214);
-// }
-
-// /* Left sidebar: Use the new lighter text color */
-// html[data-mode="dark"] #sidebar {
-//   .site-title,
-//   .site-subtitle,
-//   .nav-link {
-//     color: rgb(210, 212, 214);
-//   }
-
-//   /* Social links at bottom: Keep muted (old color) */
-//   .sidebar-bottom a,
-//   .bottom-wrapper a,
-//   .icon-border {
-//     color: rgb(175, 176, 177);
-//   }
-// }
-
-// /* Right panel (TOC, Recently Updated, Trending Tags): Keep the old darker tone */
-// html[data-mode="dark"] #panel-wrapper,
-// html[data-mode="dark"] #toc-wrapper,
-// html[data-mode="dark"] .access {
-//   color: rgb(175, 176, 177); /* Original dark mode color */
-
-//   a, li, p, span, h2, h3 {
-//     color: rgb(175, 176, 177);
-//   }
-// }
 
 /* ========== Animations Gallery ========== */
 
@@ -412,15 +498,16 @@ body:has(article[data-toc]) #panel-wrapper .access {
 }
 
 .animation-posts-label {
-  font-size: 0.75rem;
-  opacity: 0.55;
+  font-size: 1.03rem;
+  color: var(--text-muted);
   margin-bottom: 0.35rem;
 }
 
 .animation-card-posts-list {
   margin: 0;
-  padding-left: 1.1rem;
-  font-size: 0.9rem;
+  padding-left: 1.25rem;
+  font-size: 1.03rem;
+  line-height: 1.75;
 }
 
 .animation-card-posts-list li + li {
@@ -574,4 +661,60 @@ html[data-mode="dark"] #avatar img {
 
 html[data-mode="dark"] #avatar:hover img {
   filter: brightness(0.85);
+}
+
+/* Body anchors (post + about content only). Distinct color, doesn't touch home/topbar/footer. */
+html:not([data-mode="dark"]) .post-content a:not(.img-link):not(.popup),
+html:not([data-mode="dark"]) .page-content a:not(.img-link):not(.popup),
+html[data-mode="light"] .post-content a:not(.img-link):not(.popup),
+html[data-mode="light"] .page-content a:not(.img-link):not(.popup) {
+  color: #1E5BB3;
+
+  &:hover {
+    color: #143D78;
+  }
+}
+
+/* About page portrait: float right, wrap text around it */
+.content p:has(> .about-portrait),
+.content p:has(> a > .about-portrait),
+.page-content p:has(> .about-portrait),
+.page-content p:has(> a > .about-portrait) {
+  float: right;
+  width: 220px;
+  margin: 0.25rem 0 1rem 1.5rem;
+  shape-outside: margin-box;
+}
+
+.about-portrait {
+  display: block;
+  width: 100%;
+  height: 220px;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  box-shadow: 0 2px 12px rgba(31, 27, 22, 0.1);
+}
+
+/* Clearfix below the floated portrait to prevent overflow into footer/next sections */
+.page-content::after,
+.content::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+@media (max-width: 575px) {
+  .content p:has(> .about-portrait),
+  .content p:has(> a > .about-portrait),
+  .page-content p:has(> .about-portrait),
+  .page-content p:has(> a > .about-portrait) {
+    float: right;
+    width: 120px;
+    margin: 0.25rem 0 0.75rem 1rem;
+  }
+
+  .about-portrait {
+    width: 100%;
+    height: 120px;
+  }
 }

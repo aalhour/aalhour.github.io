@@ -6,49 +6,35 @@ layout: page
 permalink: /animations/
 ---
 
-_Interactive visualizations I use to explain systems concepts across posts and projects._
+Interactive visualizations I use to explain systems concepts across posts and projects.
 
----
-
-<div class="animation-gallery">
+<ul class="row-list animations-list">
   {% for animation in site.data.animations %}
-    <article class="animation-card">
-      <a class="animation-card-main" href="{{ animation.url | relative_url }}" aria-label="Open {{ animation.title }} animation">
-        <div class="animation-card-preview animation-preview-{{ animation.preview.variant }}" aria-hidden="true">
-          {% if animation.preview.variant == "lsm" %}
-            <span class="preview-node preview-memory">Memtable</span>
-            <span class="preview-arrow"></span>
-            <span class="preview-node preview-level">L0</span>
-            <span class="preview-node preview-level">L1</span>
-            <span class="preview-node preview-level">L2</span>
-          {% elsif animation.preview.variant == "skiplist" %}
-            <span class="preview-lane lane-top"></span>
-            <span class="preview-lane lane-mid"></span>
-            <span class="preview-lane lane-base"></span>
-            <span class="preview-dot dot-a"></span>
-            <span class="preview-dot dot-b"></span>
-            <span class="preview-dot dot-c"></span>
-            <span class="preview-dot dot-d"></span>
-          {% elsif animation.preview.variant == "fsync" %}
-            <span class="preview-node preview-app">app</span>
-            <span class="preview-node preview-cache">page cache</span>
-            <span class="preview-node preview-disk">disk</span>
-            <span class="preview-sync-line"></span>
-          {% endif %}
-        </div>
-
-        <div class="animation-card-copy">
-          <div class="animation-card-header">
-            <h3 class="animation-card-title">{{ animation.title }}</h3>
-            <span class="status-pill kind-educational">{{ animation.kind }}</span>
+    <li class="row-list-item">
+      <div class="row-list-meta">{{ animation.kind }}</div>
+      <div class="row-list-body">
+        <a class="row-list-title" href="{{ animation.url | relative_url }}">{{ animation.title }}</a>
+        <p class="row-list-subtitle">{{ animation.summary }}</p>
+        {% capture usage_marker %}<!-- animation: {{ animation.include_path }} -->{% endcapture %}
+        {% assign usage_count = 0 %}
+        {% for post in site.posts %}
+          {% if post.content contains usage_marker %}{% assign usage_count = usage_count | plus: 1 %}{% endif %}
+        {% endfor %}
+        {% if usage_count > 0 %}
+          <div class="row-list-usage">
+            <span class="row-list-usage-label">Used in:</span>
+            {% assign first = true %}
+            {% for post in site.posts reversed %}
+              {% if post.content contains usage_marker %}
+                {% unless first %}<span class="row-list-usage-sep">·</span>{% endunless %}
+                <a class="row-list-usage-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                {% assign first = false %}
+              {% endif %}
+            {% endfor %}
           </div>
-          <p class="animation-card-desc">{{ animation.summary }}</p>
-        </div>
-      </a>
-
-      <div class="animation-card-usage">
-        {% include animation-used-in.html include_path=animation.include_path %}
+        {% endif %}
       </div>
-    </article>
+      <a class="row-list-link" href="{{ animation.url | relative_url }}">open →</a>
+    </li>
   {% endfor %}
-</div>
+</ul>

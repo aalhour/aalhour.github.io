@@ -1,0 +1,44 @@
+// ─── Site footer ─────────────────────────────────────────────────────────────
+
+#site-footer {
+  padding: 1.5rem 0 2rem;
+  border-top: 1px solid var(--main-border-color);
+  color: var(--text-muted);
+  gap: 0.5rem;
+}
+
+.footer-social {
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+
+  li { margin: 0; }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.4rem;
+    color: var(--text-muted);
+    font-size: 1.02rem;
+    text-decoration: none;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &:hover {
+      color: var(--link-color);
+      background: var(--accent-soft);
+      text-decoration: none;
+    }
+  }
+}
+
+.footer-copy {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+
+  time { font-variant-numeric: tabular-nums; }
+}

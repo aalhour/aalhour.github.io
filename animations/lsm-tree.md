@@ -1,5 +1,5 @@
 ---
-title: LSM-Tree
+title: Log-structured merge-tree (LSM Tree)
 layout: page
 permalink: /animations/lsm-tree/
 ---

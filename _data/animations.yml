@@ -1,10 +1,10 @@
 - slug: "lsm-tree"
-  title: "LSM-Tree"
-  kind: "data structure"
+  title: "Log-structured merge-tree (LSM Tree)"
+  kind: "database architecture"
   include_path: "animations/lsm-tree.html"
   url: "/animations/lsm-tree/"
   summary: "An interactive demo of a simple LSM-based key-value storage engine: Put, Get, Delete, memtable flushes, and compaction across SSTable levels."
-  detail: "This animation is a compact, educational model of a log-structured merge tree backing a simple key-value storage engine. It covers Put, Get, Delete, memtable flushes, and compaction so the moving pieces are easier to reason about. It is not a production-accurate RocksDB, Cassandra, or HBase simulator: bloom filters, block indexes, concurrent background work, write stalls, and real compaction strategies are deliberately left out."
+  detail: "This animation is a compact, educational model of a log-structured merge-tree backing a simple key-value storage engine. It covers Put, Get, Delete, memtable flushes, and compaction so the moving pieces are easier to reason about. It is not a production-accurate RocksDB, Cassandra, or HBase simulator: bloom filters, block indexes, concurrent background work, write stalls, and real compaction strategies are deliberately left out."
   preview:
     variant: "lsm"
 
