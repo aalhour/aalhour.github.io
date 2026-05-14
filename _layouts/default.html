@@ -12,31 +12,50 @@ layout: compress
   {% capture prefer_mode %}data-mode="{{ site.theme_mode }}"{% endcapture %}
 {% endif %}
 
+{%- comment -%}
+  Shell selection.
+  - show_panel: post pages (TOC) + /archives/ (trending/updated).
+  - shell-animation-detail: single-animation pages (wider container, no narrow reader clamp).
+  - shell-reader: everything else (home, /writings/, /talks/, /projects/, /animations/, /about/, /tags/, /categories/).
+{%- endcomment -%}
+
+{% assign show_archive_widgets = false %}
+{% if page.url == '/archives/' %}{% assign show_archive_widgets = true %}{% endif %}
+
+{% assign has_panel_includes = false %}
+{% if layout.panel_includes and layout.panel_includes.size > 0 %}
+  {% assign has_panel_includes = true %}
+{% endif %}
+
+{% assign show_panel = false %}
+{% if show_archive_widgets or has_panel_includes %}
+  {% assign show_panel = true %}
+{% endif %}
+
+{% assign is_animation_detail = false %}
+{% if page.shell == 'animation-detail' %}{% assign is_animation_detail = true %}{% endif %}
+
+{% if show_panel %}
+  {% assign shell_class = 'shell-panel' %}
+{% elsif is_animation_detail %}
+  {% assign shell_class = 'shell-animation-detail' %}
+{% else %}
+  {% assign shell_class = 'shell-reader' %}
+{% endif %}
+
 <!-- `site.alt_lang` can specify a language different from the UI -->
 <html lang="{{ page.lang | default: site.alt_lang | default: site.lang }}" {{ prefer_mode }}>
   {% include head.html lang=lang %}
 
-  <body>
+  <body class="{{ shell_class }}">
     {% include topbar.html lang=lang %}
 
     <div id="main-wrapper" class="d-flex justify-content-center">
       <div class="container d-flex flex-column px-xxl-5">
 
-        {% assign show_archive_widgets = false %}
-        {% if page.url == '/archives/' %}{% assign show_archive_widgets = true %}{% endif %}
-
-        {% assign has_panel_includes = false %}
-        {% if layout.panel_includes and layout.panel_includes.size > 0 %}
-          {% assign has_panel_includes = true %}
-        {% endif %}
-
-        {% assign show_panel = false %}
-        {% if show_archive_widgets or has_panel_includes %}
-          {% assign show_panel = true %}
-        {% endif %}
-
         <div class="row flex-grow-1">
-          <main aria-label="Main Content" class="col-12 col-lg-11 {% if show_panel %}col-xl-9{% else %}col-xl-12{% endif %} px-md-4">
+          <main aria-label="Main Content"
+                class="col-12 col-lg-11 {% if show_panel %}col-xl-9{% else %}col-xl-12{% endif %} px-md-4 site-main site-main--{{ shell_class | remove: 'shell-' }}">
             {% if layout.layout == 'default' and page.layout != 'home' %}
               {% include refactor-content.html content=content lang=lang %}
             {% else %}
@@ -64,7 +83,8 @@ layout: compress
 
         <div class="row">
           <!-- tail -->
-          <div id="tail-wrapper" class="col-12 col-lg-11 {% if show_panel %}col-xl-9{% else %}col-xl-12{% endif %} px-md-4">
+          <div id="tail-wrapper"
+               class="col-12 col-lg-11 {% if show_panel %}col-xl-9{% else %}col-xl-12{% endif %} px-md-4 site-tail site-tail--{{ shell_class | remove: 'shell-' }}">
             {% for _include in layout.tail_includes %}
               {% assign _include_path = _include | append: '.html' %}
               {% include {{ _include_path }} lang=lang %}

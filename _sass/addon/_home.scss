@@ -3,7 +3,7 @@
 // ─── Home hub (Step 4) ───────────────────────────────────────────────────────
 
 .home-hub {
-  width: 100%;
+  // Width is clamped by the reader shell on body.shell-reader (see _layout.scss).
   margin: 0 auto;
   padding: 1rem 0 4rem;
 

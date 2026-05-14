@@ -41,3 +41,14 @@ $topbar-shell-offset: 3.85rem;
 $anchor-scroll-padding: 2.25rem;
 $heading-scroll-margin: 2rem;
 $short-page-shell-min-height: 80vh;
+
+// ─── Reader Shell ────────────────────────────────────────────────────────────
+// Tight content width for no-panel pages (home, /writings/, /talks/, /projects/,
+// /animations/, /about/, /tags/, /categories/). Matches readability research:
+// 50-75 CPL, max 80 (WCAG 1.4.8). 50rem at 1.03rem Inter ≈ 75-85 CPL.
+$reader-content-max: 50rem;
+$reader-shell-max: calc(#{$reader-content-max} + 3rem);
+
+// Single-animation detail pages stay wider — they show interactive demos,
+// not prose. Use the panel-shell width.
+$animation-detail-shell-max: $shell-max-xl;

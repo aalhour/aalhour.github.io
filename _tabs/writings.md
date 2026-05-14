@@ -13,7 +13,7 @@ permalink: /writings/
 {% assign by_year = visible_posts | group_by_exp: 'p', 'p.date | date: "%Y"' %}
 
 <div class="writings-page">
-  <p class="writings-lede">
+  <p>
     Essays and notes on software, systems, books, philosophy, and the useful trouble in between.
   </p>
 

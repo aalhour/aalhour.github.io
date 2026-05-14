@@ -3,16 +3,7 @@
 // ─── Writings (annotated archive at /writings/) ──────────────────────────────
 
 .writings-page {
-  width: 100%;
-  max-width: none;
-}
-
-.writings-lede {
-  max-width: none;
-  margin: 0 0 2rem;
-  color: var(--text-muted);
-  font-size: 1.05rem;
-  line-height: 1.7;
+  // Width is set by the reader shell on body.shell-reader (see _layout.scss).
 }
 
 .writings-year {
@@ -243,12 +234,15 @@
   &[data-c='career'] {
     color: #A04B26;
   }
+
   &[data-c='philosophy'] {
     color: #6B2D5C;
   }
+
   &[data-c='books'] {
     color: #A05B22;
   }
+
   &[data-c='meta'] {
     color: var(--text-muted);
   }
@@ -281,9 +275,11 @@
 html[data-mode='dark'] .writings-browse-cat[data-c='career'] {
   color: #E68A5C;
 }
+
 html[data-mode='dark'] .writings-browse-cat[data-c='philosophy'] {
   color: #C49AC4;
 }
+
 html[data-mode='dark'] .writings-browse-cat[data-c='books'] {
   color: #CC9156;
 }

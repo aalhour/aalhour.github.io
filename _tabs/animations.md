@@ -14,7 +14,9 @@ Interactive visualizations I use to explain systems concepts across posts and pr
 <ul class="row-list animations-list">
   {% for animation in site.data.animations %}
     <li class="row-list-item">
-      <div class="row-list-meta">{{ animation.kind }}</div>
+      <div class="row-list-meta">
+        <span class="status">{{ animation.kind }}</span>
+      </div>
       <div class="row-list-body">
         <a class="row-list-title" href="{{ animation.url | relative_url }}">{{ animation.title }}</a>
         <p class="row-list-subtitle">{{ animation.summary }}</p>
@@ -37,7 +39,6 @@ Interactive visualizations I use to explain systems concepts across posts and pr
           </div>
         {% endif %}
       </div>
-      <a class="row-list-link" href="{{ animation.url | relative_url }}">open →</a>
     </li>
   {% endfor %}
 </ul>

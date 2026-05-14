@@ -31,7 +31,6 @@ A mix of active projects and older work: some educational rabbit holes, some pra
           <a class="row-list-title" href="{{ project.link }}" target="_blank" rel="noopener">{{ project.title }}</a>
           <p class="row-list-subtitle">{{ project.description | markdownify | remove: '<p>' | remove: '</p>' }}</p>
         </div>
-        <a class="row-list-link" href="{{ project.link }}" target="_blank" rel="noopener">{{ project.link_title | default: 'open' }} →</a>
       </li>
     {% endif %}
   {% endfor %}
@@ -48,20 +47,19 @@ Archived, finished, and older collaborations.
         <div class="row-list-meta">
           {{ project.kind }}
           {% if project.maintenance == "archived" %}
-            <span class="status muted">archived</span>
+            <span class="status">archived</span>
           {% elsif project.maintenance == "abandoned" %}
-            <span class="status muted">abandoned</span>
+            <span class="status">abandoned</span>
           {% elsif project.engagement == "contributor" %}
-            <span class="status muted">contributed</span>
+            <span class="status">contributed</span>
           {% else %}
-            <span class="status muted">past</span>
+            <span class="status">past</span>
           {% endif %}
         </div>
         <div class="row-list-body">
           <a class="row-list-title" href="{{ project.link }}" target="_blank" rel="noopener">{{ project.title }}</a>
           <p class="row-list-subtitle">{{ project.description | markdownify | remove: '<p>' | remove: '</p>' }}</p>
         </div>
-        <a class="row-list-link" href="{{ project.link }}" target="_blank" rel="noopener">{{ project.link_title | default: 'open' }} →</a>
       </li>
     {% endif %}
   {% endfor %}
