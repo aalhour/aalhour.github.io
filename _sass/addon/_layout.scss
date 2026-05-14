@@ -4,10 +4,6 @@
 // Chirpy is sidebar-first. These rules reshape the page shell for the
 // horizontal topbar layout; component-specific styles live in their own files.
 
-#sidebar {
-  display: none !important;
-}
-
 // Zero Chirpy's sidebar-induced left margin and reserve space for the fixed topbar.
 #main-wrapper {
   margin-left: 0 !important;

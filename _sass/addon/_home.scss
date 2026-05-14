@@ -2,9 +2,6 @@
 
 // ─── Home hub (Step 4) ───────────────────────────────────────────────────────
 
-// Hide Chirpy's right panel (TOC/trending) on home: slim hub doesn't need it
-body[data-spy] #panel-wrapper { /* no-op anchor */ }
-
 .home-hub {
   width: 100%;
   margin: 0 auto;
@@ -20,12 +17,6 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
       text-underline-offset: 3px;
     }
   }
-}
-
-// On home, kill the right panel that default.html injects
-.layout-home {
-  #panel-wrapper { display: none !important; }
-  main { width: 100% !important; max-width: 100% !important; }
 }
 
 // ─── Hero ────────────────────────────────────────────────────────────────────

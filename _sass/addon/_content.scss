@@ -45,11 +45,6 @@ html[data-mode="dark"] blockquote.prompt-monologue {
   }
 }
 
-// Hide Chirpy's access blocks on post pages while keeping the TOC visible.
-body:has(article[data-toc]) #panel-wrapper .access {
-  display: none !important;
-}
-
 // Body anchors only; this deliberately avoids home, topbar, and footer links.
 html:not([data-mode="dark"]) .post-content a:not(.img-link):not(.popup),
 html:not([data-mode="dark"]) .page-content a:not(.img-link):not(.popup),
