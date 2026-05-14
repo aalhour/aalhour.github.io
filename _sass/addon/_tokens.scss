@@ -19,6 +19,22 @@ $bp-md-exclusive-max: 767px;
 $bp-md-max: 768px;
 $bp-lg-min: 992px;
 $bp-lg-max: 991.98px;
+$bp-xl-min: 1200px;
+$bp-xxl-min: 1400px;
+$bp-xxxl-min: 1650px;
+
+// ─── Page Shell ──────────────────────────────────────────────────────────────
+// Bootstrap desktop container widths, plus Chirpy's custom xxxl cap.
+$shell-max-lg: 960px;
+$shell-max-xl: 1140px;
+$shell-max-xxl: 1320px;
+$shell-max-xxxl: 1250px;
+
+$shell-content-gutter-lg: 3.42rem;
+$shell-content-gutter-xl: 2.25rem;
+$shell-content-gutter-xxl: 4.5rem;
+$shell-content-left-gutter-xxxl: 3.25rem;
+$shell-content-right-gutter-xxxl: 6.25rem;
 
 $topbar-height: 3.25rem;
 $topbar-shell-offset: 3.85rem;

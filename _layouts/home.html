@@ -80,7 +80,7 @@ layout: default
     </header>
     <ul class="home-list">
       {% for talk in recent_talks %}
-      {% assign link = talk.video_link | default: talk.slides_link | default: talk.speakerdeck_link %}
+      {% assign link = talk.video_link | default: talk.speakerdeck_link | default: talk.slides_link %}
       <li class="home-list-item">
         {% if talk.date %}
         <time class="home-list-date">{{ talk.date }}</time>

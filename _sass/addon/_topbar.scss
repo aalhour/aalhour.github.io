@@ -28,13 +28,44 @@ html {
 }
 
 #topbar {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0.35rem 1.25rem;
   height: $topbar-height;
+}
+
+@media (min-width: $bp-lg-min) {
+  #topbar {
+    max-width: $shell-max-lg;
+    padding-inline: $shell-content-gutter-lg;
+  }
+}
+
+@media (min-width: $bp-xl-min) {
+  #topbar {
+    max-width: $shell-max-xl;
+    padding-inline: $shell-content-gutter-xl;
+  }
+}
+
+@media (min-width: $bp-xxl-min) {
+  #topbar {
+    max-width: $shell-max-xxl;
+    padding-inline: $shell-content-gutter-xxl;
+  }
+}
+
+@media (min-width: $bp-xxxl-min) {
+  #topbar {
+    max-width: $shell-max-xxxl;
+    padding-left: $shell-content-left-gutter-xxxl;
+    padding-right: $shell-content-right-gutter-xxxl;
+  }
 }
 
 // ─── Brand ────────────────────────────────────────────────────────────────────
@@ -87,16 +118,6 @@ html {
       color: var(--link-color);
       font-weight: 600;
     }
-  }
-
-  .topbar-sep {
-    display: inline-block;
-    width: 1px;
-    height: 1rem;
-    background: var(--main-border-color);
-    margin: 0 0.4rem;
-    flex-shrink: 0;
-    align-self: center;
   }
 }
 
@@ -303,11 +324,5 @@ html {
       color: var(--link-color);
       font-weight: 600;
     }
-  }
-
-  .mobile-sep {
-    border: 0;
-    border-top: 1px solid var(--main-border-color);
-    margin: 0.4rem 0;
   }
 }
