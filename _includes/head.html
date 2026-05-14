@@ -32,17 +32,18 @@
   {% include media-url.html src=site.social_preview_image absolute=true %}
   {%- endcapture -%}
 
-  {%- capture og_image -%}
+  {% capture og_image %}
   <meta property="og:image" content="{{ img_url }}" />
-  {%- endcapture -%}
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  {% endcapture %}
 
-  {%- capture twitter_image -%}
+  {% capture twitter_image %}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta property="twitter:image" content="{{ img_url }}" />
-  {%- endcapture -%}
+  <meta name="twitter:image" content="{{ img_url }}" />
+  {% endcapture %}
 
-  {% assign old_meta_clip = '
-  <meta name="twitter:card" content="summary" />' %}
+  {% assign old_meta_clip = '<meta name="twitter:card" content="summary" />' %}
   {% assign new_meta_clip = og_image | append: twitter_image %}
   {% assign seo_tags = seo_tags | replace: old_meta_clip, new_meta_clip %}
   {% endif %}
