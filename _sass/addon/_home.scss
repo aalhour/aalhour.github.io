@@ -75,12 +75,18 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-photo {
+  display: block;
   width: 132px;
   height: 132px;
   border-radius: 0.6rem;
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: 0 2px 12px rgba(31, 27, 22, 0.08);
+  text-decoration: none !important;
+
+  &:hover {
+    text-decoration: none !important;
+  }
 
   @media (max-width: $bp-home-stack-max) {
     float: right;

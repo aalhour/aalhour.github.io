@@ -89,8 +89,9 @@
   }
 }
 
+// Mobile safe-area only; tail-wrapper handles breathing room in _layout.scss.
 @media (max-width: $bp-lg-max) {
   #site-footer {
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
   }
 }

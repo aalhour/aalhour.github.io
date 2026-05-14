@@ -6,6 +6,13 @@ $font-display: 'Space Grotesk', system-ui, sans-serif;
 $font-display-bold: 'Space Grotesk Bold', $font-display;
 $font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
+// ─── Breakpoints ─────────────────────────────────────────────────────────────
+// $bp-sm-max: site-wide "stack to single column" threshold (Bootstrap sm).
+// $bp-home-stack-max: 25px wider than $bp-sm-max so the home hero photo keeps
+//   wrapping the lede on small landscape phones / iPhone Pro Max portrait
+//   instead of jumping to the desktop side-by-side layout too early.
+// $bp-md-* / $bp-lg-*: Bootstrap-equivalent thresholds (991.98px matches
+//   Bootstrap's `max-width: 991.98px` convention for lg).
 $bp-sm-max: 575px;
 $bp-home-stack-max: 600px;
 $bp-md-exclusive-max: 767px;

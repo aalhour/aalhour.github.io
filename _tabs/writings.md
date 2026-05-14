@@ -94,7 +94,7 @@ permalink: /writings/
 
   <section class="writings-section writings-section-spaced" aria-labelledby="browse-category">
     <header class="writings-section-header">
-      <h2 id="browse-category">Browse By Category</h2>
+      <h2 id="browse-category">Browse by Category</h2>
       <a href="{{ '/categories/' | relative_url }}">all categories <span aria-hidden="true">→</span></a>
     </header>
 
@@ -125,7 +125,7 @@ permalink: /writings/
 
   <section class="writings-section writings-section-spaced" aria-labelledby="browse-tags">
     <header class="writings-section-header">
-      <h2 id="browse-tags">Tags</h2>
+      <h2 id="browse-tags">Browse by Tag</h2>
       <a href="{{ '/tags/' | relative_url }}">all tags <span aria-hidden="true">→</span></a>
     </header>
 
