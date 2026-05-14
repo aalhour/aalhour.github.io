@@ -33,8 +33,13 @@
 // ─── SHARED TABLE BOILERPLATE ─────────────────────────────────────────────────
 
 @mixin highlight-base {
-  .highlight table td { padding: 5px; }
-  .highlight table pre { margin: 0; }
+  .highlight table td {
+    padding: 5px;
+  }
+
+  .highlight table pre {
+    margin: 0;
+  }
 }
 
 // ─── LIGHT SYNTAX THEME ───────────────────────────────────────────────────────
@@ -55,13 +60,17 @@
   .highlight .kp,
   .highlight .kr,
   .highlight .kt,
-  .highlight .kv { color: #C0623A; }
+  .highlight .kv {
+    color: #C0623A;
+  }
 
   // Keyword.constant, operators, regex
   .highlight .kc,
   .highlight .o,
   .highlight .ow,
-  .highlight .sr { color: #2D7A7B; }
+  .highlight .sr {
+    color: #2D7A7B;
+  }
 
   // Strings
   .highlight .s,
@@ -75,10 +84,14 @@
   .highlight .sx,
   .highlight .s1,
   .highlight .ss,
-  .highlight .sb { color: #5C8040; }
+  .highlight .sb {
+    color: #5C8040;
+  }
 
   // String.interpol
-  .highlight .si { color: #2D7A7B; }
+  .highlight .si {
+    color: #2D7A7B;
+  }
 
   // Comments
   .highlight .c,
@@ -88,7 +101,9 @@
   .highlight .cp,
   .highlight .cpf,
   .highlight .c1,
-  .highlight .cs { color: #7A6F5F; }
+  .highlight .cs {
+    color: #7A6F5F;
+  }
 
   // Numbers / literals
   .highlight .m,
@@ -100,26 +115,38 @@
   .highlight .mo,
   .highlight .mx,
   .highlight .l,
-  .highlight .ld { color: #8E6F4A; }
+  .highlight .ld {
+    color: #8E6F4A;
+  }
 
   // Functions / methods
   .highlight .nf,
-  .highlight .fm { color: #7A5C8E; }
+  .highlight .fm {
+    color: #7A5C8E;
+  }
 
   // Decorators
-  .highlight .nd { color: #8E6F4A; }
+  .highlight .nd {
+    color: #8E6F4A;
+  }
 
   // Classes, types, namespaces, constants
   .highlight .nc,
   .highlight .no,
-  .highlight .nn { color: #4F6C9E; }
+  .highlight .nn {
+    color: #4F6C9E;
+  }
 
   // Tags, attributes
   .highlight .na,
-  .highlight .nt { color: #5C7A4A; }
+  .highlight .nt {
+    color: #5C7A4A;
+  }
 
   // Builtins
-  .highlight .nb { color: #A04B26; }
+  .highlight .nb {
+    color: #A04B26;
+  }
 
   // Variables, labels, exceptions, properties, pseudo-builtins
   .highlight .nv,
@@ -130,7 +157,9 @@
   .highlight .nl,
   .highlight .ne,
   .highlight .py,
-  .highlight .bp { color: #4F6C9E; }
+  .highlight .bp {
+    color: #4F6C9E;
+  }
 
   // Generic inserted (diff +)
   .highlight .gi {
@@ -156,7 +185,9 @@
   }
 
   // Generic.traceback error
-  .highlight .gr { color: #FAF6EE; }
+  .highlight .gr {
+    color: #FAF6EE;
+  }
 
   // Error
   .highlight .err {
@@ -170,10 +201,17 @@
   .highlight .gs,
   .highlight .gl,
   .highlight .gt,
-  .highlight .gp { color: #1F1B16; }
+  .highlight .gp {
+    color: #1F1B16;
+  }
 
-  .highlight .ge { font-style: italic; }
-  .highlight .gs { font-weight: bold; }
+  .highlight .ge {
+    font-style: italic;
+  }
+
+  .highlight .gs {
+    font-weight: bold;
+  }
 }
 
 // ─── DARK SYNTAX THEME ────────────────────────────────────────────────────────
@@ -194,13 +232,17 @@
   .highlight .kp,
   .highlight .kr,
   .highlight .kt,
-  .highlight .kv { color: #E68A5C; }
+  .highlight .kv {
+    color: #E68A5C;
+  }
 
   // Keyword.constant, operators, regex
   .highlight .kc,
   .highlight .o,
   .highlight .ow,
-  .highlight .sr { color: #4FB3B4; }
+  .highlight .sr {
+    color: #4FB3B4;
+  }
 
   // Strings
   .highlight .s,
@@ -214,10 +256,14 @@
   .highlight .sx,
   .highlight .s1,
   .highlight .ss,
-  .highlight .sb { color: #7DC47C; }
+  .highlight .sb {
+    color: #7DC47C;
+  }
 
   // String.interpol
-  .highlight .si { color: #4FB3B4; }
+  .highlight .si {
+    color: #4FB3B4;
+  }
 
   // Comments
   .highlight .c,
@@ -227,7 +273,9 @@
   .highlight .cp,
   .highlight .cpf,
   .highlight .c1,
-  .highlight .cs { color: #A89A7E; }
+  .highlight .cs {
+    color: #A89A7E;
+  }
 
   // Numbers / literals
   .highlight .m,
@@ -239,26 +287,38 @@
   .highlight .mo,
   .highlight .mx,
   .highlight .l,
-  .highlight .ld { color: #D4A857; }
+  .highlight .ld {
+    color: #D4A857;
+  }
 
   // Functions / methods
   .highlight .nf,
-  .highlight .fm { color: #B08ED4; }
+  .highlight .fm {
+    color: #B08ED4;
+  }
 
   // Decorators
-  .highlight .nd { color: #D4A857; }
+  .highlight .nd {
+    color: #D4A857;
+  }
 
   // Classes, types, namespaces, constants
   .highlight .nc,
   .highlight .no,
-  .highlight .nn { color: #7BA3D4; }
+  .highlight .nn {
+    color: #7BA3D4;
+  }
 
   // Tags, attributes
   .highlight .na,
-  .highlight .nt { color: #88BA6E; }
+  .highlight .nt {
+    color: #88BA6E;
+  }
 
   // Builtins
-  .highlight .nb { color: #F0A077; }
+  .highlight .nb {
+    color: #F0A077;
+  }
 
   // Variables, labels, exceptions, properties, pseudo-builtins
   .highlight .nv,
@@ -269,7 +329,9 @@
   .highlight .nl,
   .highlight .ne,
   .highlight .py,
-  .highlight .bp { color: #7BA3D4; }
+  .highlight .bp {
+    color: #7BA3D4;
+  }
 
   // Generic inserted (diff +)
   .highlight .gi {
@@ -295,7 +357,9 @@
   }
 
   // Generic.traceback
-  .highlight .gr { color: #1B1813; }
+  .highlight .gr {
+    color: #1B1813;
+  }
 
   // Error
   .highlight .err {
@@ -309,15 +373,23 @@
   .highlight .gs,
   .highlight .gl,
   .highlight .gt,
-  .highlight .gp { color: #EFE7D6; }
+  .highlight .gp {
+    color: #EFE7D6;
+  }
 
-  .highlight .ge { font-style: italic; }
-  .highlight .gs { font-weight: bold; }
+  .highlight .ge {
+    font-style: italic;
+  }
+
+  .highlight .gs {
+    font-weight: bold;
+  }
 }
 
 // ─── Apply with identical selector structure as Chirpy's _base.scss ───────────
 
 @media (prefers-color-scheme: light) {
+
   html:not([data-mode]),
   html[data-mode='light'] {
     @include rouge-light;
@@ -329,6 +401,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
+
   html:not([data-mode]),
   html[data-mode='dark'] {
     @include rouge-dark;
