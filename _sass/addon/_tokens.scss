@@ -1,0 +1,20 @@
+// Shared addon tokens.
+// Keep cross-cutting constants here so component partials can stay semantic.
+
+$font-body: 'Inter', system-ui, -apple-system, sans-serif;
+$font-display: 'Space Grotesk', system-ui, sans-serif;
+$font-display-bold: 'Space Grotesk Bold', $font-display;
+$font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+$bp-sm-max: 575px;
+$bp-home-stack-max: 600px;
+$bp-md-exclusive-max: 767px;
+$bp-md-max: 768px;
+$bp-lg-min: 992px;
+$bp-lg-max: 991.98px;
+
+$topbar-height: 3.25rem;
+$topbar-shell-offset: 3.85rem;
+$anchor-scroll-padding: 2.25rem;
+$heading-scroll-margin: 2rem;
+$short-page-shell-min-height: 80vh;

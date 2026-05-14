@@ -1,10 +1,7 @@
 <!-- Site footer -->
 
-<footer
-  id="site-footer"
-  aria-label="Site footer"
-  class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center text-muted"
->
+<footer id="site-footer" aria-label="Site footer"
+  class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center text-muted">
   <ul class="footer-social list-unstyled d-flex mb-2 mb-lg-0" aria-label="Social links">
     <li>
       <a href="https://github.com/aalhour" aria-label="GitHub" rel="noopener noreferrer">
@@ -28,7 +25,15 @@
     </li>
   </ul>
 
-  <p class="footer-copy mb-0">
-    © 2015–<time>{{ 'now' | date: '%Y' }}</time> Ahmad Alhour. All rights reserved.
-  </p>
+  <div class="footer-meta">
+    <p class="footer-copy mb-0">
+      © 2015–<time>{{ 'now' | date: '%Y' }}</time> Ahmad Alhour. All rights reserved.
+    </p>
+    <p class="footer-built mb-0">
+      Made with &lt;3 using
+      <a href="https://jekyllrb.com/" rel="noopener noreferrer" target="_blank">Jekyll</a>
+      and
+      <a href="https://github.com/cotes2020/jekyll-theme-chirpy" rel="noopener noreferrer" target="_blank">Chirpy</a>.
+    </p>
+  </div>
 </footer>

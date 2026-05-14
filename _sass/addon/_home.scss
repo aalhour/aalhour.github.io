@@ -1,3 +1,5 @@
+@use 'tokens' as *;
+
 // ─── Home hub (Step 4) ───────────────────────────────────────────────────────
 
 // Hide Chirpy's right panel (TOC/trending) on home: slim hub doesn't need it
@@ -34,7 +36,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
   align-items: flex-start;
   margin-bottom: 2.5rem;
 
-  @media (max-width: 600px) {
+  @media (max-width: $bp-home-stack-max) {
     display: block;
 
     &::after {
@@ -56,7 +58,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-title {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: $font-display;
   font-size: 2.1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -80,7 +82,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
   flex-shrink: 0;
   box-shadow: 0 2px 12px rgba(31, 27, 22, 0.08);
 
-  @media (max-width: 600px) {
+  @media (max-width: $bp-home-stack-max) {
     float: right;
     width: 110px;
     height: 110px;
@@ -108,7 +110,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-pinned-label {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: $font-mono;
   font-size: 0.72rem;
   color: var(--accent-color, var(--link-color));
   text-transform: uppercase;
@@ -117,7 +119,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-pinned-title {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: $font-display;
   font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.3;
@@ -142,7 +144,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-pinned-meta {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: $font-mono;
   font-size: 0.76rem;
   color: var(--text-muted);
 
@@ -164,7 +166,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
   border-radius: 0 0.3rem 0.3rem 0;
 
   .home-now-label {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: $font-mono;
     font-size: 0.72rem;
     color: var(--prompt-tip-icon-color, #2D7A7B);
     text-transform: uppercase;
@@ -201,7 +203,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
   padding-bottom: 0.5rem;
 
   h2 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: $font-display;
     font-size: 0.78rem;
     font-weight: 500;
     margin: 0;
@@ -213,7 +215,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-section-arrow {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: $font-mono;
   font-size: 0.78rem;
   color: var(--accent-color, var(--link-color));
 
@@ -239,7 +241,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 
   &:last-child { border-bottom: 0; }
 
-  @media (max-width: 575px) {
+  @media (max-width: $bp-sm-max) {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.2rem;
@@ -248,7 +250,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-list-date {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: $font-mono;
   font-size: 0.82rem;
   color: var(--text-muted);
   min-width: 5.5rem;
@@ -257,7 +259,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 
 .home-hub .home-list-link {
   color: var(--text-color);
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: $font-display;
   font-weight: 500;
   flex: 1;
   text-decoration: none;
@@ -270,7 +272,7 @@ body[data-spy] #panel-wrapper { /* no-op anchor */ }
 }
 
 .home-list-tag {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: $font-mono;
   font-size: 0.7rem;
   color: var(--prompt-tip-icon-color, #2D7A7B);
   text-transform: uppercase;

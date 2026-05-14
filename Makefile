@@ -1,4 +1,4 @@
-.PHONY: help update build serve clean
+.PHONY: help update build serve css-coverage clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -22,6 +22,9 @@ serve: ## Start local dev server
 
 serve-drafts: ## Start local dev server with drafts
 	bundle exec jekyll serve --port 4000 --drafts
+
+css-coverage: ## Build PROD site and run Chrome CSS coverage audit
+	node tools/css-coverage.mjs
 
 lint: ## Check for unknown categories
 	@echo "Categories in use:"; \

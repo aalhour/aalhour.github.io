@@ -1,24 +1,15 @@
-// ─── Step 3: Horizontal sticky topbar — hide sidebar, reset layout ───────────
+@use 'tokens' as *;
 
-// Kill sidebar
-#sidebar {
-  display: none !important;
-}
-
-// Zero sidebar-induced left margin (Chirpy adds margin-left: 260px at lg+)
-#main-wrapper {
-  margin-left: 0 !important;
-  padding-top: 3.85rem; // offset for fixed topbar
-}
+// ─── Horizontal sticky topbar ─────────────────────────────────────────────────
 
 html {
-  scroll-padding-top: 2.25rem;
+  scroll-padding-top: $anchor-scroll-padding;
 }
 
 .post-content,
 .page-content {
   :is(h1, h2, h3, h4, h5, h6)[id] {
-    scroll-margin-top: 2rem;
+    scroll-margin-top: $heading-scroll-margin;
   }
 }
 
@@ -43,13 +34,13 @@ html {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0.35rem 1.25rem;
-  height: 3.25rem;
+  height: $topbar-height;
 }
 
 // ─── Brand ────────────────────────────────────────────────────────────────────
 
 .topbar-brand {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: $font-display;
   font-weight: 600;
   font-size: 1.05rem;
   letter-spacing: -0.01em;
@@ -76,7 +67,7 @@ html {
   min-width: 0;
 
   .nav-link {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: $font-display;
     font-size: 1.0625rem;
     font-weight: 500;
     color: var(--topbar-text-color);
@@ -109,7 +100,7 @@ html {
   }
 }
 
-@media (min-width: 992px) {
+@media (min-width: $bp-lg-min) {
   .topbar-nav {
     display: flex;
   }
@@ -164,7 +155,7 @@ html {
 // Topbar title (shown by Chirpy JS during search; hidden otherwise)
 .topbar-title-label {
   display: none;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: $font-display;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--topbar-text-color);
@@ -219,8 +210,61 @@ html {
 // ─── Hamburger: desktop hidden ────────────────────────────────────────────────
 
 #hamburger {
-  @media (min-width: 992px) {
+  @media (min-width: $bp-lg-min) {
     display: none !important;
+  }
+}
+
+// Let Chirpy's native mobile post TOC bar replace the navbar after scroll.
+// The JS that toggles `.invisible` and opens `#toc-popup` stays theme-owned.
+@media (max-width: $bp-lg-max) {
+  #toc-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    height: $topbar-height;
+    margin: 0;
+    padding: 0.35rem 1rem;
+    color: var(--topbar-text-color);
+    background: var(--topbar-bg);
+    border-bottom: 1px solid var(--main-border-color);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  #toc-bar.invisible {
+    top: -$topbar-height;
+  }
+
+  #toc-bar .label {
+    min-width: 0;
+    margin: 0;
+    padding: 0 0.75rem 0 0;
+    font-family: $font-display;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--topbar-text-color);
+  }
+
+  #toc-bar .toc-trigger {
+    color: var(--topbar-text-color);
+    padding: 0.3rem 0.45rem;
+    border: none;
+    background: none;
+    border-radius: 0.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--text-color);
+      background: var(--accent-soft);
+    }
+  }
+
+  #toc-popup {
+    margin-top: $topbar-height;
   }
 }
 
@@ -239,7 +283,7 @@ html {
   }
 
   .nav-link {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: $font-display;
     font-size: 1rem;
     font-weight: 500;
     color: var(--topbar-text-color);

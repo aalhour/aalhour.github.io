@@ -1,0 +1,105 @@
+@use 'tokens' as *;
+
+// Global type system.
+
+html body {
+  font-family: $font-body;
+  font-feature-settings: "cv01", "cv02", "cv11"; // Inter stylistic alternates
+}
+
+html .post-content,
+html .page-content {
+  font-family: $font-body;
+  line-height: 1.75;
+}
+
+html h1,
+html h2,
+html h3,
+html h4,
+html h5,
+html h6,
+html .site-title,
+html .site-subtitle,
+html .nav-link,
+html .post-title,
+html .page-title,
+html .card-title,
+html header .post-desc,
+html #toc-bar .label,
+html #search-results a,
+html #sidebar .site-title,
+html #sidebar .site-subtitle,
+html #sidebar .nav-link,
+html .section-num,
+html .panel-heading {
+  font-family: $font-display;
+  letter-spacing: -0.01em;
+}
+
+html h1,
+html h2,
+html h3,
+html h4,
+html h5,
+html h6,
+html .post-title,
+html .page-title,
+html .card-title,
+html .section-num,
+html .panel-heading {
+  font-family: $font-display-bold;
+  font-weight: 400;
+}
+
+// Chirpy sets this with an ID selector, so match that specificity.
+html #panel-wrapper .panel-heading {
+  font-family: $font-display-bold;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+html .post-content h2,
+html .page-content h2 {
+  font-size: 1.85rem;
+  line-height: 1.3;
+}
+
+html .post-content h3,
+html .page-content h3 {
+  font-size: 1.55rem;
+  line-height: 1.35;
+}
+
+html .post-content h4,
+html .page-content h4 {
+  font-size: 1.35rem;
+  line-height: 1.4;
+}
+
+html .post-content h5,
+html .page-content h5 {
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+
+html .post-content h6,
+html .page-content h6 {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+html code,
+html pre,
+html kbd,
+html samp,
+html .pagination,
+html .footnotes,
+html #toc-popup-content,
+html #toc-popup .header .label,
+html #notification .toast-body,
+html #toc-solo-trigger .label,
+html #archives .date.day {
+  font-family: $font-mono;
+  font-feature-settings: "calt" 1, "liga" 1; // JetBrains Mono ligatures
+}

@@ -1,3 +1,5 @@
+@use 'tokens' as *;
+
 // ─── Writings hub ─────────────────────────────────────────────────────────────
 
 .writings-page {
@@ -20,7 +22,7 @@
   margin: 1.4rem 0 2.6rem;
 
   a {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: $font-mono;
     font-size: 0.82rem;
     color: var(--link-color);
     text-decoration: none;
@@ -59,7 +61,7 @@
   }
 
   a {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: $font-mono;
     font-size: 0.8rem;
     color: var(--link-color);
     text-decoration: none;
@@ -76,7 +78,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 1.75rem;
 
-  @media (max-width: 767px) {
+  @media (max-width: $bp-md-exclusive-max) {
     grid-template-columns: 1fr;
   }
 }
@@ -88,7 +90,7 @@
   padding: 1rem 0;
   border-bottom: 1px solid var(--main-border-color);
 
-  @media (max-width: 575px) {
+  @media (max-width: $bp-sm-max) {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
@@ -122,7 +124,7 @@
   a {
     display: block;
     color: var(--text-color);
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: $font-display;
     font-size: 1.05rem;
     text-decoration: none;
 
@@ -135,7 +137,7 @@
     display: block;
     margin-top: 0.2rem;
     color: var(--text-muted);
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: $font-mono;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -166,7 +168,7 @@
   }
 
   span {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: $font-mono;
     font-size: 0.76rem;
   }
 
@@ -188,7 +190,7 @@
     align-items: baseline;
     gap: 0.35rem;
     color: var(--text-color);
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: $font-mono;
     padding-right: 0.7rem;
     border-right: 1px solid var(--main-border-color);
 
