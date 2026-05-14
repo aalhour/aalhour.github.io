@@ -20,7 +20,8 @@
         projects
       </a>
 
-      <a href="{{ '/animations/' | relative_url }}" class="nav-link{% if page.url == '/animations/' %} active{% endif %}">
+      <a href="{{ '/animations/' | relative_url }}"
+        class="nav-link{% if page.url == '/animations/' %} active{% endif %}">
         animations
       </a>
 
@@ -35,12 +36,12 @@
       <!-- Topbar title: shown by Chirpy search JS during search mode -->
       <span id="topbar-title" class="topbar-title-label" aria-hidden="true">
         {%- if page.layout == 'home' -%}
-          {{- site.data.locales[include.lang].title | default: site.title -}}
+        {{- site.data.locales[include.lang].title | default: site.title -}}
         {%- elsif page.collection == 'tabs' or page.layout == 'page' -%}
-          {%- capture tab_key -%}{{ page.url | split: '/' }}{%- endcapture -%}
-          {{- site.data.locales[include.lang].tabs[tab_key] | default: page.title -}}
+        {%- capture tab_key -%}{{ page.url | split: '/' }}{%- endcapture -%}
+        {{- site.data.locales[include.lang].tabs[tab_key] | default: page.title -}}
         {%- else -%}
-          {{- page.title | default: site.title -}}
+        {{- page.title | default: site.title -}}
         {%- endif -%}
       </span>
 
@@ -59,28 +60,16 @@
       <!-- Inline search bar (Chirpy JS shows/hides via class) -->
       <search id="search" class="topbar-search" aria-label="Search site">
         <i class="fas fa-search fa-fw topbar-search-icon"></i>
-        <input
-          class="form-control"
-          id="search-input"
-          type="search"
-          aria-label="search"
-          autocomplete="off"
-          placeholder="{{ site.data.locales[include.lang].search.hint | default: 'Search' | capitalize }}..."
-        >
+        <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off"
+          placeholder="{{ site.data.locales[include.lang].search.hint | default: 'Search' | capitalize }}...">
       </search>
       <button type="button" class="btn btn-link topbar-btn" id="search-cancel">
         {{- site.data.locales[include.lang].search.cancel | default: 'Cancel' | downcase -}}
       </button>
 
       <!-- Hamburger: mobile nav toggle -->
-      <button
-        type="button"
-        id="hamburger"
-        class="btn btn-link topbar-btn"
-        aria-label="Toggle navigation"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-      >
+      <button type="button" id="hamburger" class="btn btn-link topbar-btn" aria-label="Toggle navigation"
+        aria-expanded="false" aria-controls="mobile-menu">
         <i class="fas fa-bars fa-fw"></i>
       </button>
 

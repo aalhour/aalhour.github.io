@@ -1,5 +1,6 @@
 ---
 title: "nand2tetris, or Building a Computer from First Principles"
+description: "Notes from nand2tetris on building a computer from NAND gates up through hardware, assembly, and computer architecture."
 date: 2016-04-01
 categories: [Programming]
 tags: [hardware, assembly, computer-architecture, courses]

@@ -1,5 +1,6 @@
 ---
 title: "Making the on-disk state real: Sorted-String Tables (SSTables)"
+description: "A BeachDB milestone on Sorted-String Tables, immutable on-disk files, sparse indexes, and making storage state real."
 date: 2026-04-06
 categories: [Programming]
 tags: [beachdb, databases, storage, sstable, durability]

@@ -1,5 +1,8 @@
 ---
 title: Skip List
+description: "An interactive skip list animation demonstrating search, insert, and delete operations across probabilistic express lanes."
+seo:
+  type: WebPage
 layout: page
 permalink: /animations/skiplist/
 ---

@@ -1,5 +1,6 @@
 ---
 title: "Implementing Data Structures and Algorithms in C#"
+description: "A look at implementing classic data structures and algorithms in C# as an open-source learning project."
 date: 2015-08-01
 categories: [Programming]
 tags: [c#, algorithms, data-structures, open-source]

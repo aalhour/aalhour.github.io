@@ -1,5 +1,8 @@
 ---
 title: Log-structured merge-tree (LSM Tree)
+description: "An interactive LSM tree animation explaining puts, gets, deletes, memtable flushes, SSTables, and compaction."
+seo:
+  type: WebPage
 layout: page
 permalink: /animations/lsm-tree/
 ---

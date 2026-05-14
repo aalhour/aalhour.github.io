@@ -1,5 +1,6 @@
 ---
 title: "Summary of My 2017 Readings"
+description: "A summary of books read in 2017, including notes on stoicism, philosophy, management, and personal learning."
 date: 2018-01-02
 categories: [Books]
 tags: [stoicism, philosophy, management, yearly-review]

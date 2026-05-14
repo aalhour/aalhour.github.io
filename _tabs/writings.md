@@ -1,5 +1,8 @@
 ---
 title: Writings
+description: "Essays and notes by Ahmad Alhour on software, systems, books, philosophy, career, and curiosity."
+seo:
+  type: CollectionPage
 icon: fas fa-pen-nib
 order: 1
 layout: page

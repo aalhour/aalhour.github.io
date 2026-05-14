@@ -1,5 +1,6 @@
 ---
 title: "The syscall I forgot: directory fsync"
+description: "A short BeachDB note about the forgotten durability step: syncing directory entries after filesystem changes."
 date: 2026-02-16
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, fsync]

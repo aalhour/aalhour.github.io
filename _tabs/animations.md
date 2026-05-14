@@ -1,5 +1,8 @@
 ---
 title: Animations
+description: "Interactive animations for systems concepts such as LSM trees, skip lists, and fsync durability."
+seo:
+  type: CollectionPage
 icon: fas fa-film
 order: 4
 layout: page

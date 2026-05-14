@@ -1,5 +1,6 @@
 ---
 title: "Durability is a promise you can't hand-wave: Write-Ahead Log (WAL)"
+description: "A BeachDB milestone on write-ahead logging, durability promises, fsync, fdatasync, and what it takes to survive crashes."
 date: 2026-02-12
 categories: [Programming]
 tags: [beachdb, databases, storage, durability, wal]

@@ -1,5 +1,6 @@
 ---
 title: "Crash-only confidence, part 1: from random kills to exact boundaries"
+description: "A BeachDB milestone on crash testing with failpoints, replayable artifacts, and precise engine-boundary failures."
 date: 2026-04-24
 categories: [Programming]
 tags: [beachdb, databases, testing, crash-testing, fault-injection]

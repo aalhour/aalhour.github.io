@@ -1,5 +1,6 @@
 ---
 title: "Building BeachDB: A Database from Scratch (in Go)"
+description: "Introducing BeachDB, an educational LSM-based storage engine in Go for learning database internals end to end."
 date: 2026-01-07
 categories: [Programming]
 tags: [beachdb, databases, storage, lsm-tree]

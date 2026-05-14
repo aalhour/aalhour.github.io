@@ -1,5 +1,6 @@
 ---
 title: "The Memtable: where writes go to wait"
+description: "A BeachDB milestone explaining memtables, skip lists, write buffering, and how in-memory state becomes ordered storage."
 date: 2026-02-22
 categories: [Programming]
 tags: [beachdb, databases, storage, memtable, skip-list]

@@ -1,5 +1,8 @@
 ---
 title: Hi, there!
+description: "About Ahmad Alhour: software engineer, systems builder, database internals learner, and writer."
+seo:
+  type: AboutPage
 icon: fas fa-info-circle
 order: 5
 layout: page

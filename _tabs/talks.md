@@ -1,5 +1,8 @@
 ---
 title: Talks
+description: "Talks, podcasts, and workshops by Ahmad Alhour on distributed systems, data engineering, leadership, and Python."
+seo:
+  type: CollectionPage
 icon: fas fa-microphone
 order: 2
 layout: page

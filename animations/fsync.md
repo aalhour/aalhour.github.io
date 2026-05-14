@@ -1,5 +1,8 @@
 ---
 title: fsync() Durability
+description: "An interactive fsync durability animation showing how writes move through application memory, the OS, device buffers, and persistent storage."
+seo:
+  type: WebPage
 layout: page
 permalink: /animations/fsync/
 ---

@@ -1,5 +1,8 @@
 ---
 title: Projects
+description: "Projects by Ahmad Alhour, including active systems work, open-source tools, experiments, and previous contributions."
+seo:
+  type: CollectionPage
 icon: fas fa-code
 order: 1
 layout: page
