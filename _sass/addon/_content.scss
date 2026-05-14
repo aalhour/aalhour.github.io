@@ -50,9 +50,15 @@ html:not([data-mode="dark"]) .post-content a:not(.img-link):not(.popup),
 html:not([data-mode="dark"]) .page-content a:not(.img-link):not(.popup),
 html[data-mode="light"] .post-content a:not(.img-link):not(.popup),
 html[data-mode="light"] .page-content a:not(.img-link):not(.popup) {
-  color: #1E5BB3;
+  color: var(--body-link-color);
 
   &:hover {
-    color: #143D78;
+    color: var(--body-link-hover);
   }
+}
+
+// Post header description sits muted under the title in both themes.
+// Selector matches Chirpy's `header .post-desc` specificity so this wins.
+header .post-desc {
+  color: var(--text-muted);
 }

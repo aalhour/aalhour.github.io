@@ -53,6 +53,10 @@
     grid-template-columns: 1fr;
     gap: 0.4rem;
     padding: 1.5rem 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
   }
 }
 
@@ -230,17 +234,17 @@
     text-decoration: none;
   }
 
-  // Per-category color text variations.
+  // Per-category color text variations (colors live in _variables.scss).
   &[data-c='career'] {
-    color: #A04B26;
+    color: var(--cat-career-color);
   }
 
   &[data-c='philosophy'] {
-    color: #6B2D5C;
+    color: var(--cat-philosophy-color);
   }
 
   &[data-c='books'] {
-    color: #A05B22;
+    color: var(--cat-books-color);
   }
 
   &[data-c='meta'] {
@@ -271,15 +275,5 @@
   }
 }
 
-// Dark mode: dim category colors.
-html[data-mode='dark'] .writings-browse-cat[data-c='career'] {
-  color: #E68A5C;
-}
-
-html[data-mode='dark'] .writings-browse-cat[data-c='philosophy'] {
-  color: #C49AC4;
-}
-
-html[data-mode='dark'] .writings-browse-cat[data-c='books'] {
-  color: #CC9156;
-}
+// Dark mode handled automatically by --cat-*-color custom properties in
+// _variables.scss (warmer/brighter values declared under @mixin dark-palette).

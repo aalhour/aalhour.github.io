@@ -2,7 +2,7 @@
 title: "On Watershed Moments: Boredom, Growth, and Curiosity"
 description: "A personal essay about boredom, growth, layoffs, and using watershed moments to choose the next career direction deliberately."
 date: 2025-12-21
-categories: [Career]
+categories: [Reflections]
 tags: [career, layoffs, growth, databases, systems]
 pin: true        # Featured on homepage hero; swap when BeachDB reflection ships
 # math: true       # Enable MathJax

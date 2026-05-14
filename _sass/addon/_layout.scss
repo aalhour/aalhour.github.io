@@ -22,30 +22,4 @@
   }
 }
 
-// ─── Reader shell: clamp non-panel pages to a comfortable reading width ─────
-// Applies at lg+ only; mobile/tablet keep their natural fluid width with the
-// usual column padding. Animation-detail pages inherit Bootstrap's natural
-// col-xl-12 width — they need the full canvas for interactive demos and so
-// the topbar's panel-shell breakpoints stay edge-aligned with the content.
-@media (min-width: $bp-lg-min) {
-
-  body.shell-reader .site-main--reader,
-  body.shell-reader .site-tail--reader {
-    max-width: $reader-shell-max;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-// Chirpy adds asymmetric right-padding (4.5rem) on main at xxxl. That sizing
-// targets the panel-shell layout where the right rail eats real estate; on
-// the centered reader shell it shoves content left and makes the topbar look
-// like it overflows. Force symmetric padding.
-@media (min-width: $bp-xxxl-min) {
-
-  body.shell-reader main.site-main--reader,
-  body.shell-reader #tail-wrapper.site-tail--reader {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-  }
-}
+// Width / clamp / reader-vs-panel sizing rules live in _shell.scss.

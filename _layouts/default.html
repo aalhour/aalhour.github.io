@@ -14,9 +14,10 @@ layout: compress
 
 {%- comment -%}
   Shell selection.
-  - show_panel: post pages (TOC) + /archives/ (trending/updated).
-  - shell-animation-detail: single-animation pages (wider container, no narrow reader clamp).
-  - shell-reader: everything else (home, /writings/, /talks/, /projects/, /animations/, /about/, /tags/, /categories/).
+  - show_panel: post pages (TOC) + /archives/ (trending/updated). Uses Chirpy's
+    natural per-breakpoint container widths.
+  - shell-reader: everything else (home, /writings/, /talks/, /projects/,
+    /animations/, /about/, /tags/, /categories/). Clamped to ~50rem for reading.
 {%- endcomment -%}
 
 {% assign show_archive_widgets = false %}
@@ -32,13 +33,8 @@ layout: compress
   {% assign show_panel = true %}
 {% endif %}
 
-{% assign is_animation_detail = false %}
-{% if page.shell == 'animation-detail' %}{% assign is_animation_detail = true %}{% endif %}
-
 {% if show_panel %}
   {% assign shell_class = 'shell-panel' %}
-{% elsif is_animation_detail %}
-  {% assign shell_class = 'shell-animation-detail' %}
 {% else %}
   {% assign shell_class = 'shell-reader' %}
 {% endif %}

@@ -1,0 +1,27 @@
+{%- comment -%}
+  Emit a sorted-rows string for site.categories or site.tags, ordered by
+  descending post count. Caller splits on ';;' for rows and '||' for fields.
+
+  Required:
+    collection — site.categories or site.tags
+  Field order per row:
+    sort_key (descending count) || name || slug || count
+
+  Usage:
+    {% capture _rows %}{% include trending-list.html collection=site.tags %}{% endcapture %}
+    {% assign tags_sorted = _rows | split: ';;' | sort %}
+    {% for row in tags_sorted limit: 10 %}
+      {% assign parts = row | split: '||' %}
+      {% assign name = parts[1] %}{% assign slug = parts[2] %}{% assign count = parts[3] %}
+      ...
+    {% endfor %}
+{%- endcomment -%}
+{%- for item in include.collection -%}
+  {%- assign _name = item[0] -%}
+  {%- assign _slug = _name | slugify -%}
+  {%- assign _posts = item[1] -%}
+  {%- assign _inv = 9999 | minus: _posts.size -%}
+  {%- assign _key = _inv | prepend: '0000' | slice: -4, 4 -%}
+  {{- _key }}||{{ _name }}||{{ _slug }}||{{ _posts.size -}}
+  {%- unless forloop.last -%};;{%- endunless -%}
+{%- endfor -%}

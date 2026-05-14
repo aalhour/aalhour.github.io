@@ -32,8 +32,6 @@ html {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  width: 100%;
-  max-width: 100%;
   margin: 0 auto;
   padding: 0.35rem 1.25rem;
   height: $topbar-height;
@@ -68,16 +66,8 @@ html {
   }
 }
 
-// Reader shell: clamp the topbar to the same width as the content column.
-// Wins over the panel-shell breakpoints above via body-class specificity.
-// padding-inline matches main's px-md-4 (1.5rem each side) so the brand and
-// toggle align with the content edges below.
-@media (min-width: $bp-lg-min) {
-  body.shell-reader #topbar {
-    max-width: $reader-shell-max;
-    padding-inline: 1.5rem;
-  }
-}
+// Reader-shell topbar override lives in _shell.scss (the body.shell-reader
+// #topbar rule there wins over the per-breakpoint panel rules above).
 
 // ─── Brand ────────────────────────────────────────────────────────────────────
 

@@ -17,29 +17,10 @@ permalink: /writings/
     Essays and notes on software, systems, books, philosophy, and the useful trouble in between.
   </p>
 
-  {% comment %} Build sort keys so highest-count items render first. {% endcomment %}
-  {% capture cat_rows -%}
-    {%- for c in site.categories -%}
-      {%- assign cn = c[0] -%}
-      {%- assign cs = cn | slugify -%}
-      {%- assign cp = c[1] -%}
-      {%- assign cinv = 9999 | minus: cp.size -%}
-      {%- assign csort = cinv | prepend: '0000' | slice: -4, 4 -%}
-      {{ csort }}||{{ cn }}||{{ cs }}||{{ cp.size }}{% unless forloop.last %};;{% endunless %}
-    {%- endfor -%}
-  {%- endcapture %}
+  {% capture cat_rows %}{% include trending-list.html collection=site.categories %}{% endcapture %}
   {% assign cats_sorted = cat_rows | split: ';;' | sort %}
 
-  {% capture tag_rows -%}
-    {%- for t in site.tags -%}
-      {%- assign tn = t[0] -%}
-      {%- assign ts = tn | slugify -%}
-      {%- assign tp = t[1] -%}
-      {%- assign tinv = 9999 | minus: tp.size -%}
-      {%- assign tsort = tinv | prepend: '0000' | slice: -4, 4 -%}
-      {{ tsort }}||{{ tn }}||{{ ts }}||{{ tp.size }}{% unless forloop.last %};;{% endunless %}
-    {%- endfor -%}
-  {%- endcapture %}
+  {% capture tag_rows %}{% include trending-list.html collection=site.tags %}{% endcapture %}
   {% assign tags_sorted = tag_rows | split: ';;' | sort %}
 
   <section class="writings-browse" aria-label="Browse by category and tag">
@@ -85,16 +66,8 @@ permalink: /writings/
     </header>
     <div class="writings-entries">
       {% for post in year_group.items %}
-        {% assign day = post.date | date: '%-d' | plus: 0 %}
-        {% assign mod10 = day | modulo: 10 %}
-        {% assign mod100 = day | modulo: 100 %}
-        {% if mod100 >= 11 and mod100 <= 13 %}{% assign suffix = 'th' %}
-        {% elsif mod10 == 1 %}{% assign suffix = 'st' %}
-        {% elsif mod10 == 2 %}{% assign suffix = 'nd' %}
-        {% elsif mod10 == 3 %}{% assign suffix = 'rd' %}
-        {% else %}{% assign suffix = 'th' %}{% endif %}
         <article class="writings-entry">
-          <div class="writings-entry-date">{{ post.date | date: '%b' }} {{ day }}{{ suffix }}</div>
+          <div class="writings-entry-date">{{ post.date | date: '%b %-d' | upcase }}</div>
           <div class="writings-entry-body">
             <h3 class="writings-entry-title">
               <a href="{{ post.url | relative_url }}">{{ post.title }}</a>

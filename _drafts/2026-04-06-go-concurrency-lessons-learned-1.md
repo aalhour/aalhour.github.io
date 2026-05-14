@@ -1,7 +1,7 @@
 ---
 title: "What Building BeachDB Taught Me About Go Concurrency"
 date: 2026-04-06
-categories: [Programming]
+categories: [Languages]
 tags: [go, concurrency]
 toc: true
 mermaid: true

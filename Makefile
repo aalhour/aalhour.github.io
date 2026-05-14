@@ -1,4 +1,6 @@
-.PHONY: help update build serve css-coverage clean
+.PHONY: help install update build build-prod serve serve-drafts css-coverage lint clean
+
+CATEGORY_FILE := _data/categories.yaml
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
@@ -26,12 +28,41 @@ serve-drafts: ## Start local dev server with drafts
 css-coverage: ## Build PROD site and run Chrome CSS coverage audit
 	node tools/css-coverage.mjs
 
-lint: ## Check for unknown categories
-	@echo "Categories in use:"; \
-	grep -rh "^categories:" _posts _drafts 2>/dev/null | sed 's/categories: \[//' | sed 's/\]//' | sed 's/,/\n/g' | tr -d ' ' | grep -v "^categories:" | sort | uniq -c | sort -rn
-	@echo "------------------"
-	@echo "Tags in use:"; \
-	grep -rh "^tags:" _posts _drafts 2>/dev/null | sed 's/tags: \[//' | sed 's/\]//' | sed 's/,/\n/g' | tr -d ' ' | grep -v "^tags:" | sort | uniq -c | sort -rn
+lint: ## Check category front matter against _data/categories.yaml
+	@ruby -ryaml -rdate -e '\
+		category_file = "$(CATEGORY_FILE)"; \
+		known = YAML.safe_load_file(category_file).keys; \
+		counts = Hash.new(0); \
+		tags = Hash.new(0); \
+		unknown = Hash.new { |h, k| h[k] = [] }; \
+		Dir.glob(["_posts/*.{md,markdown}", "_drafts/*.{md,markdown}"]).sort.each do |path| \
+			text = File.read(path); \
+			match = text.match(/\A---\s*\n(.*?)\n---\s*\n/m); \
+			next unless match; \
+			data = YAML.safe_load(match[1], permitted_classes: [Date, Time], aliases: true) || {}; \
+			categories = Array(data["categories"] || data["category"]); \
+			categories.each do |category| \
+				category = category.to_s; \
+				counts[category] += 1; \
+				unknown[category] << path unless known.include?(category); \
+			end; \
+			Array(data["tags"]).each { |tag| tags[tag.to_s] += 1 }; \
+		end; \
+		puts "Known categories:"; \
+		known.each { |category| puts "\t#{category}" }; \
+		puts "------------------"; \
+		puts "Categories in use:"; \
+		counts.sort_by { |category, count| [-count, category] }.each { |category, count| puts "\t#{count} #{category}" }; \
+		unless unknown.empty?; \
+			puts "------------------"; \
+			puts "Unknown categories:"; \
+			unknown.each { |category, paths| puts "\t#{category}: #{paths.join(", ")}" }; \
+			exit 1; \
+		end; \
+		puts "------------------"; \
+		puts "Tags in use:"; \
+		tags.sort_by { |tag, count| [-count, tag] }.each { |tag, count| puts "\t#{count} #{tag}" } \
+	'
 
 clean: ## Remove all build artifacts
 	rm -rf _site .jekyll-cache .sass-cache .jekyll-metadata

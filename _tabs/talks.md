@@ -24,7 +24,7 @@ Talks, podcasts, and workshops I've done over the years.
 
     <li class="row-list-item">
       <div class="row-list-meta">
-        {{ item.date }}
+        {{ item.date | append: "-01" | date: "%b %Y" }}
         <span class="status">{{ item.type }}</span>
       </div>
 
@@ -35,7 +35,7 @@ Talks, podcasts, and workshops I've done over the years.
           <span class="row-list-title">{{ item.title }}</span>
         {% endif %}
 
-        <p class="row-list-subtitle">{{ item.description }}</p>
+        <p class="row-list-subtitle">{{ item.short_description | default: item.description }}</p>
 
         <div class="row-list-info">
           {% if item.location %}

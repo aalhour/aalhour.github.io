@@ -26,13 +26,13 @@ Interactive visualizations I use to explain systems concepts across posts and pr
           {% if post.content contains usage_marker %}{% assign usage_count = usage_count | plus: 1 %}{% endif %}
         {% endfor %}
         {% if usage_count > 0 %}
-          <div class="row-list-usage">
-            <span class="row-list-usage-label">Used in:</span>
+          <div class="row-list-info row-list-info--muted">
+            <span class="row-list-info-item">Used in:</span>
             {% assign first = true %}
             {% for post in site.posts reversed %}
               {% if post.content contains usage_marker %}
-                {% unless first %}<span class="row-list-usage-sep">·</span>{% endunless %}
-                <a class="row-list-usage-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                {% unless first %}<span class="row-list-info-sep" aria-hidden="true">·</span>{% endunless %}
+                <a class="row-list-info-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
                 {% assign first = false %}
               {% endif %}
             {% endfor %}
