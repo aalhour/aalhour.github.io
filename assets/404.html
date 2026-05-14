@@ -1,0 +1,34 @@
+---
+title: ""
+description: "The page you wanted isn't where you looked. Here are some places that exist."
+layout: page
+permalink: /404.html
+sitemap: false
+hidden: true
+---
+
+<div class="four-oh-four">
+  <p class="four-oh-four-cmd">
+    <span class="ps1">~/aalhour &gt;</span><span class="cmd">cd {{ page.url | default: page.path | default:
+      '/the-page-you-wanted' }}</span>
+  </p>
+  <p class="four-oh-four-err">cd: no such file or directory</p>
+
+  <p class="four-oh-four-lede">
+    The link you followed is broken, or the page moved. Try one of these paths instead:
+  </p>
+
+  <ul class="four-oh-four-paths">
+    <li><a href="{{ '/' | relative_url }}">~/</a> <span class="four-oh-four-comment"># home</span></li>
+    <li><a href="{{ '/writings/' | relative_url }}">~/writings</a> <span class="four-oh-four-comment"># essays and
+        notes</span></li>
+    <li><a href="{{ '/projects/' | relative_url }}">~/projects</a> <span class="four-oh-four-comment"># things I've
+        built</span></li>
+    <li><a href="{{ '/animations/' | relative_url }}">~/animations</a> <span class="four-oh-four-comment"># interactive
+        demos</span></li>
+    <li><a href="{{ '/talks/' | relative_url }}">~/talks</a> <span class="four-oh-four-comment"># conference talks &amp;
+        podcasts</span></li>
+    <li><a href="{{ '/about/' | relative_url }}">~/about</a> <span class="four-oh-four-comment"># the long version of
+        who I am</span></li>
+  </ul>
+</div>

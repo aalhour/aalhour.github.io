@@ -3,6 +3,9 @@
 // ─── Site footer ─────────────────────────────────────────────────────────────
 
 #site-footer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   padding: 1.5rem 0 2rem;
   border-top: 1px solid var(--main-border-color);
   color: var(--text-muted);
@@ -12,6 +15,9 @@
 }
 
 .footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
   gap: 0.4rem;
   justify-content: center;
   margin: 0;
@@ -77,6 +83,8 @@
 
 @media (min-width: $bp-lg-min) {
   #site-footer {
+    flex-direction: row;
+    justify-content: space-between;
     text-align: right;
   }
 

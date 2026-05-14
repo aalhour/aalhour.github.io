@@ -1,17 +1,17 @@
 // Shared post/page content overrides.
 
-.post-meta .d-flex.justify-content-between > span:first-child,
-article .post-content + .d-flex > span:first-child,
-.post > .d-flex.justify-content-between > span:first-child {
+.post-meta .d-flex.justify-content-between>span:first-child,
+article .post-content+.d-flex>span:first-child,
+.post>.d-flex.justify-content-between>span:first-child {
   display: none !important;
 }
 
-blockquote[class*="prompt-"] > h1:first-child,
-blockquote[class*="prompt-"] > h2:first-child,
-blockquote[class*="prompt-"] > h3:first-child,
-blockquote[class*="prompt-"] > h4:first-child,
-blockquote[class*="prompt-"] > h5:first-child,
-blockquote[class*="prompt-"] > h6:first-child {
+blockquote[class*="prompt-"]>h1:first-child,
+blockquote[class*="prompt-"]>h2:first-child,
+blockquote[class*="prompt-"]>h3:first-child,
+blockquote[class*="prompt-"]>h4:first-child,
+blockquote[class*="prompt-"]>h5:first-child,
+blockquote[class*="prompt-"]>h6:first-child {
   margin-top: 0;
   padding-top: 0;
 }
@@ -23,8 +23,9 @@ blockquote.prompt-monologue {
   border-radius: 0.375rem;
   background-color: rgba(0, 0, 0, 0.05);
 
-  > p {
-    color: #52525b; /* zinc-600 */
+  >p {
+    color: #52525b;
+    /* zinc-600 */
   }
 
   &::before {
@@ -40,8 +41,9 @@ blockquote.prompt-monologue {
 html[data-mode="dark"] blockquote.prompt-monologue {
   background-color: rgba(0, 0, 0, 0.25);
 
-  > p {
-    color: #a1a1aa; /* zinc-400 */
+  >p {
+    color: #a1a1aa;
+    /* zinc-400 */
   }
 }
 
@@ -61,4 +63,111 @@ html[data-mode="light"] .page-content a:not(.img-link):not(.popup) {
 // Selector matches Chirpy's `header .post-desc` specificity so this wins.
 header .post-desc {
   color: var(--text-muted);
+}
+
+// Prompt callouts — palette-matched chrome with a thin coloured border so
+// tip vs info read as distinct (teal vs blue) without raising warning/danger
+// to alert-level visual weight.
+blockquote.prompt-tip,
+blockquote.prompt-info,
+blockquote.prompt-warning,
+blockquote.prompt-danger {
+  border-left: 0;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  padding: 0.85rem 1.1rem 0.85rem 3rem;
+}
+
+blockquote.prompt-tip {
+  background: var(--prompt-tip-bg);
+  border-color: var(--prompt-tip-border);
+}
+
+blockquote.prompt-info {
+  background: var(--prompt-info-bg);
+  border-color: var(--prompt-info-border);
+}
+
+blockquote.prompt-warning {
+  background: var(--prompt-warning-bg);
+  border-color: var(--prompt-warning-border);
+}
+
+blockquote.prompt-danger {
+  background: var(--prompt-danger-bg);
+  border-color: var(--prompt-danger-border);
+}
+
+// The icon color is keyed to per-type --prompt-*-icon-color in _variables.scss.
+
+// ─── 404 page (terminal-style "no such file or directory") ──────────────────
+
+.four-oh-four {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  margin: 1.5rem 0 0;
+}
+
+.four-oh-four-cmd {
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+
+  .ps1 {
+    color: var(--accent-color);
+    font-weight: 600;
+    margin-right: 0.4rem;
+  }
+
+  .cmd {
+    color: var(--text-color);
+  }
+}
+
+.four-oh-four-err {
+  color: var(--link-color);
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin: 0 0 2rem;
+}
+
+.four-oh-four-lede {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  margin: 0 0 1.5rem;
+}
+
+.four-oh-four-paths {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.98rem;
+
+  li {
+    line-height: 1.5;
+  }
+
+  li::before {
+    content: '$ cd ';
+    color: var(--label-color);
+  }
+
+  a {
+    color: var(--link-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+  }
+}
+
+.four-oh-four-comment {
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-left: 0.5rem;
 }

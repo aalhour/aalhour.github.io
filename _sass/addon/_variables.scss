@@ -84,12 +84,16 @@
   --prompt-text-color: rgb(31 27 22 / 80%);
   --prompt-tip-bg: rgb(45 122 123 / 10%);
   --prompt-tip-icon-color: #2D7A7B;
-  --prompt-info-bg: rgb(45 122 123 / 12%);
-  --prompt-info-icon-color: #2D7A7B;
+  --prompt-tip-border: rgb(45 122 123 / 25%);
+  --prompt-info-bg: rgb(30 91 179 / 9%);
+  --prompt-info-icon-color: #1E5BB3;
+  --prompt-info-border: rgb(30 91 179 / 25%);
   --prompt-warning-bg: rgb(192 98 58 / 12%);
   --prompt-warning-icon-color: #C0623A;
+  --prompt-warning-border: rgb(192 98 58 / 30%);
   --prompt-danger-bg: rgb(160 75 38 / 14%);
   --prompt-danger-icon-color: #A04B26;
+  --prompt-danger-border: rgb(160 75 38 / 30%);
 
   // Code blocks
   --language-border-color: #E3DDC9;
@@ -220,12 +224,16 @@
   --prompt-text-color: rgb(239 231 214 / 78%);
   --prompt-tip-bg: rgb(79 179 180 / 12%);
   --prompt-tip-icon-color: #4FB3B4;
-  --prompt-info-bg: rgb(79 179 180 / 10%);
-  --prompt-info-icon-color: #4FB3B4;
+  --prompt-tip-border: rgb(79 179 180 / 28%);
+  --prompt-info-bg: rgb(125 167 234 / 12%);
+  --prompt-info-icon-color: #7DA7EA;
+  --prompt-info-border: rgb(125 167 234 / 28%);
   --prompt-warning-bg: rgb(230 138 92 / 14%);
   --prompt-warning-icon-color: #E68A5C;
+  --prompt-warning-border: rgb(230 138 92 / 32%);
   --prompt-danger-bg: rgb(240 160 119 / 14%);
   --prompt-danger-icon-color: #F0A077;
+  --prompt-danger-border: rgb(240 160 119 / 32%);
 
   // Code blocks
   --language-border-color: #2A2620;

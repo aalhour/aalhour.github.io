@@ -1,0 +1,9 @@
+[build]
+  command = "JEKYLL_ENV=production bundle exec jekyll build"
+  publish = "_site"
+
+[context.deploy-preview]
+  command = "printf 'url: %s\n' \"$DEPLOY_PRIME_URL\" > _config_netlify.yml && JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,_config_netlify.yml"
+
+[context.branch-deploy]
+  command = "printf 'url: %s\n' \"$DEPLOY_PRIME_URL\" > _config_netlify.yml && JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,_config_netlify.yml"
