@@ -7,6 +7,7 @@ help:
 
 install: ## Runs bundle install
 	git submodule init
+	git submodule update --init --recursive assets/lib
 	bundle install
 
 update: ## Update gems and submodule
