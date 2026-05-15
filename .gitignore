@@ -9,3 +9,5 @@ _site
 vendor/*
 index_algolia.sh
 .trunk/
+_untracked/
+
