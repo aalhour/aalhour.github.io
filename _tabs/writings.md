@@ -72,7 +72,13 @@ permalink: /writings/
             <h3 class="writings-entry-title">
               <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
             </h3>
-            <p class="writings-entry-note">{{ post.excerpt | strip_html | normalize_whitespace | truncatewords: 28 }}</p>
+            <p class="writings-entry-note">
+              {%- if post.tldr -%}
+                {{ post.tldr | markdownify | strip_html | normalize_whitespace | truncatewords: 36 }}
+              {%- else -%}
+                {{ post.excerpt | strip_html | normalize_whitespace | truncatewords: 28 }}
+              {%- endif -%}
+            </p>
             {% assign word_count = post.content | strip_html | number_of_words %}
             {% assign read_minutes = word_count | divided_by: 200 %}
             {% if read_minutes < 1 %}{% assign read_minutes = 1 %}{% endif %}

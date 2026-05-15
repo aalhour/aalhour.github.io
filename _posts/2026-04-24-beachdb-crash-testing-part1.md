@@ -1,17 +1,19 @@
 ---
 title: "Crash-only confidence, part 1: from random kills to exact boundaries"
 description: "A BeachDB milestone on crash testing with failpoints, replayable artifacts, and precise engine-boundary failures."
+tldr: >-
+  BeachDB v0.0.4 turns crash testing from random `SIGKILL`s into crashes
+  aimed at named engine boundaries. It ships a controller/worker harness,
+  replayable artifacts, and a tiny `crashhook` layer with failpoints across
+  the WAL and flush paths. The goal is simple: stop asking "did it survive?"
+  and start asking "what exactly survived, at which boundary, and why?"
+  [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.4).
 date: 2026-04-24
 categories: [Databases]
 tags: [beachdb, databases, testing, crash-testing, fault-injection]
 toc: true
 mermaid: true
 ---
-
-> **TL;DR**: BeachDB v0.0.4 turns crash testing from random `SIGKILL`s into crashes aimed at named engine boundaries. It ships a controller/worker harness, replayable artifacts, and a tiny `crashhook` layer with failpoints across the WAL and flush paths. The goal is simple: stop asking "did it survive?" and start asking "what exactly survived, at which boundary, and why?"
->
-> [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.4).
-{: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 

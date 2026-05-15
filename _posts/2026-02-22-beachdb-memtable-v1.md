@@ -1,17 +1,19 @@
 ---
 title: "The Memtable: where writes go to wait"
 description: "A BeachDB milestone explaining memtables, skip lists, write buffering, and how in-memory state becomes ordered storage."
+tldr: >-
+  BeachDB v0.0.2 ships the memtable — a skip list that replaces the
+  placeholder map. This post covers why maps don't work for LSM storage,
+  how internal key ordering makes "newest version wins" fall out naturally,
+  and why deletes are actually writes.
+  [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.2). Includes
+  two interactive demos and a few diagrams.
 date: 2026-02-22
 categories: [Databases]
 tags: [beachdb, databases, storage, memtable, skip-list]
 toc: true
 mermaid: true
 ---
-
-> **TL;DR**: BeachDB v0.0.2 ships the memtable — a skip list that replaces the placeholder map. This post covers why maps don't work for LSM storage, how internal key ordering makes "newest version wins" fall out naturally, and why deletes are actually writes. [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.2).
->
-> This post includes: two interactive demos and a few diagrams to drive the current architecture home.
-{: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 

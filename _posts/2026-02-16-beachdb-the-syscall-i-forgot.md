@@ -1,14 +1,15 @@
 ---
 title: "The syscall I forgot: directory fsync"
 description: "A short BeachDB note about the forgotten durability step: syncing directory entries after filesystem changes."
+tldr: >-
+  I fsynced the WAL file on every write. Crash tests passed. SIGKILL tests
+  passed. Then someone asked: "What if the directory doesn't know the file
+  exists?" I was one missing syscall away from losing (almost) everything.
 date: 2026-02-16
 categories: [Databases]
 tags: [beachdb, databases, storage, durability, fsync]
 toc: true
 ---
-
-> **TL;DR**: I fsynced the WAL file on every write. Crash tests passed. SIGKILL tests passed. Then someone asked: "What if the directory doesn't know the file exists?" I was one missing syscall away from losing (almost) everything.
-{: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 

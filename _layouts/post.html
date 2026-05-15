@@ -93,6 +93,12 @@ script_includes:
   {% endif %}
 
   <div class="content">
+    {% if page.tldr %}
+      <aside class="post-tldr" aria-label="TL;DR">
+        <span class="post-tldr-label">TL;DR</span>
+        {{ page.tldr | markdownify }}
+      </aside>
+    {% endif %}
     {{ content }}
   </div>
 

@@ -1,15 +1,18 @@
 ---
 title: "Making the on-disk state real: Sorted-String Tables (SSTables)"
 description: "A BeachDB milestone on Sorted-String Tables, immutable on-disk files, sparse indexes, and making storage state real."
+tldr: >-
+  BeachDB v0.0.3 ships SSTables v1: immutable sorted files on disk, a real
+  memtable flush path, on-disk reads, and an `sst_dump` tool so I can inspect
+  the bytes instead of trusting vibes. This is the milestone where BeachDB
+  stops being an in-memory engine with a WAL and starts having a real disk
+  plane. [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.3).
 date: 2026-04-06
 categories: [Databases]
 tags: [beachdb, databases, storage, sstable, durability]
 toc: true
 mermaid: true
 ---
-
-> **TL;DR**: BeachDB v0.0.3 is out, and it ships SSTables v1: immutable sorted files on disk, a real memtable flush path, on-disk reads, and an `sst_dump` tool so I can inspect the bytes instead of trusting vibes. This is the milestone where BeachDB stops being an in-memory engine with a WAL and starts having a real disk plane. [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.3).
-{: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 

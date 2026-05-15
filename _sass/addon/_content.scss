@@ -100,6 +100,43 @@ blockquote.prompt-danger {
 
 // The icon color is keyed to per-type --prompt-*-icon-color in _variables.scss.
 
+// ─── TL;DR callout (V4 — bordered with title pill) ──────────────────────────
+// Rendered at the top of post content when `tldr: "..."` is in front matter.
+
+.post-tldr {
+  position: relative;
+  margin: 1.4rem 0 2rem;
+  padding: 1.4rem 1.4rem 1rem;
+  border: 1px solid var(--main-border-color);
+  border-radius: 0.4rem;
+  background: var(--card-bg, var(--main-bg));
+  line-height: 1.65;
+  color: var(--text-color);
+
+  >p {
+    margin: 0 0 0.6rem;
+  }
+
+  >p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.post-tldr-label {
+  position: absolute;
+  top: -0.7rem;
+  left: 1rem;
+  padding: 0.15rem 0.55rem;
+  background: var(--main-bg);
+  border: 1px solid var(--main-border-color);
+  border-radius: 0.2rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.80rem;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
 // ─── 404 page (terminal-style "no such file or directory") ──────────────────
 
 .four-oh-four {
