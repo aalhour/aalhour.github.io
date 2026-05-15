@@ -62,7 +62,7 @@
 
 .writings-entry-date {
   font-family: $font-mono;
-  font-size: 0.82rem;
+  font-size: $fs-list-meta;
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -77,8 +77,8 @@
 .writings-entry-title {
   grid-area: title;
   font-family: $font-display;
-  font-size: 1.08rem;
-  font-weight: 600;
+  font-size: $fs-list-title;
+  font-weight: $fw-list-title;
   margin: 0;
   line-height: 1.35;
 
@@ -96,7 +96,7 @@
 .writings-entry-note {
   grid-area: note;
   font-family: $font-body;
-  font-size: 0.92rem;
+  font-size: $fs-list-subtitle;
   color: var(--text-muted);
   margin: 0;
   line-height: 1.55;
@@ -106,7 +106,7 @@
   grid-area: meta;
   margin-top: 0.3rem;
   font-family: $font-mono;
-  font-size: 0.74rem;
+  font-size: $fs-list-meta;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -149,7 +149,9 @@
 .writings-browse {
   border: 1px solid var(--main-border-color);
   border-radius: 0.5rem;
-  background: var(--card-bg, var(--main-bg));
+  // --browse-card-bg sits a smidge above --mask-bg in light (sand-paper
+  // halfway between main and mask). Dark keeps the existing mask-bg tone.
+  background: var(--browse-card-bg);
   padding: 1.1rem 1.25rem;
   margin: 0 0 2.25rem;
 }
@@ -175,7 +177,7 @@
 .writings-browse-label {
   grid-area: label;
   font-family: $font-mono;
-  font-size: 0.74rem;
+  font-size: $fs-list-meta;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -186,7 +188,7 @@
 .writings-browse-seeall {
   grid-area: seeall;
   font-family: $font-mono;
-  font-size: 0.74rem;
+  font-size: $fs-list-meta;
   color: var(--link-color);
   text-decoration: none;
   white-space: nowrap;
@@ -219,7 +221,8 @@
   align-items: baseline;
   gap: 0.3rem;
   font-family: $font-mono;
-  font-size: 0.78rem;
+  font-size: $fs-list-meta;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   text-decoration: none;
@@ -255,7 +258,7 @@
 .writings-browse-cat .writings-browse-count,
 .writings-browse-tag .writings-browse-count {
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: $fs-list-tag;
   margin-left: 0.2rem;
   letter-spacing: 0;
   opacity: 0.8;
@@ -265,7 +268,8 @@
   display: inline-flex;
   align-items: baseline;
   font-family: $font-mono;
-  font-size: 0.78rem;
+  font-size: $fs-list-meta;
+  font-weight: 500;
   text-decoration: none;
   color: var(--text-color);
 

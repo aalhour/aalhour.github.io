@@ -48,3 +48,15 @@ $short-page-shell-min-height: 80vh;
 // 50-75 CPL, max 80 (WCAG 1.4.8). 50rem at 1.03rem Inter ≈ 75-85 CPL.
 $reader-content-max: 50rem;
 $reader-shell-max: calc(#{$reader-content-max} + 3rem);
+
+// ─── List Type Scale ─────────────────────────────────────────────────────────
+// Role-based type scale shared across listing pages (home, /writings/,
+// /talks/, /projects/, /animations/). Ratios follow a Major Third
+// (1.2 / 1 / 0.85), grounded in readability research and editorial-blog
+// conventions. Adjust here to bump the entire listing layer.
+$fs-list-title:    1.2rem;   // row link / post title in a listing row
+$fs-list-subtitle: 1rem;     // description / note / TL;DR-blurb under title
+$fs-list-meta:     0.85rem;  // meta strip below subtitle AND left-column text
+$fs-list-tag:      0.75rem;  // small secondary text (browse-card counts, etc.)
+
+$fw-list-title:    500;      // relaxed weight on row/list titles

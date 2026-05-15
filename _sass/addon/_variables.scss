@@ -82,9 +82,9 @@
 
   // Prompts / callouts
   --prompt-text-color: rgb(31 27 22 / 80%);
-  --prompt-tip-bg: rgb(45 122 123 / 10%);
-  --prompt-tip-icon-color: #2D7A7B;
-  --prompt-tip-border: rgb(45 122 123 / 25%);
+  --prompt-tip-bg: rgb(46 126 154 / 10%);
+  --prompt-tip-icon-color: #2E7E9A;
+  --prompt-tip-border: rgb(46 126 154 / 25%);
   --prompt-info-bg: rgb(30 91 179 / 9%);
   --prompt-info-icon-color: #1E5BB3;
   --prompt-info-border: rgb(30 91 179 / 25%);
@@ -105,7 +105,7 @@
   --code-header-text-color: #7A6F5F;
   --code-header-muted-color: #E3DDC9;
   --code-header-icon-color: #B0A490;
-  --clipboard-checked-color: #2D7A7B;
+  --clipboard-checked-color: #2E7E9A;
 
   // KBD
   --kbd-wrap-color: #C8BEA8;
@@ -117,10 +117,12 @@
 
   // Our addon custom properties (used by future steps)
   --link-hover: #A04B26;
-  --accent-color: #2D7A7B;
-  --accent-soft: #2D7A7B1A;
+  // Glacier teal — bluer hue (198°) than the original warm teal. Light-mode
+  // only; dark-mode accent stays at #4FB3B4 (already reads as bright teal).
+  --accent-color: #2E7E9A;
+  --accent-soft: #2E7E9A1A;
   --border-color: #E3DDC9;
-  --selection-bg: #2D7A7B33;
+  --selection-bg: #2E7E9A33;
   --btn-bg: #C0623A;
   --btn-fg: #FFFFFF;
   --code-bg: #F0E9D7;
@@ -135,6 +137,10 @@
   --cat-career-color: #A04B26;
   --cat-philosophy-color: #6B2D5C;
   --cat-books-color: #A05B22;
+
+  // /writings/ browse-card bg: a smidge above --mask-bg so the card reads
+  // as a contained component without darkening the page.
+  --browse-card-bg: #F5F0E3;
 }
 
 // ─── DARK PALETTE ─────────────────────────────────────────────────────────────
@@ -281,6 +287,10 @@
   --cat-career-color: #E68A5C;
   --cat-philosophy-color: #C49AC4;
   --cat-books-color: #CC9156;
+
+  // /writings/ browse-card bg: dark keeps the same --mask-bg behaviour as
+  // before this token existed.
+  --browse-card-bg: #1B1813;
 }
 
 // ─── Apply with the SAME selector structure Chirpy uses in _sass/base/_base.scss

@@ -27,7 +27,7 @@ permalink: /writings/
     <div class="writings-browse-section">
       <h3 class="writings-browse-label">Categories</h3>
       <div class="writings-browse-items">
-        {% for row in cats_sorted %}
+        {% for row in cats_sorted limit: 8 %}
           {% assign parts = row | split: '||' %}
           {% assign cname = parts[1] %}
           {% assign cslug = parts[2] %}
@@ -45,7 +45,7 @@ permalink: /writings/
     <div class="writings-browse-section">
       <h3 class="writings-browse-label">Trending tags</h3>
       <div class="writings-browse-items">
-        {% for row in tags_sorted limit: 10 %}
+        {% for row in tags_sorted limit: 12 %}
           {% assign parts = row | split: '||' %}
           {% assign tname = parts[1] %}
           {% assign tslug = parts[2] %}
