@@ -1,0 +1,335 @@
+// Beach-paper palette — overrides for Chirpy 7.5.0
+// Must mirror Chirpy's @media + html selector structure to win specificity.
+
+// ─── LIGHT PALETTE ────────────────────────────────────────────────────────────
+
+@mixin light-palette {
+  // Chirpy framework vars
+  --main-bg: #FAF6EE;
+  --mask-bg: #F0E9D7;
+  --main-border-color: #E3DDC9;
+
+  // Text
+  --text-color: #1F1B16;
+  --text-muted-color: #7A6F5F;
+  --heading-color: #1F1B16;
+  --label-color: #5A4F40;
+
+  // Links (terracotta, default palette)
+  --link-color: #C0623A;
+  --link-underline-color: #E3DDC9;
+
+  // Blockquote
+  --blockquote-border-color: #E3DDC9;
+  --blockquote-text-color: #7A6F5F;
+
+  // Buttons
+  --button-bg: #FAF6EE;
+  --btn-border-color: #E3DDC9;
+  --btn-backtotop-color: #7A6F5F;
+  --btn-backtotop-border-color: #E3DDC9;
+
+  // Cards
+  --card-bg: #FAF6EE;
+  --card-hover-bg: #F0E9D7;
+  --card-shadow: rgb(100 80 50 / 6%) 0 2px 6px 0,
+    rgb(200 190 170 / 14%) 0 0 0 1px;
+
+  // Tables
+  --tb-odd-bg: #F5F0E4;
+  --tb-border-color: #E3DDC9;
+
+  // Sidebar
+  --sidebar-bg: #F0E9D7;
+  --sidebar-border-color: #E3DDC9;
+  --sidebar-muted-color: #7A6F5F;
+  --sidebar-active-color: #1F1B16;
+  --sidebar-hover-bg: #E8DFC8;
+  --sidebar-btn-bg: #FAF6EE;
+  --sidebar-btn-color: #7A6F5F;
+  --avatar-border-color: #FAF6EE;
+  --site-title-color: #7A6F5F;
+  --site-subtitle-color: #7A6F5F;
+
+  // Topbar
+  --topbar-bg: rgb(250 246 238 / 85%);
+  --topbar-text-color: #5A4F40;
+  --search-border-color: #E3DDC9;
+  --search-icon-color: #B0A490;
+  --input-focus-border-color: #C0623A;
+
+  // Home / post list
+  --post-list-text-color: #5A4F40;
+
+  // TOC
+  --toc-highlight: #C0623A;
+  --toc-popup-border-color: #E3DDC9;
+
+  // Tags / categories
+  --tag-border: #E3DDC9;
+  --tag-shadow: #E3DDC9;
+  --tag-hover: #F0E9D7;
+  --search-tag-bg: #F5F0E4;
+  --categories-border: rgb(200 190 170 / 25%);
+  --categories-hover-bg: #F0E9D7;
+  --categories-icon-hover-color: #1F1B16;
+
+  // Archive
+  --timeline-color: #E3DDC9;
+  --timeline-node-bg: #C0623A;
+  --timeline-year-dot-color: #FAF6EE;
+  --dash-color: #C8BEA8;
+
+  // Prompts / callouts
+  --prompt-text-color: rgb(31 27 22 / 80%);
+  --prompt-tip-bg: rgb(46 126 154 / 10%);
+  --prompt-tip-icon-color: #2E7E9A;
+  --prompt-tip-border: rgb(46 126 154 / 25%);
+  --prompt-info-bg: rgb(30 91 179 / 9%);
+  --prompt-info-icon-color: #1E5BB3;
+  --prompt-info-border: rgb(30 91 179 / 25%);
+  --prompt-warning-bg: rgb(192 98 58 / 12%);
+  --prompt-warning-icon-color: #C0623A;
+  --prompt-warning-border: rgb(192 98 58 / 30%);
+  --prompt-danger-bg: rgb(160 75 38 / 14%);
+  --prompt-danger-icon-color: #A04B26;
+  --prompt-danger-border: rgb(160 75 38 / 30%);
+
+  // Code blocks (Beach-tuned One Light — light mode)
+  --language-border-color: #D8CBB0;
+  --highlight-bg-color: #F4ECD8;
+  --highlighter-rouge-color: #3A3028;
+  --highlight-lineno-color: #A89A7E;
+  --inline-code-bg: #E9E1CB;
+  --code-color: #1A1611;
+  --code-header-text-color: #5A4F40;
+  --code-header-muted-color: #B8AA91;
+  --code-header-icon-color: #7A6F5F;
+  --clipboard-checked-color: #2E7E9A;
+  // Code-window chrome (light mode only). Consumed by _sass/addon/_code.scss.
+  --code-window-border-color: #D8CBB0;
+  --code-header-bg: #E9DDC2;
+  --code-header-border-color: #D8CBB0;
+
+  // KBD
+  --kbd-wrap-color: #C8BEA8;
+  --kbd-text-color: #1F1B16;
+  --kbd-bg-color: #FAF6EE;
+
+  // Footnotes
+  --footnote-target-bg: #D4EDE8;
+
+  // Our addon custom properties (used by future steps)
+  --link-hover: #A04B26;
+  // Glacier teal — bluer hue (198°) than the original warm teal. Light-mode
+  // only; dark-mode accent stays at #4FB3B4 (already reads as bright teal).
+  --accent-color: #2E7E9A;
+  --accent-soft: #2E7E9A1A;
+  --border-color: #E3DDC9;
+  --selection-bg: #2E7E9A33;
+  --btn-bg: #C0623A;
+  --btn-fg: #FFFFFF;
+  --code-bg: #F4ECD8;
+  --text-muted: #7A6F5F;
+
+  // Body anchor color (light mode only). Cool blue against the warm sand
+  // background, distinct from the warm accent palette.
+  --body-link-color: #1E5BB3;
+  --body-link-hover: #143D78;
+
+  // Per-category accent colors (used by .writings-browse-cat tinted chips).
+  --cat-career-color: #A04B26;
+  --cat-philosophy-color: #6B2D5C;
+  --cat-books-color: #A05B22;
+
+  // /writings/ browse-card bg: a smidge above --mask-bg so the card reads
+  // as a contained component without darkening the page.
+  --browse-card-bg: #F5F0E3;
+}
+
+// ─── DARK PALETTE ─────────────────────────────────────────────────────────────
+
+@mixin dark-palette {
+  color-scheme: dark;
+
+  // Chirpy framework vars
+  --main-bg: #14110D;
+  --mask-bg: #1B1813;
+  --main-border-color: #2A2620;
+
+  // Text
+  --text-color: #EFE7D6;
+  --text-muted-color: #A89A7E;
+  --heading-color: #EFE7D6;
+  --label-color: #C0B8A8;
+
+  // Links
+  --link-color: #E68A5C;
+  --link-underline-color: #2A2620;
+
+  // Blockquote
+  --blockquote-border-color: #2A2620;
+  --blockquote-text-color: #A89A7E;
+
+  // Buttons
+  --button-bg: #1B1813;
+  --btn-border-color: #2A2620;
+  --btn-backtotop-color: #A89A7E;
+  --btn-backtotop-border-color: #2A2620;
+
+  // Cards
+  --card-bg: #1B1813;
+  --card-header-bg: #23201A;
+  --card-hover-bg: #23201A;
+  --card-shadow: rgb(10 8 5 / 70%) 0 6px 18px 0,
+    rgb(100 85 60 / 22%) 0 0 0 1px;
+
+  // Tables
+  --tb-odd-bg: #1B1813;
+  --tb-even-bg: #14110D;
+  --tb-border-color: #2A2620;
+
+  // Sidebar
+  --sidebar-bg: #1B1813;
+  --sidebar-border-color: #2A2620;
+  --sidebar-muted-color: #A89A7E;
+  --sidebar-active-color: rgb(239 231 214 / 95%);
+  --sidebar-hover-bg: #23201A;
+  --sidebar-btn-bg: #1F1C16;
+  --sidebar-btn-color: #A89A7E;
+  --avatar-border-color: rgb(200 185 160 / 85%);
+  --site-title-color: #A89A7E;
+  --site-subtitle-color: #A89A7E;
+
+  // Topbar
+  --topbar-bg: rgb(20 17 13 / 80%);
+  --topbar-text-color: #EFE7D6;
+  --search-border-color: #2A2620;
+  --search-icon-color: #6A6058;
+  --input-focus-border-color: #E68A5C;
+
+  // Home / post list
+  --post-list-text-color: #A89A7E;
+
+  // TOC
+  --toc-highlight: #E68A5C;
+  --toc-popup-border-color: #2A2620;
+
+  // Tags / categories
+  --tag-border: #2A2620;
+  --tag-shadow: #1B1813;
+  --tag-hover: #23201A;
+  --search-tag-bg: #1F1C16;
+  --categories-border: rgb(60 50 35 / 50%);
+  --categories-hover-bg: #23201A;
+  --categories-icon-hover-color: #EFE7D6;
+
+  // Archive
+  --timeline-color: #2A2620;
+  --timeline-node-bg: #E68A5C;
+  --timeline-year-dot-color: #2A2620;
+  --dash-color: #3A3328;
+
+  // Prompts / callouts
+  --prompt-text-color: rgb(239 231 214 / 78%);
+  --prompt-tip-bg: rgb(79 179 180 / 12%);
+  --prompt-tip-icon-color: #4FB3B4;
+  --prompt-tip-border: rgb(79 179 180 / 28%);
+  --prompt-info-bg: rgb(125 167 234 / 12%);
+  --prompt-info-icon-color: #7DA7EA;
+  --prompt-info-border: rgb(125 167 234 / 28%);
+  --prompt-warning-bg: rgb(230 138 92 / 14%);
+  --prompt-warning-icon-color: #E68A5C;
+  --prompt-warning-border: rgb(230 138 92 / 32%);
+  --prompt-danger-bg: rgb(240 160 119 / 14%);
+  --prompt-danger-icon-color: #F0A077;
+  --prompt-danger-border: rgb(240 160 119 / 32%);
+
+  // Code blocks (warm dark)
+  --language-border-color: #2A2620;
+  --highlight-bg-color: #1B1813;
+  --highlighter-rouge-color: #C0B8A8;
+  --highlight-lineno-color: #6A5E50;
+  --inline-code-bg: #23201A;
+  --code-color: #EFE7D6;
+  --code-header-text-color: #C0B8A8;
+  --code-header-muted-color: #4A4034;
+  --code-header-icon-color: #8A7D68;
+  --clipboard-checked-color: #4FB3B4;
+  --filepath-text-color: #C0B8A8;
+  // Code-window chrome. Consumed by _sass/addon/_code.scss.
+  --code-window-border-color: #332D24;
+  --code-header-bg: #242018;
+  --code-header-border-color: #332D24;
+
+  // KBD
+  --kbd-wrap-color: #5A5048;
+  --kbd-text-color: #EFE7D6;
+  --kbd-bg-color: #23201A;
+
+  // Footnotes
+  --footnote-target-bg: rgb(45 122 123 / 30%);
+
+  // Checkbox
+  --checkbox-color: #5A5048;
+  --checkbox-checked-color: #E68A5C;
+
+  // Our addon custom properties
+  --link-hover: #F0A077;
+  --accent-color: #4FB3B4;
+  --accent-soft: #4FB3B433;
+  --border-color: #2A2620;
+  --selection-bg: #4FB3B444;
+  --btn-bg: #E68A5C;
+  --btn-fg: #14110D;
+  --code-bg: #1B1813;
+  --text-muted: #A89A7E;
+
+  // Body anchor colour stays terracotta in dark; the cool-blue override is
+  // light-mode only. Fall back to --link-color so any rule that references
+  // --body-link-color picks up the warm accent in dark.
+  --body-link-color: var(--link-color);
+  --body-link-hover: var(--link-hover);
+
+  // Per-category accent colors (warmer/brighter in dark to maintain contrast).
+  --cat-career-color: #E68A5C;
+  --cat-philosophy-color: #C49AC4;
+  --cat-books-color: #CC9156;
+
+  // /writings/ browse-card bg: dark keeps the same --mask-bg behaviour as
+  // before this token existed.
+  --browse-card-bg: #1B1813;
+}
+
+// ─── Apply with the SAME selector structure Chirpy uses in _sass/base/_base.scss
+// (so same specificity; loading after main CSS = later in cascade = wins)
+
+@media (prefers-color-scheme: light) {
+
+  html:not([data-mode]),
+  html[data-mode='light'] {
+    @include light-palette;
+  }
+
+  html[data-mode='dark'] {
+    @include dark-palette;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+
+  html:not([data-mode]),
+  html[data-mode='dark'] {
+    @include dark-palette;
+  }
+
+  html[data-mode='light'] {
+    @include light-palette;
+  }
+}
+
+// ─── Selection colour ────────────────────────────────────────────────────────
+
+::selection {
+  background: var(--selection-bg);
+}

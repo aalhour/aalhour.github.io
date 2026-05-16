@@ -1,0 +1,210 @@
+// Shared post/page content overrides.
+
+.post-meta .d-flex.justify-content-between>span:first-child,
+article .post-content+.d-flex>span:first-child,
+.post>.d-flex.justify-content-between>span:first-child {
+  display: none !important;
+}
+
+blockquote[class*="prompt-"]>h1:first-child,
+blockquote[class*="prompt-"]>h2:first-child,
+blockquote[class*="prompt-"]>h3:first-child,
+blockquote[class*="prompt-"]>h4:first-child,
+blockquote[class*="prompt-"]>h5:first-child,
+blockquote[class*="prompt-"]>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+blockquote.prompt-monologue {
+  border-left: 0;
+  position: relative;
+  padding: 1rem 1rem 1rem 3rem;
+  border-radius: 0.375rem;
+  background-color: rgba(0, 0, 0, 0.05);
+
+  >p {
+    color: #52525b;
+    /* zinc-600 */
+  }
+
+  &::before {
+    content: '💭';
+    text-align: center;
+    width: 3rem;
+    position: absolute;
+    left: 0.25rem;
+    margin-top: 0.4rem;
+  }
+}
+
+html[data-mode="dark"] blockquote.prompt-monologue {
+  background-color: rgba(0, 0, 0, 0.25);
+
+  >p {
+    color: #a1a1aa;
+    /* zinc-400 */
+  }
+}
+
+// Body anchors only; this deliberately avoids home, topbar, and footer links.
+html:not([data-mode="dark"]) .post-content a:not(.img-link):not(.popup),
+html:not([data-mode="dark"]) .page-content a:not(.img-link):not(.popup),
+html[data-mode="light"] .post-content a:not(.img-link):not(.popup),
+html[data-mode="light"] .page-content a:not(.img-link):not(.popup) {
+  color: var(--body-link-color);
+
+  &:hover {
+    color: var(--body-link-hover);
+  }
+}
+
+// Post header description sits muted under the title in both themes.
+// Selector matches Chirpy's `header .post-desc` specificity so this wins.
+header .post-desc {
+  color: var(--text-muted);
+}
+
+// Prompt callouts — palette-matched chrome with a thin coloured border so
+// tip vs info read as distinct (teal vs blue) without raising warning/danger
+// to alert-level visual weight.
+blockquote.prompt-tip,
+blockquote.prompt-info,
+blockquote.prompt-warning,
+blockquote.prompt-danger {
+  border-left: 0;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  padding: 0.85rem 1.1rem 0.85rem 3rem;
+}
+
+blockquote.prompt-tip {
+  background: var(--prompt-tip-bg);
+  border-color: var(--prompt-tip-border);
+}
+
+blockquote.prompt-info {
+  background: var(--prompt-info-bg);
+  border-color: var(--prompt-info-border);
+}
+
+blockquote.prompt-warning {
+  background: var(--prompt-warning-bg);
+  border-color: var(--prompt-warning-border);
+}
+
+blockquote.prompt-danger {
+  background: var(--prompt-danger-bg);
+  border-color: var(--prompt-danger-border);
+}
+
+// The icon color is keyed to per-type --prompt-*-icon-color in _variables.scss.
+
+// ─────────────────────── TL;DR callout ────────────────────────────────────
+// Rendered at the top of post content when `tldr: "..."` is in front matter.
+
+.post-tldr {
+  position: relative;
+  margin: 1.4rem 0 2rem;
+  padding: 1.4rem 1.4rem 1rem;
+  border: 1px solid var(--main-border-color);
+  border-radius: 0.4rem;
+  background: var(--card-bg, var(--main-bg));
+  line-height: 1.65;
+  color: var(--text-color);
+
+  >p {
+    margin: 0 0 0.6rem;
+  }
+
+  >p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.post-tldr-label {
+  position: absolute;
+  top: -0.7rem;
+  left: 1rem;
+  padding: 0.15rem 0.55rem;
+  background: var(--main-bg);
+  border: 1px solid var(--main-border-color);
+  border-radius: 0.2rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.80rem;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+// ─── 404 page (terminal-style "no such file or directory") ──────────────────
+
+.four-oh-four {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  margin: 1.5rem 0 0;
+}
+
+.four-oh-four-cmd {
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+
+  .ps1 {
+    color: var(--accent-color);
+    font-weight: 600;
+    margin-right: 0.4rem;
+  }
+
+  .cmd {
+    color: var(--text-color);
+  }
+}
+
+.four-oh-four-err {
+  color: var(--link-color);
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin: 0 0 2rem;
+}
+
+.four-oh-four-lede {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  margin: 0 0 1.5rem;
+}
+
+.four-oh-four-paths {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.98rem;
+
+  li {
+    line-height: 1.5;
+  }
+
+  li::before {
+    content: '$ cd ';
+    color: var(--label-color);
+  }
+
+  a {
+    color: var(--link-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+  }
+}
+
+.four-oh-four-comment {
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}

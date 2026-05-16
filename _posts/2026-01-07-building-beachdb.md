@@ -1,15 +1,22 @@
 ---
 title: "Building BeachDB: A Database from Scratch (in Go)"
+subtitle: "The fastest way past hand-waving is to make the machine answer back."
+description: "Building an LSM storage engine from scratch in Go: writes, reads, compaction, and what hand-waving database internals actually hides."
+tldr: >-
+  I'm building [BeachDB](https://github.com/aalhour/beachdb): a toy,
+  inspectable LSM-based storage engine in Go, to stop hand-waving database
+  internals and learn them by building them end-to-end, in public. This
+  kickoff post explains why I'm going down the stateful-systems rabbit hole,
+  lays out goals/non-goals + the "engine → server → Raft cluster"
+  architecture, and includes an interactive LSM-tree visualization to make
+  the write/read/compaction flow concrete.
 date: 2026-01-07
-categories: [Programming]
+categories: [Databases]
 tags: [beachdb, databases, storage, lsm-tree]
 toc: true
-image: /assets/images/posts/2026-01-07-building-beachdb.webp
 track: https://soundcloud.com/silent-planet/antimatter?in=exixts/sets/3-ovens
+pin: true        # Featured on homepage hero; swap when BeachDB reflection ships
 ---
-
-> **TL;DR**: I’m building [BeachDB](https://github.com/aalhour/beachdb) — a toy, inspectable LSM-based storage engine in Go — to stop hand-waving database internals and learn them by building them end-to-end, in public. This kickoff post explains why I’m going down the stateful-systems rabbit hole, lays out goals/non-goals + the “engine → server → Raft cluster” architecture, and includes an interactive LSM-tree visualization to make the write/read/compaction flow concrete.
-{: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 

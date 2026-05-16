@@ -10,4 +10,5 @@ vendor/*
 index_algolia.sh
 .trunk/
 _untracked/
-
+design-previews/
+_manual/css-coverage/

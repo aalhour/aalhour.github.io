@@ -1,0 +1,266 @@
+@use 'tokens' as *;
+
+// ─── Home hub ───────────────────────────────────────────────────────────────
+
+.home-hub {
+  // Width is clamped by the reader shell on body.shell-reader (see _layout.scss).
+  margin: 0 auto;
+  padding: 1rem 0 4rem;
+
+  a {
+    color: var(--link-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text-color);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+}
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
+
+.home-hero {
+  display: flex;
+  gap: 1.75rem;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+
+  @media (max-width: $bp-home-stack-max) {
+    display: block;
+
+    &::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+  }
+}
+
+.home-hero-text {
+  flex: 1;
+  min-width: 0;
+  order: 1;
+}
+
+.home-photo {
+  order: 2;
+}
+
+.home-title {
+  font-family: $font-display;
+  font-size: 2.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.65rem;
+  color: var(--heading-color);
+}
+
+.home-lede {
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 34rem;
+}
+
+.home-photo {
+  display: block;
+  width: 132px;
+  height: 132px;
+  border-radius: 0.6rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(31, 27, 22, 0.08);
+  text-decoration: none !important;
+
+  &:hover {
+    text-decoration: none !important;
+  }
+
+  @media (max-width: $bp-home-stack-max) {
+    float: right;
+    width: 110px;
+    height: 110px;
+    margin: 0.25rem 0 0.75rem 1rem;
+    shape-outside: margin-box;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+// ─── Now callout ─────────────────────────────────────────────────────────────
+
+.home-now {
+  font-size: 1.05rem;
+  color: var(--text-color);
+  margin: 0 0 3rem;
+  padding: 0.75rem 1rem;
+  background: var(--prompt-tip-bg, rgba(45, 122, 123, 0.06));
+  border-left: 2px solid var(--prompt-tip-icon-color, #2D7A7B);
+  border-radius: 0 0.3rem 0.3rem 0;
+
+  .home-now-label {
+    font-family: $font-mono;
+    font-size: 0.72rem;
+    color: var(--prompt-tip-icon-color, #2D7A7B);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-right: 0.5rem;
+  }
+
+  a {
+    color: var(--accent-color) !important;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-color);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--accent-color) !important;
+      text-decoration-color: var(--accent-color);
+    }
+  }
+}
+
+// ─── Section ─────────────────────────────────────────────────────────────────
+
+.home-section {
+  margin: 0 0 2.5rem;
+}
+
+.home-section-h {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0 0.85rem;
+  border-bottom: 1px solid var(--main-border-color);
+  padding-bottom: 0.5rem;
+
+  h2 {
+    font-family: $font-display;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin: 0;
+    flex: 1;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+}
+
+.home-section-arrow {
+  font-family: $font-mono;
+  font-size: 0.78rem;
+  color: var(--accent-color, var(--link-color));
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ─── List ────────────────────────────────────────────────────────────────────
+
+.home-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home-list-item {
+  padding: 0.5rem 0;
+  // EXCEPTION to the shared listing scale: home rows render multiple sections
+  // (Featured, Recent writing, Recent talks) on a single page. A 1.2rem title
+  // makes the home page feel heavy. 1.1rem keeps the rhythm closer to the
+  // surrounding hero + callout typography. All other listing pages stay at
+  // $fs-list-title (1.2rem) since each is a single-section view.
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--main-border-color);
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @media (max-width: $bp-sm-max) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    padding: 0.9rem 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
+  }
+}
+
+.home-list-date {
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--text-muted);
+  min-width: 5.5rem;
+  flex-shrink: 0;
+}
+
+.home-hub .home-list-link {
+  color: var(--text-color);
+  font-family: $font-display;
+  font-weight: $fw-list-title;
+  flex: 1;
+  text-decoration: none;
+  min-width: 0;
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration: none !important;
+  }
+}
+
+.home-list-tag {
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--prompt-tip-icon-color, #2D7A7B);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.home-list-venue {
+  color: var(--text-muted);
+  font-size: $fs-list-meta;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+// ─── Closing paragraph ───────────────────────────────────────────────────────
+
+.home-closing {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 3rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--main-border-color);
+
+  a {
+    color: var(--text-color);
+    text-decoration: underline;
+    text-decoration-color: var(--main-border-color);
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--accent-color, var(--link-color));
+      text-decoration-color: var(--accent-color, var(--link-color));
+    }
+  }
+}

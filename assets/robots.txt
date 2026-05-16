@@ -1,11 +1,74 @@
 ---
 permalink: /robots.txt
 ---
+# aalhour.com — robots.txt
+# Public site. PDFs in /assets/docs/ excluded from all crawlers.
+# AI / LLM crawlers welcome; see llms.txt for guidance.
 
 User-agent: *
-
+Disallow: /assets/docs/
 Disallow: /norobots/
+
+# ─── AI training + retrieval bots (explicit opt-in; same exclusions) ─────────
+
+User-agent: GPTBot
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: CCBot
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /assets/docs/
+
+User-agent: DuckAssistBot
+Allow: /
 Disallow: /assets/docs/
 
 Sitemap: {{ '/sitemap.xml' | absolute_url }}
-

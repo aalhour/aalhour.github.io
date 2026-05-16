@@ -1,0 +1,412 @@
+// Syntax highlight — Beach-paper palette
+// Single-file home for syntax-highlight tokens + selectors.
+// Mirrors the selector structure from Chirpy's _sass/base/_base.scss so our
+// rules have identical specificity and win via later-in-cascade ordering.
+//
+// Light values: $l-rouge-*  (Beach-tuned One Light)
+// Dark  values: $d-rouge-*  (Beach-paper, unchanged)
+// To swap a palette: edit values below. Selectors reference these — never literals.
+
+// ─── LIGHT TOKEN VALUES (Beach-tuned One Light) ───────────────────────────────
+
+$l-rouge-bg: #F4ECD8; // block surface (Beach-paper)
+$l-rouge-fg: #1A1611; // base text
+$l-rouge-kw: #8F3D88; // keywords (purple, Beach-tuned)
+$l-rouge-op: #205F60; // kw.const + operators + regex + string-interp (deep teal)
+$l-rouge-str: #4E7333; // strings (olive)
+$l-rouge-cmt: #6F6452; // comments (driftwood)
+$l-rouge-num: #7A5028; // numbers, literals, decorators (bronze)
+$l-rouge-fn: #3D5A8E; // functions / methods (muted blue)
+$l-rouge-cls: #8A6500; // classes, types, namespaces, vars, exceptions (gold)
+$l-rouge-tag: #B5421C; // tags, attributes (terracotta)
+$l-rouge-bi: #8A3A1A; // builtins (deep terra)
+$l-rouge-subhead: #574E40; // generic subheading (.gu) — darker than cmt
+$l-rouge-diff-ins-fg: #205F60;
+$l-rouge-diff-ins-bg: #D9E8DE;
+$l-rouge-diff-del-fg: #8A3A1A;
+$l-rouge-diff-del-bg: #F2DAD0;
+$l-rouge-err-fg: #FAF6EE;
+$l-rouge-err-bg: #8A3A1A;
+
+// ─── DARK TOKEN VALUES (unchanged from Mk1) ───────────────────────────────────
+
+$d-rouge-bg: #1B1813;
+$d-rouge-fg: #EFE7D6;
+$d-rouge-kw: #E68A5C;
+$d-rouge-op: #4FB3B4;
+$d-rouge-str: #7DC47C;
+$d-rouge-cmt: #A89A7E;
+$d-rouge-num: #D4A857;
+$d-rouge-fn: #B08ED4;
+$d-rouge-cls: #7BA3D4;
+$d-rouge-tag: #88BA6E;
+$d-rouge-bi: #F0A077;
+$d-rouge-subhead: #A89A7E;
+$d-rouge-diff-ins-fg: #7DC47C;
+$d-rouge-diff-ins-bg: #1A2A1A;
+$d-rouge-diff-del-fg: #E68A5C;
+$d-rouge-diff-del-bg: #2A1A12;
+$d-rouge-err-fg: #14110D;
+$d-rouge-err-bg: #C04040;
+
+// ─── SHARED TABLE BOILERPLATE ─────────────────────────────────────────────────
+
+@mixin highlight-base {
+  .highlight table td {
+    padding: 5px;
+  }
+
+  .highlight table pre {
+    margin: 0;
+  }
+}
+
+// ─── LIGHT SYNTAX THEME ───────────────────────────────────────────────────────
+
+@mixin rouge-light {
+  @include highlight-base;
+
+  .highlight,
+  .highlight .w {
+    color: $l-rouge-fg;
+    background-color: $l-rouge-bg;
+  }
+
+  // Keywords
+  .highlight .k,
+  .highlight .kd,
+  .highlight .kn,
+  .highlight .kp,
+  .highlight .kr,
+  .highlight .kt,
+  .highlight .kv {
+    color: $l-rouge-kw;
+  }
+
+  // Keyword.constant, operators, regex, string-interpolation
+  .highlight .kc,
+  .highlight .o,
+  .highlight .ow,
+  .highlight .sr,
+  .highlight .si {
+    color: $l-rouge-op;
+  }
+
+  // Strings
+  .highlight .s,
+  .highlight .sa,
+  .highlight .sc,
+  .highlight .dl,
+  .highlight .sd,
+  .highlight .s2,
+  .highlight .se,
+  .highlight .sh,
+  .highlight .sx,
+  .highlight .s1,
+  .highlight .ss,
+  .highlight .sb {
+    color: $l-rouge-str;
+  }
+
+  // Comments
+  .highlight .c,
+  .highlight .ch,
+  .highlight .cd,
+  .highlight .cm,
+  .highlight .cp,
+  .highlight .cpf,
+  .highlight .c1,
+  .highlight .cs {
+    color: $l-rouge-cmt;
+  }
+
+  // Numbers, literals, decorators
+  .highlight .m,
+  .highlight .mb,
+  .highlight .mf,
+  .highlight .mh,
+  .highlight .mi,
+  .highlight .il,
+  .highlight .mo,
+  .highlight .mx,
+  .highlight .l,
+  .highlight .ld,
+  .highlight .nd {
+    color: $l-rouge-num;
+  }
+
+  // Functions / methods
+  .highlight .nf,
+  .highlight .fm {
+    color: $l-rouge-fn;
+  }
+
+  // Classes, types, namespaces, constants,
+  // variables, labels, exceptions, properties, pseudo-builtins
+  .highlight .nc,
+  .highlight .no,
+  .highlight .nn,
+  .highlight .nv,
+  .highlight .vc,
+  .highlight .vg,
+  .highlight .vi,
+  .highlight .vm,
+  .highlight .nl,
+  .highlight .ne,
+  .highlight .py,
+  .highlight .bp {
+    color: $l-rouge-cls;
+  }
+
+  // Tags, attributes
+  .highlight .na,
+  .highlight .nt {
+    color: $l-rouge-tag;
+  }
+
+  // Builtins
+  .highlight .nb {
+    color: $l-rouge-bi;
+  }
+
+  // Generic inserted (diff +)
+  .highlight .gi {
+    color: $l-rouge-diff-ins-fg;
+    background-color: $l-rouge-diff-ins-bg;
+  }
+
+  // Generic deleted (diff -)
+  .highlight .gd {
+    color: $l-rouge-diff-del-fg;
+    background-color: $l-rouge-diff-del-bg;
+  }
+
+  // Generic heading
+  .highlight .gh {
+    color: $l-rouge-fg;
+    font-weight: 600;
+  }
+
+  // Generic subheading
+  .highlight .gu {
+    color: $l-rouge-subhead;
+    font-weight: 600;
+  }
+
+  // Generic.traceback
+  .highlight .gr {
+    color: $l-rouge-err-fg;
+  }
+
+  // Error
+  .highlight .err {
+    color: $l-rouge-err-fg;
+    background-color: $l-rouge-err-bg;
+  }
+
+  // Neutral / base text tokens
+  .highlight .ni,
+  .highlight .ge,
+  .highlight .gs,
+  .highlight .gl,
+  .highlight .gt,
+  .highlight .gp {
+    color: $l-rouge-fg;
+  }
+
+  .highlight .ge {
+    font-style: italic;
+  }
+
+  .highlight .gs {
+    font-weight: 600;
+  }
+}
+
+// ─── DARK SYNTAX THEME ────────────────────────────────────────────────────────
+
+@mixin rouge-dark {
+  @include highlight-base;
+
+  .highlight,
+  .highlight .w {
+    color: $d-rouge-fg;
+    background-color: $d-rouge-bg;
+  }
+
+  // Keywords
+  .highlight .k,
+  .highlight .kd,
+  .highlight .kn,
+  .highlight .kp,
+  .highlight .kr,
+  .highlight .kt,
+  .highlight .kv {
+    color: $d-rouge-kw;
+  }
+
+  // Keyword.constant, operators, regex, string-interpolation
+  .highlight .kc,
+  .highlight .o,
+  .highlight .ow,
+  .highlight .sr,
+  .highlight .si {
+    color: $d-rouge-op;
+  }
+
+  // Strings
+  .highlight .s,
+  .highlight .sa,
+  .highlight .sc,
+  .highlight .dl,
+  .highlight .sd,
+  .highlight .s2,
+  .highlight .se,
+  .highlight .sh,
+  .highlight .sx,
+  .highlight .s1,
+  .highlight .ss,
+  .highlight .sb {
+    color: $d-rouge-str;
+  }
+
+  // Comments
+  .highlight .c,
+  .highlight .ch,
+  .highlight .cd,
+  .highlight .cm,
+  .highlight .cp,
+  .highlight .cpf,
+  .highlight .c1,
+  .highlight .cs {
+    color: $d-rouge-cmt;
+  }
+
+  // Numbers, literals, decorators
+  .highlight .m,
+  .highlight .mb,
+  .highlight .mf,
+  .highlight .mh,
+  .highlight .mi,
+  .highlight .il,
+  .highlight .mo,
+  .highlight .mx,
+  .highlight .l,
+  .highlight .ld,
+  .highlight .nd {
+    color: $d-rouge-num;
+  }
+
+  // Functions / methods
+  .highlight .nf,
+  .highlight .fm {
+    color: $d-rouge-fn;
+  }
+
+  // Classes, types, namespaces, constants,
+  // variables, labels, exceptions, properties, pseudo-builtins
+  .highlight .nc,
+  .highlight .no,
+  .highlight .nn,
+  .highlight .nv,
+  .highlight .vc,
+  .highlight .vg,
+  .highlight .vi,
+  .highlight .vm,
+  .highlight .nl,
+  .highlight .ne,
+  .highlight .py,
+  .highlight .bp {
+    color: $d-rouge-cls;
+  }
+
+  // Tags, attributes
+  .highlight .na,
+  .highlight .nt {
+    color: $d-rouge-tag;
+  }
+
+  // Builtins
+  .highlight .nb {
+    color: $d-rouge-bi;
+  }
+
+  // Generic inserted (diff +)
+  .highlight .gi {
+    color: $d-rouge-diff-ins-fg;
+    background-color: $d-rouge-diff-ins-bg;
+  }
+
+  // Generic deleted (diff -)
+  .highlight .gd {
+    color: $d-rouge-diff-del-fg;
+    background-color: $d-rouge-diff-del-bg;
+  }
+
+  // Generic heading
+  .highlight .gh {
+    color: $d-rouge-fg;
+    font-weight: 600;
+  }
+
+  // Generic subheading
+  .highlight .gu {
+    color: $d-rouge-subhead;
+    font-weight: 600;
+  }
+
+  // Generic.traceback
+  .highlight .gr {
+    color: $d-rouge-bg;
+  }
+
+  // Error
+  .highlight .err {
+    color: $d-rouge-err-fg;
+    background-color: $d-rouge-err-bg;
+  }
+
+  // Neutral / base text tokens
+  .highlight .ni,
+  .highlight .ge,
+  .highlight .gs,
+  .highlight .gl,
+  .highlight .gt,
+  .highlight .gp {
+    color: $d-rouge-fg;
+  }
+
+  .highlight .ge {
+    font-style: italic;
+  }
+
+  .highlight .gs {
+    font-weight: 600;
+  }
+}
+
+// ─── Apply with identical selector structure as Chirpy's _base.scss ───────────
+
+@media (prefers-color-scheme: light) {
+
+  html:not([data-mode]),
+  html[data-mode='light'] {
+    @include rouge-light;
+  }
+
+  html[data-mode='dark'] {
+    @include rouge-dark;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+
+  html:not([data-mode]),
+  html[data-mode='dark'] {
+    @include rouge-dark;
+  }
+
+  html[data-mode='light'] {
+    @include rouge-light;
+  }
+}

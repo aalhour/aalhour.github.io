@@ -1,0 +1,45 @@
+// Code-window chrome — applies in both light and dark modes.
+// Token colours live in _sass/addon/_rouge.scss.
+// CSS custom properties (--code-window-border-color, --code-header-bg,
+// --code-header-border-color, --code-header-{text,muted,icon}-color) live in
+// both palette mixins of _sass/addon/_variables.scss. Mode-switching falls
+// out of the CSS-var cascade — no @media or [data-mode] selector needed here.
+
+// ─── Block-code weight ────────────────────────────────────────────────────────
+// Fenced code renders at JetBrains Mono Medium (500). Generic emphasis tokens
+// (.gh, .gs, .gu) render at 600 (defence-in-depth alongside the same rule in
+// _rouge.scss mixins). Inline `<code>` in prose stays at body weight — the
+// selector is rooted at .highlight so only fenced blocks are affected.
+
+.highlight,
+.highlight pre,
+.highlight code,
+.highlight table pre {
+  font-weight: 500;
+}
+
+.highlight .gh,
+.highlight .gu,
+.highlight .gs {
+  font-weight: 600;
+}
+
+// ─── Code-window chrome ───────────────────────────────────────────────────────
+
+div[class^='language-'] {
+  box-shadow: var(--code-window-border-color) 0 0 0 1px;
+}
+
+// Header + body need explicit corner radii because Chirpy's container
+// (div[class^='language-']) has border-radius: 10px but no overflow: hidden,
+// so child surfaces paint square corners over the rounded container clip.
+.code-header {
+  background-color: var(--code-header-bg);
+  border-bottom: 1px solid var(--code-header-border-color);
+  border-radius: 10px 10px 0 0;
+  font-weight: 500;
+}
+
+.highlight {
+  border-radius: 0 0 10px 10px;
+}

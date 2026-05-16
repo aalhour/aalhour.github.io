@@ -1,12 +1,25 @@
 # Site settings
-title: ahmad alhour
+title: aalhour
 tagline: notes on software, systems, books, and curiosity.
 description: notes on software, systems, books, and curiosity.
 url: https://aalhour.com
 baseurl: ""
+logo: /assets/img/favicons/android-chrome-512x512.png
+social_preview_image: /assets/images/og-default.png
+
+author:
+  name: Ahmad Alhour
+  twitter: ahmad_alhour
+  linkedin: aalhour
+  github: aalhour
+  url: https://aalhour.com/about/
 
 # Social links (used for SEO)
 social:
+  name: Ahmad Alhour
+  # Surfaced as <meta name="fediverse:creator"> by _includes/head.html so
+  # Mastodon link previews attribute back to your account.
+  fediverse_handle: "@aalhour@hachyderm.io"
   links:
     - https://twitter.com/ahmad_alhour
     - https://github.com/aalhour
@@ -18,6 +31,7 @@ github:
   username: aalhour
 twitter:
   username: ahmad_alhour
+  card: summary_large_image
 mastodon:
   username: aalhour
   instance: hachyderm.io
@@ -40,7 +54,7 @@ lang: en
 paginate: 10
 
 # Theme mode - leave empty to enable toggle (dark default via JS)
-theme_mode:
+theme_mode: 
 
 # CDN endpoint for media resources (optional)
 # cdn:
@@ -85,6 +99,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-archives
+  - jekyll-last-modified-at
 
 # ------------ The following options are not recommended to be modified ------------------
 
@@ -127,6 +142,12 @@ defaults:
     values:
       layout: page
       permalink: /:title/
+  - scope:
+      path: "assets/docs"
+    values:
+      # Excluded from sitemap.xml because robots.txt blocks crawlers from
+      # /assets/docs/ — sitemap listing would contradict the disallow.
+      sitemap: false
 
 sass:
   style: compressed
@@ -146,6 +167,7 @@ exclude:
   - docs
   - tools
   - _manual
+  - assets/lib/fonts
   - README.md
   - LICENSE
   - purgecss.js

@@ -1,13 +1,16 @@
 ---
 title: "The syscall I forgot: directory fsync"
+subtitle: "Sometimes the missing durability bug is one directory above where you were looking."
+description: "Directory fsync in Go: why fsyncing a file isn't enough, what filesystem metadata needs, and how BeachDB caught the missing syscall."
+tldr: >-
+  I fsynced the WAL file on every write. Crash tests passed. SIGKILL tests
+  passed. Then someone asked: "What if the directory doesn't know the file
+  exists?" I was one missing syscall away from losing (almost) everything.
 date: 2026-02-16
-categories: [Programming]
+categories: [Databases]
 tags: [beachdb, databases, storage, durability, fsync]
 toc: true
 ---
-
-> **TL;DR**: I fsynced the WAL file on every write. Crash tests passed. SIGKILL tests passed. Then someone asked: "What if the directory doesn't know the file exists?" I was one missing syscall away from losing (almost) everything.
-{: .prompt-info }
 
 _This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
 

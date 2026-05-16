@@ -1,0 +1,46 @@
+@use 'tokens' as *;
+
+// ─── Page shell sizing ───────────────────────────────────────────────────────
+// All rules that decide how wide content + topbar render at each breakpoint
+// live here. Structural concerns (layout flow, positioning) stay in
+// _layout.scss and _topbar.scss.
+//
+// Two shells are in play:
+//
+//   .shell-panel  → posts + /archives/. Uses Chirpy's per-breakpoint container
+//                   widths and the panel-shell topbar rules in _topbar.scss.
+//   .shell-reader → home, /writings/, /talks/, /projects/, /animations/,
+//                   /about/, /tags/, /categories/. Clamped to $reader-shell-max
+//                   for comfortable reading.
+
+@media (min-width: $bp-lg-min) {
+
+  // Centre + clamp the reader main and tail.
+  body.shell-reader .site-main--reader,
+  body.shell-reader .site-tail--reader {
+    max-width: $reader-shell-max;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  // Match the topbar to the reader content width so brand/toggle align with
+  // the content edges below. Wins over the panel-shell breakpoints in
+  // _topbar.scss via body-class specificity.
+  body.shell-reader #topbar {
+    max-width: $reader-shell-max;
+    padding-inline: 1.5rem;
+  }
+}
+
+// Chirpy ships `main.col-12 { padding-right: 4.5rem !important }` at xxxl.
+// That asymmetric padding is for the panel-shell layout where the right rail
+// eats real estate; on the centred reader shell it shoves content left and
+// makes the topbar appear to overflow. Force symmetric padding here.
+@media (min-width: $bp-xxxl-min) {
+
+  body.shell-reader main.site-main--reader,
+  body.shell-reader #tail-wrapper.site-tail--reader {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+}

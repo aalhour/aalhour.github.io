@@ -1,0 +1,41 @@
+// Animations: live styles for /animations/<slug>/ detail pages.
+//
+// The /animations/ index uses the .row-list-* primitive (see _row-list.scss),
+// not the legacy .animation-card* gallery. Rules here cover only:
+//   - the "Used in:" strip from _includes/animation-used-in.html
+//   - the detail-page intro + usage + stage wrappers used by animations/*.md
+
+.animation-posts-label {
+  font-size: 1.03rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.animation-card-posts-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 1.03rem;
+  line-height: 1.75;
+}
+
+.animation-card-posts-list li + li {
+  margin-top: 0.25rem;
+}
+
+.animation-detail-intro {
+  margin-bottom: 1.5rem;
+}
+
+.animation-detail-usage {
+  display: block;
+  margin-top: 0.9rem;
+}
+
+.animation-detail-stage {
+  width: 100%;
+  max-width: 100%;
+}
+
+.animation-detail-stage > div {
+  width: 100%;
+}

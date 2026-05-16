@@ -1,0 +1,283 @@
+@use 'tokens' as *;
+
+// ─── Writings (annotated archive at /writings/) ──────────────────────────────
+
+.writings-page {
+  // Width is set by the reader shell on body.shell-reader (see _layout.scss).
+}
+
+.writings-year {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--main-border-color);
+
+  h2 {
+    font-family: $font-display-bold;
+    font-size: 1.65rem;
+    font-weight: 400;
+    margin: 0;
+    color: var(--heading-color);
+    letter-spacing: -0.01em;
+  }
+}
+
+.writings-year-count {
+  font-family: $font-mono;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.writings-entries {
+  display: flex;
+  flex-direction: column;
+}
+
+.writings-entry {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 1.25rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--main-border-color);
+  align-items: baseline;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @media (max-width: $bp-sm-max) {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 1.5rem 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
+  }
+}
+
+.writings-entry-date {
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.writings-entry-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.writings-entry-title {
+  grid-area: title;
+  font-family: $font-display;
+  font-size: $fs-list-title;
+  font-weight: $fw-list-title;
+  margin: 0;
+  line-height: 1.35;
+
+  a {
+    color: var(--text-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--link-color);
+      text-decoration: none;
+    }
+  }
+}
+
+.writings-entry-note {
+  grid-area: note;
+  font-family: $font-body;
+  font-size: $fs-list-subtitle;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.writings-entry-meta {
+  grid-area: meta;
+  margin-top: 0.3rem;
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem;
+  line-height: 1.6;
+}
+
+.writings-entry-cat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--accent-color);
+  text-decoration: none;
+
+  i {
+    font-size: 0.85em;
+  }
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+}
+
+.writings-entry-sep {
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin: 0 0.1rem;
+}
+
+.writings-entry-read {
+  color: var(--text-muted);
+}
+
+// ─── Browse card (categories + trending tags) ────────────────────────────────
+
+.writings-browse {
+  border: 1px solid var(--main-border-color);
+  border-radius: 0.5rem;
+  // --browse-card-bg sits a smidge above --mask-bg in light (sand-paper
+  // halfway between main and mask). Dark keeps the existing mask-bg tone.
+  background: var(--browse-card-bg);
+  padding: 1.1rem 1.25rem;
+  margin: 0 0 2.25rem;
+}
+
+.writings-browse-section {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "label items seeall";
+  column-gap: 1rem;
+  row-gap: 0.45rem;
+  align-items: baseline;
+
+  @media (max-width: $bp-home-stack-max) {
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "label seeall"
+      "items items";
+    justify-content: space-between;
+    row-gap: 0.5rem;
+  }
+}
+
+.writings-browse-label {
+  grid-area: label;
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  margin: 0;
+}
+
+.writings-browse-seeall {
+  grid-area: seeall;
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--link-color);
+  text-decoration: none;
+  white-space: nowrap;
+  justify-self: end;
+
+  &:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+  }
+}
+
+.writings-browse-divider {
+  border: 0;
+  border-top: 1px dashed var(--main-border-color);
+  margin: 1rem 0;
+}
+
+.writings-browse-items {
+  grid-area: items;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.1rem;
+  row-gap: 0.35rem;
+  line-height: 1.7;
+  min-width: 0;
+}
+
+.writings-browse-cat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: var(--accent-color);
+
+  i {
+    font-size: 0.85em;
+  }
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+
+  // Per-category color text variations (colors live in _variables.scss).
+  &[data-c='career'] {
+    color: var(--cat-career-color);
+  }
+
+  &[data-c='philosophy'] {
+    color: var(--cat-philosophy-color);
+  }
+
+  &[data-c='books'] {
+    color: var(--cat-books-color);
+  }
+
+  &[data-c='meta'] {
+    color: var(--text-muted);
+  }
+}
+
+.writings-browse-cat .writings-browse-count,
+.writings-browse-tag .writings-browse-count {
+  color: var(--text-muted);
+  font-size: $fs-list-tag;
+  margin-left: 0.2rem;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+.writings-browse-tag {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-color);
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+}
+
+// Dark mode handled automatically by --cat-*-color custom properties in
+// _variables.scss (warmer/brighter values declared under @mixin dark-palette).

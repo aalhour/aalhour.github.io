@@ -1,0 +1,206 @@
+@use 'tokens' as *;
+
+// ─── Row-list primitive ──────────────────────────────────────────────────────
+// Used by /animations/, /talks/, /projects/. Each row:
+//   [meta] left   |   [body] middle   |   [link]? right (optional)
+//   - .row-list-meta: mono uppercase. Wrap the page-specific type in .status
+//     to get teal styling automatically. Optional larger primary text above
+//     (e.g., date) sits on the parent in muted color.
+//   - .row-list-body: title + optional subtitle + optional .row-list-info
+//     strip (location, "used in", action links — all teal, mono separators).
+//   - .row-list-link: optional terracotta right-side arrow. Omit when meta-line
+//     handles all actions inline.
+//
+// Conventions: keep page-specific overrides out of here. If a page needs a
+// new variant, add a modifier class to .row-list (e.g., .row-list--projects).
+
+.row-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.row-list-item {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1.25rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--main-border-color);
+  align-items: baseline;
+
+  // Expand to 3 columns only when a right-side arrow link is present.
+  &:has(> .row-list-link) {
+    grid-template-columns: 8rem 1fr auto;
+  }
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @media (max-width: $bp-sm-max) {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 1.5rem 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:has(> .row-list-link) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ─── Left meta column ────────────────────────────────────────────────────────
+
+.row-list-meta {
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+
+  // Page-type label (talk/podcast/training, syscall/data structure, etc.).
+  // Teal in both modes — same treatment as /writings/ categories. Same size
+  // as the parent so a two-word left column (e.g. "2025-10 / TALK") reads
+  // uniform; the colour shift carries the distinction.
+  .status {
+    display: block;
+    font-size: $fs-list-meta;
+    margin-top: 0.2rem;
+    color: var(--accent-color);
+    letter-spacing: 0.06em;
+  }
+
+  // Inactive variant (archived, abandoned, past-tense engagement).
+  .status.archived,
+  .status.muted {
+    color: var(--text-muted);
+  }
+}
+
+// ─── Body ────────────────────────────────────────────────────────────────────
+
+.row-list-body { min-width: 0; }
+
+.row-list-title {
+  font-family: $font-display;
+  font-size: $fs-list-title;
+  font-weight: $fw-list-title;
+  color: var(--text-color);
+  text-decoration: none;
+  display: inline;
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+}
+
+.row-list-subtitle {
+  font-family: $font-body;
+  font-size: $fs-list-subtitle;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0;
+  line-height: 1.55;
+}
+
+// ─── Info strip (under the subtitle): location · watch → · slides → / etc.
+// Reused across talks, projects, animations. Teal text, mono dot separator,
+// links inside inherit teal and underline on hover.
+
+.row-list-info {
+  margin-top: 0.7rem;
+  font-family: $font-mono;
+  font-size: $fs-list-meta;
+  color: var(--accent-color);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem;
+  line-height: 1.6;
+}
+
+.row-list-info-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--accent-color);
+
+  i {
+    font-size: 0.85em;
+  }
+}
+
+.row-list-info-sep {
+  color: var(--accent-color);
+  opacity: 0.6;
+  margin: 0 0.1rem;
+}
+
+.row-list-info-link {
+  color: var(--accent-color);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration: underline;
+  }
+}
+
+// Muted variant of the info strip (Inter body, smaller, no teal). Used by the
+// /animations/ "Used in: <posts>" line where the link list is the focus.
+.row-list-info--muted {
+  margin-top: 0.5rem;
+  font-family: $font-body;
+  font-size: $fs-list-meta;
+  color: var(--text-muted);
+  line-height: 1.55;
+  gap: 0.3rem;
+
+  .row-list-info-item {
+    color: var(--text-muted);
+    margin-right: 0.1rem;
+  }
+
+  .row-list-info-sep {
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin: 0 0.25rem;
+  }
+
+  .row-list-info-link {
+    color: var(--text-color);
+    text-decoration: underline;
+    text-decoration-color: var(--main-border-color);
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--link-color);
+      text-decoration-color: var(--link-color);
+    }
+  }
+}
+
+// ─── Optional right-side arrow link ──────────────────────────────────────────
+// Used when the row has no inline info strip.
+
+.row-list-link {
+  font-family: $font-mono;
+  font-size: 0.82rem;
+  color: var(--link-color);
+  text-decoration: none;
+  white-space: nowrap;
+  align-self: start;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: $bp-sm-max) {
+    justify-self: start;
+  }
+}

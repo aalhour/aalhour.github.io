@@ -1,0 +1,25 @@
+@use 'tokens' as *;
+
+// ─── Site shell overrides ────────────────────────────────────────────────────
+// Chirpy is sidebar-first. These rules reshape the page shell for the
+// horizontal topbar layout; component-specific styles live in their own files.
+
+// Zero Chirpy's sidebar-induced left margin and reserve space for the fixed topbar.
+#main-wrapper {
+  margin-left: 0 !important;
+  padding-top: $topbar-shell-offset;
+}
+
+// Chirpy sets this shell container to 100vh. With a fixed topbar, that pushes
+// short pages beyond the viewport and creates a large blank band before footer.
+#main-wrapper>.container {
+  min-height: $short-page-shell-min-height;
+}
+
+@media (max-width: $bp-lg-max) {
+  #tail-wrapper {
+    padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+// Width / clamp / reader-vs-panel sizing rules live in _shell.scss.

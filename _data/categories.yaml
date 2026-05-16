@@ -1,0 +1,34 @@
+# Canonical blog categories.
+#
+# Use these keys exactly in post front matter:
+#   categories: [Databases]
+#
+# Keep this list small. Use tags for technologies, projects, books,
+# authors, languages, and narrower concepts.
+
+Databases:
+  description: "Database internals, storage engines, durability, indexing, query processing, and distributed data systems."
+
+Systems:
+  description: "Operating systems, runtimes, compilers, networking, distributed systems, and lower-level software architecture."
+
+Hardware:
+  description: "Computer architecture, digital logic, CPUs, instruction sets, RISC-V, and hardware-oriented learning notes."
+
+Languages:
+  description: "Programming languages, language design, idioms, APIs, type systems, and language-specific implementation notes."
+
+AI:
+  description: "AI systems, agents, language models, tooling, product trends, infrastructure, and applied machine intelligence."
+
+Engineering:
+  description: "Engineering craft, process, testing strategy, debugging practice, architecture judgment, operations, and team habits."
+
+Reading:
+  description: "Book reviews, reading notes, reading lists, summaries, and essays centered on books or papers."
+
+Reflections:
+  description: "Personal essays, philosophy, career reflections, learning arcs, taste, ambition, and meaning-making."
+
+Meta:
+  description: "Site notes, announcements, archive markers, and writing about the blog itself."

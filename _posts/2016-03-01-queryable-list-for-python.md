@@ -1,7 +1,9 @@
 ---
 title: "A Queryable List for Python: Proof of Concept"
+subtitle: "What I missed from LINQ, and a small experiment in bringing query-shaped thinking to Python lists."
+description: "A Python proof of concept for LINQ-style queryable lists, exploring collection querying, functional programming, map, reduce, and declarative APIs."
 date: 2016-03-01
-categories: [Programming]
+categories: [Languages]
 tags: [python, c#, linq, functional-programming]
 ---
 

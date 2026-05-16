@@ -32,17 +32,18 @@
   {% include media-url.html src=site.social_preview_image absolute=true %}
   {%- endcapture -%}
 
-  {%- capture og_image -%}
+  {% capture og_image %}
   <meta property="og:image" content="{{ img_url }}" />
-  {%- endcapture -%}
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  {% endcapture %}
 
-  {%- capture twitter_image -%}
+  {% capture twitter_image %}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta property="twitter:image" content="{{ img_url }}" />
-  {%- endcapture -%}
+  <meta name="twitter:image" content="{{ img_url }}" />
+  {% endcapture %}
 
-  {% assign old_meta_clip = '
-  <meta name="twitter:card" content="summary" />' %}
+  {% assign old_meta_clip = '<meta name="twitter:card" content="summary" />' %}
   {% assign new_meta_clip = og_image | append: twitter_image %}
   {% assign seo_tags = seo_tags | replace: old_meta_clip, new_meta_clip %}
   {% endif %}
@@ -53,6 +54,40 @@
   <!-- Fediverse handle/creator -->
   <meta name="fediverse:creator" content="{{ site.social.fediverse_handle }}">
   {% endif %}
+
+  {%- if page.layout == 'home' %}
+  <!-- WebSite + SearchAction JSON-LD. Declares site identity to AI/search
+       crawlers and links author to social profiles via sameAs. Home-only to
+       avoid duplicating the entity graph on every page. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": {{ site.url | jsonify }},
+    "name": {{ site.title | jsonify }},
+    "description": {{ site.description | jsonify }},
+    "inLanguage": {{ site.lang | jsonify }},
+    "publisher": {
+      "@type": "Person",
+      "name": {{ site.author.name | jsonify }},
+      "url": {{ site.author.url | jsonify }},
+      "sameAs": [
+        {% for link in site.social.links -%}
+        {{ link | jsonify }}{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "{{ site.url }}/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  {%- endif %}
 
   <title>
     {%- unless page.layout == 'home' -%}
@@ -94,9 +129,6 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ '/assets/css/:THEME.css' | replace: ':THEME', site.theme | relative_url }}">
 
-  <!-- Web Font -->
-  <link rel="stylesheet" href="{{ site.data.origin[type].webfonts | relative_url }}">
-
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="{{ site.data.origin[type].fontawesome.css | relative_url }}">
 
@@ -116,6 +148,55 @@
   {% endif %}
 
   <!-- Scripts -->
+
+  <!-- localStorage bridge: Chirpy uses sessionStorage("mode"), plan locks localStorage persistence -->
+  <script>
+    (function () {
+      var KEY = 'mode';
+
+      function isMode(value) {
+        return value === 'light' || value === 'dark';
+      }
+
+      try {
+        var saved = localStorage.getItem(KEY);
+        if (isMode(saved)) {
+          sessionStorage.setItem(KEY, saved);
+          document.documentElement.setAttribute('data-mode', saved);
+        }
+
+        var proto = window.Storage && window.Storage.prototype;
+        if (!proto || proto.__modeLocalStorageBridge) return;
+
+        var nativeSet = proto.setItem;
+        var nativeRemove = proto.removeItem;
+
+        Object.defineProperty(proto, '__modeLocalStorageBridge', { value: true });
+
+        Object.defineProperty(proto, 'setItem', {
+          configurable: true,
+          writable: true,
+          value: function (key, value) {
+            nativeSet.call(this, key, value);
+            if (this === sessionStorage && key === KEY && isMode(value)) {
+              nativeSet.call(localStorage, KEY, value);
+            }
+          }
+        });
+
+        Object.defineProperty(proto, 'removeItem', {
+          configurable: true,
+          writable: true,
+          value: function (key) {
+            nativeRemove.call(this, key);
+            if (this === sessionStorage && key === KEY) {
+              nativeRemove.call(localStorage, KEY);
+            }
+          }
+        });
+      } catch (_) {}
+    })();
+  </script>
 
   <script src="{{ '/assets/js/dist/theme.min.js' | relative_url }}"></script>
 

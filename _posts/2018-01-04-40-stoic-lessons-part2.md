@@ -1,8 +1,9 @@
 ---
 title: "On Stoicism: 40 lessons I learned in 2017, Part 2"
-categories: [Philosophy]
+subtitle: "More notes on steadiness, judgment, adversity, and the work that stays yours."
+description: "The second part of forty Stoic lessons on judgment, adversity, steadiness, self-control, and practical philosophy from 2017."
+categories: [Reflections]
 tags: [stoicism, reflections]
-# image: /assets/images/posts/2018-01-04-stoicism-part-2.webp
 ---
 
 1. "Who then is invincible? The one who cannot be disturbed by anything outside their reasoned choice."

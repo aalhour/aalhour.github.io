@@ -1,7 +1,9 @@
 ---
 title: "nand2tetris, or Building a Computer from First Principles"
+subtitle: "Going from a single NAND gate to a working computer over twelve weeks — what the nand2tetris course actually teaches you."
+description: "Notes on the nand2tetris course, building a computer from NAND gates through logic chips, assembly, memory, CPU design, and architecture."
 date: 2016-04-01
-categories: [Programming]
+categories: [Hardware]
 tags: [hardware, assembly, computer-architecture, courses]
 ---
 

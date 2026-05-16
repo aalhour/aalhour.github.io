@@ -1,0 +1,329 @@
+@use 'tokens' as *;
+
+// ─── Horizontal sticky topbar ─────────────────────────────────────────────────
+
+html {
+  scroll-padding-top: $anchor-scroll-padding;
+}
+
+.post-content,
+.page-content {
+  :is(h1, h2, h3, h4, h5, h6)[id] {
+    scroll-margin-top: $heading-scroll-margin;
+  }
+}
+
+// ─── Topbar shell ─────────────────────────────────────────────────────────────
+
+#topbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--topbar-bg);
+  border-bottom: 1px solid var(--main-border-color);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#topbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0 auto;
+  padding: 0.35rem 1.25rem;
+  height: $topbar-height;
+}
+
+@media (min-width: $bp-lg-min) {
+  #topbar {
+    max-width: $shell-max-lg;
+    padding-inline: $shell-content-gutter-lg;
+  }
+}
+
+@media (min-width: $bp-xl-min) {
+  #topbar {
+    max-width: $shell-max-xl;
+    padding-inline: $shell-content-gutter-xl;
+  }
+}
+
+@media (min-width: $bp-xxl-min) {
+  #topbar {
+    max-width: $shell-max-xxl;
+    padding-inline: $shell-content-gutter-xxl;
+  }
+}
+
+@media (min-width: $bp-xxxl-min) {
+  #topbar {
+    max-width: $shell-max-xxxl;
+    padding-left: $shell-content-left-gutter-xxxl;
+    padding-right: $shell-content-right-gutter-xxxl;
+  }
+}
+
+// Reader-shell topbar override lives in _shell.scss (the body.shell-reader
+// #topbar rule there wins over the per-breakpoint panel rules above).
+
+// ─── Brand ────────────────────────────────────────────────────────────────────
+
+.topbar-brand {
+  font-family: $font-display;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--site-title-color);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: auto;
+
+  &:hover {
+    color: var(--link-hover);
+    text-decoration: none;
+  }
+}
+
+// ─── Desktop nav ──────────────────────────────────────────────────────────────
+
+.topbar-nav {
+  display: none; // hidden on mobile; shown at lg via media query below
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.1rem;
+  flex: 0 1 auto;
+  min-width: 0;
+
+  .nav-link {
+    font-family: $font-display;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    color: var(--topbar-text-color);
+    padding: 0.3rem 0.55rem;
+    border-radius: 0.3rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: var(--accent-soft);
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    &.active {
+      color: var(--link-color);
+      font-weight: 600;
+    }
+  }
+}
+
+@media (min-width: $bp-lg-min) {
+  .topbar-nav {
+    display: flex;
+  }
+}
+
+// ─── Right controls ───────────────────────────────────────────────────────────
+
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: 0.35rem;
+  flex-shrink: 0;
+}
+
+.topbar-btn {
+  color: var(--topbar-text-color);
+  padding: 0.3rem 0.45rem;
+  border: none;
+  background: none;
+  border-radius: 0.3rem;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    color: var(--text-color);
+    background: var(--accent-soft);
+    text-decoration: none;
+  }
+
+  &:focus,
+  &:active {
+    border: none;
+    box-shadow: none;
+    text-decoration: none;
+  }
+}
+
+#search-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Chirpy shows #topbar-title at <850px via its own media query; suppress it
+// (search UX will be overhauled in Step 10)
+#topbar-title {
+  display: none !important;
+}
+
+// Topbar title (shown by Chirpy JS during search; hidden otherwise)
+.topbar-title-label {
+  display: none;
+  font-family: $font-display;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--topbar-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 14rem;
+}
+
+// ─── Inline search ────────────────────────────────────────────────────────────
+
+.topbar-search {
+  display: none; // Chirpy JS shows this
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.topbar-search-icon {
+  color: var(--search-icon-color);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+#search-input {
+  width: 10rem;
+  height: 1.85rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--search-border-color);
+  border-radius: 0.3rem;
+  background: var(--main-bg);
+  color: var(--text-color);
+  padding: 0 0.5rem;
+  transition: border-color 0.15s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--input-focus-border-color);
+    box-shadow: none;
+  }
+}
+
+#search-cancel {
+  display: none; // Chirpy JS shows this
+  font-size: 0.85rem;
+  color: var(--topbar-text-color);
+
+  &:hover {
+    color: var(--text-color);
+  }
+}
+
+// ─── Hamburger: desktop hidden ────────────────────────────────────────────────
+
+#hamburger {
+  @media (min-width: $bp-lg-min) {
+    display: none !important;
+  }
+}
+
+// Let Chirpy's native mobile post TOC bar replace the navbar after scroll.
+// The JS that toggles `.invisible` and opens `#toc-popup` stays theme-owned.
+@media (max-width: $bp-lg-max) {
+  #toc-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    height: $topbar-height;
+    margin: 0;
+    padding: 0.35rem 1rem;
+    color: var(--topbar-text-color);
+    background: var(--topbar-bg);
+    border-bottom: 1px solid var(--main-border-color);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  #toc-bar.invisible {
+    top: -$topbar-height;
+  }
+
+  #toc-bar .label {
+    min-width: 0;
+    margin: 0;
+    padding: 0 0.75rem 0 0;
+    font-family: $font-display;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--topbar-text-color);
+  }
+
+  #toc-bar .toc-trigger {
+    color: var(--topbar-text-color);
+    padding: 0.3rem 0.45rem;
+    border: none;
+    background: none;
+    border-radius: 0.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--text-color);
+      background: var(--accent-soft);
+    }
+  }
+
+  #toc-popup {
+    margin-top: $topbar-height;
+  }
+}
+
+// ─── Mobile drawer ────────────────────────────────────────────────────────────
+
+.mobile-menu {
+  background: var(--main-bg);
+  border-top: 1px solid var(--main-border-color);
+  padding: 0.6rem 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+
+  &[hidden] {
+    display: none;
+  }
+
+  .nav-link {
+    font-family: $font-display;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--topbar-text-color);
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.3rem;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: var(--accent-soft);
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    &.active {
+      color: var(--link-color);
+      font-weight: 600;
+    }
+  }
+}

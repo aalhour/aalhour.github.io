@@ -1,10 +1,11 @@
 ---
 title: "On Watershed Moments: Boredom, Growth, and Curiosity"
+subtitle: "A personal essay about boredom, growth, layoffs, and using watershed moments to choose the next career direction deliberately."
+description: "A personal career essay on boredom, growth, layoffs, curiosity, software engineering, and choosing a new technical direction deliberately."
 date: 2025-12-21
-categories: [Career]
+categories: [Reflections]
 tags: [career, layoffs, growth, databases, systems]
-image: /assets/images/posts/2025-12-21-on-watershed-moments.webp
-# pin: true        # Pin to the top of home
+pin: true        # Featured on homepage hero; swap when BeachDB reflection ships
 # math: true       # Enable MathJax
 # mermaid: true    # Enable diagrams
 ---
@@ -106,4 +107,3 @@ Watershed moments, to me, are inflection points for growth. There's nothing wron
 But now that I'm here, I want to make the most out of it.
 
 I'm writing again because I want to learn more about databases and distributed systems, and because writing is how I learn. If this sounds like your alley, stay tuned for future posts about my toy database project.
-

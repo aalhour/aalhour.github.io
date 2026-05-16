@@ -1,18 +1,43 @@
-<footer>
-  <div class="page__footer-follow">
-      <ul class="social-icons">
-          <center>
-              {% for link in site.footer.links %}
-                  {% if link.url %}
-                      <li>
-                          <a href="{{ link.url }}" rel="nofollow noopener noreferrer">
-                          <i class="{{ link.icon }}"></i>
-                          {{ link.label }}
-                          </a>
-                      </li>
-                  {% endif %}
-              {% endfor %}
-          </center>
-      </ul>
+<!-- Site footer -->
+
+<footer id="site-footer" aria-label="Site footer"
+  class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center text-muted">
+  <ul class="footer-links" aria-label="Profile links">
+    <li>
+      <a href="https://github.com/aalhour" aria-label="GitHub" rel="noopener noreferrer" target="_blank">
+        <i class="fab fa-github fa-fw" aria-hidden="true"></i>
+        <span class="footer-link-label">github</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://www.linkedin.com/in/aalhour" aria-label="LinkedIn" rel="noopener noreferrer" target="_blank">
+        <i class="fab fa-linkedin-in fa-fw" aria-hidden="true"></i>
+        <span class="footer-link-label">linkedin</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://twitter.com/ahmad_alhour" aria-label="Twitter" rel="noopener noreferrer" target="_blank">
+        <i class="fab fa-x-twitter fa-fw" aria-hidden="true"></i>
+        <span class="footer-link-label">twitter</span>
+      </a>
+    </li>
+    <li>
+      <a href="{{ '/feed.xml' | relative_url }}" aria-label="RSS feed" target="_blank">
+        <i class="fas fa-rss fa-fw" aria-hidden="true"></i>
+        <span class="footer-link-label">rss</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="footer-meta">
+    <p class="footer-copy mb-0">
+      © 2015–<time>{{ 'now' | date: '%Y' }}</time> Ahmad Alhour.
+    </p>
+    <!-- <p class="footer-built mb-0">
+      Made with &lt;3 using
+      <a href="https://jekyllrb.com/" rel="noopener noreferrer" target="_blank">Jekyll</a>
+      and
+      <a href="https://github.com/cotes2020/jekyll-theme-chirpy" rel="noopener noreferrer" target="_blank">Chirpy</a>.
+    </p> -->
   </div>
 </footer>
