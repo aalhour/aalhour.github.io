@@ -1,6 +1,7 @@
 ---
 title: "Building BeachDB: A Database from Scratch (in Go)"
-description: "Introducing BeachDB, an educational LSM-based storage engine in Go for learning database internals end to end."
+subtitle: "The fastest way past hand-waving is to make the machine answer back."
+description: "Building an LSM storage engine from scratch in Go: writes, reads, compaction, and what hand-waving database internals actually hides."
 tldr: >-
   I'm building [BeachDB](https://github.com/aalhour/beachdb) — a toy,
   inspectable LSM-based storage engine in Go — to stop hand-waving database

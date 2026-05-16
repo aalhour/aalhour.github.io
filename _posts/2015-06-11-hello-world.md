@@ -1,6 +1,7 @@
 ---
 title: "Hello, World!"
-description: "An introductory note for the site and the beginning of Ahmad Alhour's public writing archive."
+subtitle: "A public notebook for learning in the open — software systems, databases, books, and the occasional reflective detour."
+description: "An introduction to Ahmad Alhour's blog about software systems, databases, programming, books, and learning technical subjects in public."
 date: 2015-06-11
 categories: [Meta]
 tags: [meta]

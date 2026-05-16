@@ -73,7 +73,10 @@ permalink: /writings/
               <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
             </h3>
             <p class="writings-entry-note">
-              {%- if post.tldr -%}
+              {%- assign entry_note = post.subtitle | default: post.description -%}
+              {%- if entry_note -%}
+                {{ entry_note | strip_html | normalize_whitespace | truncatewords: 36 }}
+              {%- elsif post.tldr -%}
                 {{ post.tldr | markdownify | strip_html | normalize_whitespace | truncatewords: 36 }}
               {%- else -%}
                 {{ post.excerpt | strip_html | normalize_whitespace | truncatewords: 28 }}

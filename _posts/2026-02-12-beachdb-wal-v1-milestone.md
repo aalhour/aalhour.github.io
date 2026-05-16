@@ -1,6 +1,7 @@
 ---
 title: "Durability is a promise you can't hand-wave: Write-Ahead Log (WAL)"
-description: "A BeachDB milestone on write-ahead logging, durability promises, fsync, fdatasync, and what it takes to survive crashes."
+subtitle: "Once bytes leave your process, the comforting story gets complicated."
+description: "Write-ahead log internals in Go: fsync vs fdatasync, WAL record format, crash recovery, and how BeachDB tests durability."
 tldr: >-
   BeachDB v0.0.1 ships the Write-Ahead Log — the thing that makes durability
   real. This post walks through how `fsync` actually works with an interactive

@@ -1,6 +1,7 @@
 ---
 title: "On Watershed Moments: Boredom, Growth, and Curiosity"
-description: "A personal essay about boredom, growth, layoffs, and using watershed moments to choose the next career direction deliberately."
+subtitle: "A personal essay about boredom, growth, layoffs, and using watershed moments to choose the next career direction deliberately."
+description: "A personal career essay on boredom, growth, layoffs, curiosity, software engineering, and choosing a new technical direction deliberately."
 date: 2025-12-21
 categories: [Reflections]
 tags: [career, layoffs, growth, databases, systems]

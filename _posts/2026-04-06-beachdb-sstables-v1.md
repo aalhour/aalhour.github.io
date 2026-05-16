@@ -1,6 +1,7 @@
 ---
 title: "Making the on-disk state real: Sorted-String Tables (SSTables)"
-description: "A BeachDB milestone on Sorted-String Tables, immutable on-disk files, sparse indexes, and making storage state real."
+subtitle: "Files are easy; files you can trust, inspect, and recover from are the real step."
+description: "SSTables in Go: immutable sorted files on disk, sparse indexes, memtable flush paths, and an sst_dump tool for inspecting BeachDB's bytes."
 tldr: >-
   BeachDB v0.0.3 ships SSTables v1: immutable sorted files on disk, a real
   memtable flush path, on-disk reads, and an `sst_dump` tool so I can inspect

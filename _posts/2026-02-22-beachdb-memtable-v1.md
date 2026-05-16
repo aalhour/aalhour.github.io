@@ -1,6 +1,7 @@
 ---
 title: "The Memtable: where writes go to wait"
-description: "A BeachDB milestone explaining memtables, skip lists, write buffering, and how in-memory state becomes ordered storage."
+subtitle: "Before the disk gets involved, memory has to learn the rules."
+description: "Skip-list memtables in Go: write buffering, key ordering, tombstone deletes, and how BeachDB's LSM engine sequences in-memory writes."
 tldr: >-
   BeachDB v0.0.2 ships the memtable — a skip list that replaces the
   placeholder map. This post covers why maps don't work for LSM storage,

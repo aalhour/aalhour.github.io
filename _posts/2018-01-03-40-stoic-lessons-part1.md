@@ -1,6 +1,7 @@
 ---
 title: "On Stoicism: 40 lessons I learned in 2017, Part 1"
-description: "The first half of forty lessons on Stoicism, reflection, and practical philosophy learned through 2017."
+subtitle: "Notes on control, attention, action, and making philosophy practical."
+description: "The first part of forty Stoic lessons on control, perception, action, attention, and practical philosophy learned through reading in 2017."
 categories: [Reflections]
 tags: [stoicism, reflections, life-lessons]
 ---

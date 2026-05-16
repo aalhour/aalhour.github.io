@@ -1,6 +1,7 @@
 ---
 title: "The syscall I forgot: directory fsync"
-description: "A short BeachDB note about the forgotten durability step: syncing directory entries after filesystem changes."
+subtitle: "Sometimes the missing durability bug is one directory above where you were looking."
+description: "Directory fsync in Go: why fsyncing a file isn't enough, what filesystem metadata needs, and how BeachDB caught the missing syscall."
 tldr: >-
   I fsynced the WAL file on every write. Crash tests passed. SIGKILL tests
   passed. Then someone asked: "What if the directory doesn't know the file

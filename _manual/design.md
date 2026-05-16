@@ -513,9 +513,24 @@ Posts:
 
 - Desktop posts keep right-side TOC.
 - Mobile posts preserve Chirpy's TOC bar behavior.
-- `tldr:` front matter renders `.post-tldr`.
 - Prompt callouts are palette-matched, thin-bordered blocks.
 - Author repetition in post meta is hidden by local CSS.
+
+Post front matter — three distinct fields, each with one job:
+
+- `subtitle:` — visible reader-facing deck rendered under the post title in
+  `.post-desc`. Hook copy, not summary. If omitted, the `.post-desc` falls
+  back to `description` so old posts still render something during migration.
+- `description:` — SEO and social meta only. Consumed by `jekyll-seo-tag` via
+  `_includes/head.html` (untouched). Never the visible subtitle. Optimise for
+  search engines and social previews; keyword density is fine here.
+- `tldr:` — optional technical summary block for dense posts. Renders as a
+  separate `.post-tldr` callout below the subtitle and meta. Use for posts
+  where a 60-second skim is worth offering before the body.
+
+Listings (`_tabs/writings.md`) use `post.subtitle | default: post.description`
+for the entry note, so the SEO copy only leaks into teaser slots when a post
+has no subtitle.
 
 Footer:
 

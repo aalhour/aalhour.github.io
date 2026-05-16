@@ -16,8 +16,9 @@ script_includes:
 <article class="px-1" data-toc="{{ enable_toc }}">
   <header>
     <h1 data-toc-skip>{{ page.title }}</h1>
-    {% if page.description %}
-      <p class="post-desc fw-light mb-4">{{ page.description }}</p>
+    {% assign post_subtitle = page.subtitle | default: page.description %}
+    {% if post_subtitle %}
+      <p class="post-desc fw-light mb-4">{{ post_subtitle }}</p>
     {% endif %}
 
     <div class="post-meta text-muted">

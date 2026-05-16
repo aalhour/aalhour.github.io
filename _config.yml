@@ -17,6 +17,9 @@ author:
 # Social links (used for SEO)
 social:
   name: Ahmad Alhour
+  # Surfaced as <meta name="fediverse:creator"> by _includes/head.html so
+  # Mastodon link previews attribute back to your account.
+  fediverse_handle: "@aalhour@hachyderm.io"
   links:
     - https://twitter.com/ahmad_alhour
     - https://github.com/aalhour
@@ -96,6 +99,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-archives
+  - jekyll-last-modified-at
 
 # ------------ The following options are not recommended to be modified ------------------
 
@@ -138,6 +142,12 @@ defaults:
     values:
       layout: page
       permalink: /:title/
+  - scope:
+      path: "assets/docs"
+    values:
+      # Excluded from sitemap.xml because robots.txt blocks crawlers from
+      # /assets/docs/ — sitemap listing would contradict the disallow.
+      sitemap: false
 
 sass:
   style: compressed

@@ -1,6 +1,7 @@
 ---
 title: "Crash-only confidence, part 1: from random kills to exact boundaries"
-description: "A BeachDB milestone on crash testing with failpoints, replayable artifacts, and precise engine-boundary failures."
+subtitle: "A crash test that cannot explain itself is mostly theater."
+description: "Failpoint-driven crash testing in Go: controller/worker harnesses, replayable artifacts, and boundary-aimed failure injection in BeachDB."
 tldr: >-
   BeachDB v0.0.4 turns crash testing from random `SIGKILL`s into crashes
   aimed at named engine boundaries. It ships a controller/worker harness,
