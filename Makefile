@@ -1,16 +1,31 @@
-.PHONY: help install update build build-prod serve serve-drafts css-coverage lint clean
+.PHONY: help install update build build-prod serve serve-drafts css-coverage check-lychee lint-lychee lint-categories clean
 
 CATEGORY_FILE := _data/categories.yaml
+LYCHEE_PORT ?= 4001
+LYCHEE_BASE_URL := http://127.0.0.1:$(LYCHEE_PORT)
+LYCHEE_BUILD_DIR ?= /private/tmp/aalhour-lychee-site
+LYCHEE_CONFIG ?= /private/tmp/aalhour-lychee.yml
+LYCHEE_SERVER_LOG ?= /tmp/aalhour-lychee-server.log
+LYCHEE_EXCLUDES := \
+	--exclude '/webfonts/' \
+	--exclude 'https://shop.app/' \
+	--exclude 'http://www.adobe.com/' \
+	--exclude 'https://medium.datadriveninvestor.com/2025-paxos-made-really-simple-64174ac8feb5' \
+	--exclude 'https://mitpress.mit.edu/books/elements-computing-systems' \
+	--exclude 'https://www.tripadvisor.com/' \
+	--exclude 'https://online.stanford.edu/courses/soe-ycscs1-compilers' \
+	--exclude 'https://web.archive.org/web/20140829024154/https://d1g.com/' \
+	--exclude 'https://www.goodreads.com/book/show/7489.The_Optimistic_Child'
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-17s %s\n", $$1, $$2}'
 
-install: ## Runs bundle install
+install: ## Runs gitsubmodule init and bundle install
 	git submodule init
 	git submodule update --init --recursive assets/lib
 	bundle install
 
-update: ## Update gems and submodule
+update: ## Update gems and git submodule
 	bundle update
 	git submodule update --remote
 
@@ -29,7 +44,29 @@ serve-drafts: ## Start local dev server with drafts
 css-coverage: ## Build PROD site and run Chrome CSS coverage audit
 	node tools/css-coverage.mjs
 
-lint: ## Check category front matter against _data/categories.yaml
+check-lychee: ## Check that lychee is installed
+	@command -v lychee >/dev/null 2>&1 || { \
+		echo "lychee is not installed. Install it separately, then rerun make lint-lychee." >&2; \
+		exit 1; \
+	}
+
+lint-lychee: check-lychee ## Build a temporary local site and run lychee
+	@set -e; \
+		rm -rf "$(LYCHEE_BUILD_DIR)"; \
+		printf 'url: %s\ndestination: %s\n' "$(LYCHEE_BASE_URL)" "$(LYCHEE_BUILD_DIR)" > "$(LYCHEE_CONFIG)"; \
+		JEKYLL_ENV=production bundle exec jekyll build --config _config.yml,"$(LYCHEE_CONFIG)"; \
+		ruby -run -e httpd "$(LYCHEE_BUILD_DIR)" -p "$(LYCHEE_PORT)" -b 127.0.0.1 >"$(LYCHEE_SERVER_LOG)" 2>&1 & \
+		server_pid=$$!; \
+		trap 'kill "$$server_pid" 2>/dev/null || true; rm -f "$(LYCHEE_CONFIG)"' EXIT INT TERM; \
+		for _ in 1 2 3 4 5 6 7 8 9 10; do \
+			curl -fsS "$(LYCHEE_BASE_URL)/" >/dev/null 2>&1 && break; \
+			kill -0 "$$server_pid" 2>/dev/null || { cat "$(LYCHEE_SERVER_LOG)" >&2; exit 1; }; \
+			sleep 0.5; \
+		done; \
+		curl -fsS "$(LYCHEE_BASE_URL)/" >/dev/null || { cat "$(LYCHEE_SERVER_LOG)" >&2; exit 1; }; \
+		lychee --base-url "$(LYCHEE_BASE_URL)" "$(LYCHEE_BUILD_DIR)/" $(LYCHEE_EXCLUDES)
+
+lint-categories: ## Check category front matter against _data/categories.yaml
 	@ruby -ryaml -rdate -e '\
 		category_file = "$(CATEGORY_FILE)"; \
 		known = YAML.safe_load_file(category_file).keys; \
