@@ -1,34 +1,53 @@
 // Syntax highlight — Beach-paper palette
+// Single-file home for syntax-highlight tokens + selectors.
 // Mirrors the selector structure from Chirpy's _sass/base/_base.scss so our
 // rules have identical specificity and win via later-in-cascade ordering.
+//
+// Light values: $l-rouge-*  (Beach-tuned One Light)
+// Dark  values: $d-rouge-*  (Beach-paper, unchanged)
+// To swap a palette: edit values below. Selectors reference these — never literals.
 
-// ─── TOKEN COLOUR HELPERS ─────────────────────────────────────────────────────
+// ─── LIGHT TOKEN VALUES (Beach-tuned One Light) ───────────────────────────────
 
-// Light mode token palette:
-// $l-kw:      #C0623A  terracotta    — keywords, keyword-type
-// $l-kc:      #2D7A7B  teal          — keyword.constant, operators, regex
-// $l-str:     #5C8040  olive green   — strings
-// $l-cmt:     #7A6F5F  driftwood     — comments
-// $l-num:     #8E6F4A  bronze        — numbers, literals
-// $l-fn:      #7A5C8E  plum          — functions/methods
-// $l-cls:     #4F6C9E  muted blue    — classes, types, namespaces
-// $l-tag:     #5C7A4A  sage          — tags, attributes
-// $l-bi:      #A04B26  deep terra    — builtins
-// $l-err-fg:  #FAF6EE               — error foreground
-// $l-err-bg:  #A04B26               — error background
+$l-rouge-bg: #F4ECD8; // block surface (Beach-paper)
+$l-rouge-fg: #1A1611; // base text
+$l-rouge-kw: #8F3D88; // keywords (purple, Beach-tuned)
+$l-rouge-op: #205F60; // kw.const + operators + regex + string-interp (deep teal)
+$l-rouge-str: #4E7333; // strings (olive)
+$l-rouge-cmt: #6F6452; // comments (driftwood)
+$l-rouge-num: #7A5028; // numbers, literals, decorators (bronze)
+$l-rouge-fn: #3D5A8E; // functions / methods (muted blue)
+$l-rouge-cls: #8A6500; // classes, types, namespaces, vars, exceptions (gold)
+$l-rouge-tag: #B5421C; // tags, attributes (terracotta)
+$l-rouge-bi: #8A3A1A; // builtins (deep terra)
+$l-rouge-subhead: #574E40; // generic subheading (.gu) — darker than cmt
+$l-rouge-diff-ins-fg: #205F60;
+$l-rouge-diff-ins-bg: #D9E8DE;
+$l-rouge-diff-del-fg: #8A3A1A;
+$l-rouge-diff-del-bg: #F2DAD0;
+$l-rouge-err-fg: #FAF6EE;
+$l-rouge-err-bg: #8A3A1A;
 
-// Dark mode token palette:
-// $d-kw:      #E68A5C  sunset        — keywords
-// $d-kc:      #4FB3B4  shallow water — keyword.constant, operators, regex
-// $d-str:     #7DC47C  soft green    — strings
-// $d-cmt:     #A89A7E  driftwood     — comments
-// $d-num:     #D4A857  warm gold     — numbers
-// $d-fn:      #B08ED4  soft plum     — functions
-// $d-cls:     #7BA3D4  soft blue     — classes, types
-// $d-tag:     #88BA6E  sage          — tags
-// $d-bi:      #F0A077  peach         — builtins
-// $d-err-fg:  #14110D               — error foreground
-// $d-err-bg:  #C04040               — error background
+// ─── DARK TOKEN VALUES (unchanged from Mk1) ───────────────────────────────────
+
+$d-rouge-bg: #1B1813;
+$d-rouge-fg: #EFE7D6;
+$d-rouge-kw: #E68A5C;
+$d-rouge-op: #4FB3B4;
+$d-rouge-str: #7DC47C;
+$d-rouge-cmt: #A89A7E;
+$d-rouge-num: #D4A857;
+$d-rouge-fn: #B08ED4;
+$d-rouge-cls: #7BA3D4;
+$d-rouge-tag: #88BA6E;
+$d-rouge-bi: #F0A077;
+$d-rouge-subhead: #A89A7E;
+$d-rouge-diff-ins-fg: #7DC47C;
+$d-rouge-diff-ins-bg: #1A2A1A;
+$d-rouge-diff-del-fg: #E68A5C;
+$d-rouge-diff-del-bg: #2A1A12;
+$d-rouge-err-fg: #14110D;
+$d-rouge-err-bg: #C04040;
 
 // ─── SHARED TABLE BOILERPLATE ─────────────────────────────────────────────────
 
@@ -49,8 +68,8 @@
 
   .highlight,
   .highlight .w {
-    color: #1F1B16;
-    background-color: #F0E9D7;
+    color: $l-rouge-fg;
+    background-color: $l-rouge-bg;
   }
 
   // Keywords
@@ -61,15 +80,16 @@
   .highlight .kr,
   .highlight .kt,
   .highlight .kv {
-    color: #C0623A;
+    color: $l-rouge-kw;
   }
 
-  // Keyword.constant, operators, regex
+  // Keyword.constant, operators, regex, string-interpolation
   .highlight .kc,
   .highlight .o,
   .highlight .ow,
-  .highlight .sr {
-    color: #2D7A7B;
+  .highlight .sr,
+  .highlight .si {
+    color: $l-rouge-op;
   }
 
   // Strings
@@ -85,12 +105,7 @@
   .highlight .s1,
   .highlight .ss,
   .highlight .sb {
-    color: #5C8040;
-  }
-
-  // String.interpol
-  .highlight .si {
-    color: #2D7A7B;
+    color: $l-rouge-str;
   }
 
   // Comments
@@ -102,10 +117,10 @@
   .highlight .cpf,
   .highlight .c1,
   .highlight .cs {
-    color: #7A6F5F;
+    color: $l-rouge-cmt;
   }
 
-  // Numbers / literals
+  // Numbers, literals, decorators
   .highlight .m,
   .highlight .mb,
   .highlight .mf,
@@ -115,40 +130,22 @@
   .highlight .mo,
   .highlight .mx,
   .highlight .l,
-  .highlight .ld {
-    color: #8E6F4A;
+  .highlight .ld,
+  .highlight .nd {
+    color: $l-rouge-num;
   }
 
   // Functions / methods
   .highlight .nf,
   .highlight .fm {
-    color: #7A5C8E;
+    color: $l-rouge-fn;
   }
 
-  // Decorators
-  .highlight .nd {
-    color: #8E6F4A;
-  }
-
-  // Classes, types, namespaces, constants
+  // Classes, types, namespaces, constants,
+  // variables, labels, exceptions, properties, pseudo-builtins
   .highlight .nc,
   .highlight .no,
-  .highlight .nn {
-    color: #4F6C9E;
-  }
-
-  // Tags, attributes
-  .highlight .na,
-  .highlight .nt {
-    color: #5C7A4A;
-  }
-
-  // Builtins
-  .highlight .nb {
-    color: #A04B26;
-  }
-
-  // Variables, labels, exceptions, properties, pseudo-builtins
+  .highlight .nn,
   .highlight .nv,
   .highlight .vc,
   .highlight .vg,
@@ -158,41 +155,53 @@
   .highlight .ne,
   .highlight .py,
   .highlight .bp {
-    color: #4F6C9E;
+    color: $l-rouge-cls;
+  }
+
+  // Tags, attributes
+  .highlight .na,
+  .highlight .nt {
+    color: $l-rouge-tag;
+  }
+
+  // Builtins
+  .highlight .nb {
+    color: $l-rouge-bi;
   }
 
   // Generic inserted (diff +)
   .highlight .gi {
-    color: #2D7A7B;
-    background-color: #DFF0E8;
+    color: $l-rouge-diff-ins-fg;
+    background-color: $l-rouge-diff-ins-bg;
   }
 
   // Generic deleted (diff -)
   .highlight .gd {
-    color: #A04B26;
-    background-color: #FAE8E0;
+    color: $l-rouge-diff-del-fg;
+    background-color: $l-rouge-diff-del-bg;
   }
 
   // Generic heading
   .highlight .gh {
-    color: #1F1B16;
-    font-weight: bold;
+    color: $l-rouge-fg;
+    font-weight: 600;
   }
 
+  // Generic subheading
   .highlight .gu {
-    color: #5A4F40;
-    font-weight: bold;
+    color: $l-rouge-subhead;
+    font-weight: 600;
   }
 
-  // Generic.traceback error
+  // Generic.traceback
   .highlight .gr {
-    color: #FAF6EE;
+    color: $l-rouge-err-fg;
   }
 
   // Error
   .highlight .err {
-    color: #FAF6EE;
-    background-color: #A04B26;
+    color: $l-rouge-err-fg;
+    background-color: $l-rouge-err-bg;
   }
 
   // Neutral / base text tokens
@@ -202,7 +211,7 @@
   .highlight .gl,
   .highlight .gt,
   .highlight .gp {
-    color: #1F1B16;
+    color: $l-rouge-fg;
   }
 
   .highlight .ge {
@@ -210,7 +219,7 @@
   }
 
   .highlight .gs {
-    font-weight: bold;
+    font-weight: 600;
   }
 }
 
@@ -221,8 +230,8 @@
 
   .highlight,
   .highlight .w {
-    color: #EFE7D6;
-    background-color: #1B1813;
+    color: $d-rouge-fg;
+    background-color: $d-rouge-bg;
   }
 
   // Keywords
@@ -233,15 +242,16 @@
   .highlight .kr,
   .highlight .kt,
   .highlight .kv {
-    color: #E68A5C;
+    color: $d-rouge-kw;
   }
 
-  // Keyword.constant, operators, regex
+  // Keyword.constant, operators, regex, string-interpolation
   .highlight .kc,
   .highlight .o,
   .highlight .ow,
-  .highlight .sr {
-    color: #4FB3B4;
+  .highlight .sr,
+  .highlight .si {
+    color: $d-rouge-op;
   }
 
   // Strings
@@ -257,12 +267,7 @@
   .highlight .s1,
   .highlight .ss,
   .highlight .sb {
-    color: #7DC47C;
-  }
-
-  // String.interpol
-  .highlight .si {
-    color: #4FB3B4;
+    color: $d-rouge-str;
   }
 
   // Comments
@@ -274,10 +279,10 @@
   .highlight .cpf,
   .highlight .c1,
   .highlight .cs {
-    color: #A89A7E;
+    color: $d-rouge-cmt;
   }
 
-  // Numbers / literals
+  // Numbers, literals, decorators
   .highlight .m,
   .highlight .mb,
   .highlight .mf,
@@ -287,40 +292,22 @@
   .highlight .mo,
   .highlight .mx,
   .highlight .l,
-  .highlight .ld {
-    color: #D4A857;
+  .highlight .ld,
+  .highlight .nd {
+    color: $d-rouge-num;
   }
 
   // Functions / methods
   .highlight .nf,
   .highlight .fm {
-    color: #B08ED4;
+    color: $d-rouge-fn;
   }
 
-  // Decorators
-  .highlight .nd {
-    color: #D4A857;
-  }
-
-  // Classes, types, namespaces, constants
+  // Classes, types, namespaces, constants,
+  // variables, labels, exceptions, properties, pseudo-builtins
   .highlight .nc,
   .highlight .no,
-  .highlight .nn {
-    color: #7BA3D4;
-  }
-
-  // Tags, attributes
-  .highlight .na,
-  .highlight .nt {
-    color: #88BA6E;
-  }
-
-  // Builtins
-  .highlight .nb {
-    color: #F0A077;
-  }
-
-  // Variables, labels, exceptions, properties, pseudo-builtins
+  .highlight .nn,
   .highlight .nv,
   .highlight .vc,
   .highlight .vg,
@@ -330,51 +317,63 @@
   .highlight .ne,
   .highlight .py,
   .highlight .bp {
-    color: #7BA3D4;
+    color: $d-rouge-cls;
+  }
+
+  // Tags, attributes
+  .highlight .na,
+  .highlight .nt {
+    color: $d-rouge-tag;
+  }
+
+  // Builtins
+  .highlight .nb {
+    color: $d-rouge-bi;
   }
 
   // Generic inserted (diff +)
   .highlight .gi {
-    color: #7DC47C;
-    background-color: #1A2A1A;
+    color: $d-rouge-diff-ins-fg;
+    background-color: $d-rouge-diff-ins-bg;
   }
 
   // Generic deleted (diff -)
   .highlight .gd {
-    color: #E68A5C;
-    background-color: #2A1A12;
+    color: $d-rouge-diff-del-fg;
+    background-color: $d-rouge-diff-del-bg;
   }
 
   // Generic heading
   .highlight .gh {
-    color: #EFE7D6;
-    font-weight: bold;
+    color: $d-rouge-fg;
+    font-weight: 600;
   }
 
+  // Generic subheading
   .highlight .gu {
-    color: #A89A7E;
-    font-weight: bold;
+    color: $d-rouge-subhead;
+    font-weight: 600;
   }
 
   // Generic.traceback
   .highlight .gr {
-    color: #1B1813;
+    color: $d-rouge-bg;
   }
 
   // Error
   .highlight .err {
-    color: #14110D;
-    background-color: #C04040;
+    color: $d-rouge-err-fg;
+    background-color: $d-rouge-err-bg;
   }
 
-  // Neutral tokens
+  // Neutral / base text tokens
   .highlight .ni,
   .highlight .ge,
   .highlight .gs,
   .highlight .gl,
   .highlight .gt,
   .highlight .gp {
-    color: #EFE7D6;
+    color: $d-rouge-fg;
   }
 
   .highlight .ge {
@@ -382,7 +381,7 @@
   }
 
   .highlight .gs {
-    font-weight: bold;
+    font-weight: 600;
   }
 }
 

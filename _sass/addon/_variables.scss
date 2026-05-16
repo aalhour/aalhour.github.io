@@ -95,17 +95,21 @@
   --prompt-danger-icon-color: #A04B26;
   --prompt-danger-border: rgb(160 75 38 / 30%);
 
-  // Code blocks
-  --language-border-color: #E3DDC9;
-  --highlight-bg-color: #F0E9D7;
+  // Code blocks (Beach-tuned One Light — light mode)
+  --language-border-color: #D8CBB0;
+  --highlight-bg-color: #F4ECD8;
   --highlighter-rouge-color: #3A3028;
   --highlight-lineno-color: #A89A7E;
   --inline-code-bg: #E9E1CB;
-  --code-color: #1F1B16;
-  --code-header-text-color: #7A6F5F;
-  --code-header-muted-color: #E3DDC9;
-  --code-header-icon-color: #B0A490;
+  --code-color: #1A1611;
+  --code-header-text-color: #5A4F40;
+  --code-header-muted-color: #B8AA91;
+  --code-header-icon-color: #7A6F5F;
   --clipboard-checked-color: #2E7E9A;
+  // Code-window chrome (light mode only). Consumed by _sass/addon/_code.scss.
+  --code-window-border-color: #D8CBB0;
+  --code-header-bg: #E9DDC2;
+  --code-header-border-color: #D8CBB0;
 
   // KBD
   --kbd-wrap-color: #C8BEA8;
@@ -125,7 +129,7 @@
   --selection-bg: #2E7E9A33;
   --btn-bg: #C0623A;
   --btn-fg: #FFFFFF;
-  --code-bg: #F0E9D7;
+  --code-bg: #F4ECD8;
   --text-muted: #7A6F5F;
 
   // Body anchor color (light mode only). Cool blue against the warm sand
@@ -241,18 +245,22 @@
   --prompt-danger-icon-color: #F0A077;
   --prompt-danger-border: rgb(240 160 119 / 32%);
 
-  // Code blocks
+  // Code blocks (warm dark)
   --language-border-color: #2A2620;
   --highlight-bg-color: #1B1813;
   --highlighter-rouge-color: #C0B8A8;
   --highlight-lineno-color: #6A5E50;
   --inline-code-bg: #23201A;
   --code-color: #EFE7D6;
-  --code-header-text-color: #A89A7E;
-  --code-header-muted-color: #2A2620;
-  --code-header-icon-color: #5A5048;
+  --code-header-text-color: #C0B8A8;
+  --code-header-muted-color: #4A4034;
+  --code-header-icon-color: #8A7D68;
   --clipboard-checked-color: #4FB3B4;
   --filepath-text-color: #C0B8A8;
+  // Code-window chrome. Consumed by _sass/addon/_code.scss.
+  --code-window-border-color: #332D24;
+  --code-header-bg: #242018;
+  --code-header-border-color: #332D24;
 
   // KBD
   --kbd-wrap-color: #5A5048;

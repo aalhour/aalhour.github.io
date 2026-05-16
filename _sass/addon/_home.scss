@@ -1,6 +1,6 @@
 @use 'tokens' as *;
 
-// ─── Home hub (Step 4) ───────────────────────────────────────────────────────
+// ─── Home hub ───────────────────────────────────────────────────────────────
 
 .home-hub {
   // Width is clamped by the reader shell on body.shell-reader (see _layout.scss).
@@ -160,7 +160,9 @@
   font-size: 0.78rem;
   color: var(--accent-color, var(--link-color));
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 // ─── List ────────────────────────────────────────────────────────────────────
@@ -185,7 +187,9 @@
   align-items: baseline;
   flex-wrap: wrap;
 
-  &:last-child { border-bottom: 0; }
+  &:last-child {
+    border-bottom: 0;
+  }
 
   @media (max-width: $bp-sm-max) {
     flex-direction: column;
