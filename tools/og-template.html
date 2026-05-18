@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>__TITLE__</title>
+  <style>
+    @font-face {
+      font-family: 'Space Grotesk';
+      font-style: normal;
+      font-weight: 400;
+      src: url('__FONTS_BASE__/SpaceGrotesk-Regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Space Grotesk';
+      font-style: normal;
+      font-weight: 700;
+      src: url('__FONTS_BASE__/SpaceGrotesk-Bold.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      /* Italic file not shipped — browser synthesises slant from Regular. */
+      src: url('__FONTS_BASE__/Inter-Regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'JetBrains Mono';
+      font-style: normal;
+      font-weight: 500;
+      src: url('__FONTS_BASE__/JetBrainsMono-Medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'JetBrains Mono';
+      font-style: normal;
+      font-weight: 700;
+      src: url('__FONTS_BASE__/JetBrainsMono-Bold.woff2') format('woff2');
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      width: 1200px;
+      height: 630px;
+      background: #FAF6EE;
+      color: #1F1B16;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 80px 100px;
+      overflow: hidden;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .cat-chip {
+      background: #C0623A;
+      color: #FFFFFF;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+    }
+    .body { display: flex; flex-direction: column; }
+    .title {
+      font-size: 68px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 1000px;
+      overflow-wrap: break-word;
+    }
+    .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 1.35;
+      color: #5A4F40;
+      margin-top: 28px;
+      max-width: 920px;
+    }
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 500;
+      color: #5A4F40;
+    }
+    .footer .domain { color: #1F1B16; font-weight: 700; }
+    .footer .date { color: #7A6F5F; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <span class="cat-chip">__CATEGORY__</span>
+  </div>
+  <div class="body">
+    <div class="title">__TITLE__</div>
+    <div class="subtitle">__SUBTITLE__</div>
+  </div>
+  <div class="footer">
+    <span class="domain">__DOMAIN__</span>
+    <span class="date">__DATE__</span>
+  </div>
+</body>
+</html>

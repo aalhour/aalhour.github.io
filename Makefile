@@ -1,4 +1,4 @@
-.PHONY: help install update build build-prod serve serve-drafts css-coverage check-lychee lint-lychee lint-categories clean
+.PHONY: help install update build build-prod serve serve-drafts css-coverage check-lychee lint-lychee lint-categories og-images check-node check-chrome clean
 
 CATEGORY_FILE := _data/categories.yaml
 LYCHEE_PORT ?= 4001
@@ -20,10 +20,30 @@ LYCHEE_EXCLUDES := \
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-17s %s\n", $$1, $$2}'
 
-install: ## Runs gitsubmodule init and bundle install
+install: check-node check-chrome ## Runs gitsubmodule init, bundle install, and verifies Node + Chrome
 	git submodule init
 	git submodule update --init --recursive assets/lib
 	bundle install
+
+check-node: ## Verify Node.js is available (for css-coverage + og-images)
+	@command -v node >/dev/null 2>&1 || { \
+		echo "Node.js not found. Install via 'brew install node' or from https://nodejs.org" >&2; \
+		exit 1; \
+	}
+	@printf "node: " && node --version
+
+check-chrome: ## Verify Chrome/Chromium is available (for headless screenshots)
+	@for candidate in \
+		"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+		"/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary" \
+		"/Applications/Chromium.app/Contents/MacOS/Chromium" \
+		"/usr/bin/google-chrome" "/usr/bin/google-chrome-stable" \
+		"/usr/bin/chromium" "/usr/bin/chromium-browser" "/snap/bin/chromium"; do \
+		if [ -x "$$candidate" ]; then echo "chrome: $$candidate"; exit 0; fi; \
+	done; \
+	if [ -n "$$CHROME_PATH" ] && [ -x "$$CHROME_PATH" ]; then echo "chrome: $$CHROME_PATH (from CHROME_PATH)"; exit 0; fi; \
+	echo "Chrome/Chromium not found. Install via 'brew install --cask google-chrome' or set CHROME_PATH." >&2; \
+	exit 1
 
 update: ## Update gems and git submodule
 	bundle update
@@ -41,8 +61,11 @@ serve: ## Start local dev server
 serve-drafts: ## Start local dev server with drafts
 	bundle exec jekyll serve --port 4000 --drafts
 
-css-coverage: ## Build PROD site and run Chrome CSS coverage audit
+css-coverage: check-node check-chrome ## Build PROD site and run Chrome CSS coverage audit
 	node tools/css-coverage.mjs
+
+og-images: check-node check-chrome ## Generate per-post Open Graph cards into assets/og/
+	node tools/og-render.mjs $(OG_ARGS)
 
 check-lychee: ## Check that lychee is installed
 	@command -v lychee >/dev/null 2>&1 || { \
