@@ -20,9 +20,9 @@
   // Anime.js v4 API shortcuts
   const { animate, createTimeline, stagger } = anime;
 
-  // Detect light/dark mode (Chirpy uses data-mode on html element)
+  // Detect light/dark mode (Chirpy 7.6 sets the resolved theme as data-bs-theme on <html>)
   const isDarkMode = () => {
-    const htmlMode = document.documentElement.getAttribute('data-mode');
+    const htmlMode = document.documentElement.getAttribute('data-bs-theme');
     if (htmlMode) return htmlMode === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   };
@@ -84,6 +84,8 @@
     flushCount: 0,
     compactCount: 0,
     isAnimating: false,
+    demoRunning: false,   // true for the whole Play run, across its steps
+    locked: false,        // controls locked; re-applied after a theme rebuild
     log: []
   };
 
@@ -109,12 +111,16 @@
     if (!themeObserver) {
       themeObserver = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
-          if (mutation.attributeName === 'data-mode') {
+          if (mutation.attributeName === 'data-bs-theme' && mutation.oldValue !== mutation.target.getAttribute('data-bs-theme')) {
             rebuildForTheme();
           }
         }
       });
-      themeObserver.observe(document.documentElement, { attributes: true });
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: ['data-bs-theme']
+      });
     }
   }
 
@@ -132,6 +138,7 @@
     Object.assign(state, currentState);
 
     setupControls();
+    setButtonsLocked(state.locked);
     drawComponents();
     render();
     updateStats();
@@ -144,7 +151,7 @@
     return `
       <style>
         .lsm-anime-container {
-          font-family: 'Space Grotesk', 'SF Mono', 'Fira Code', monospace;
+          font-family: 'Source Serif 4', Charter, Georgia, serif;
           background: ${dark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)'};
           border: 1px solid ${colors.border};
           border-radius: 12px;
@@ -288,9 +295,9 @@
           font-size: 0.6rem;
         }
         .lsm-anime-log-entry { padding: 0.1rem 0; color: ${colors.textMuted}; }
-        .lsm-anime-log-entry.highlight { color: ${colors.highlight}; }
-        .lsm-anime-log-entry.success { color: ${colors.memtable}; }
-        .lsm-anime-log-entry.error { color: #ef4444; }
+        .lsm-anime-log-entry.is-highlight { color: ${colors.highlight}; }
+        .lsm-anime-log-entry.is-success { color: ${colors.memtable}; }
+        .lsm-anime-log-entry.is-error { color: #ef4444; }
       </style>
       
       <div class="lsm-anime-container">
@@ -516,15 +523,20 @@
            { opacity: [0, 1], duration: 400, delay: stagger(30) });
   }
 
+  // Each operation unlocks the controls when it ends; during a Play run they
+  // stay locked until the whole run is done.
   function setButtonsLocked(locked) {
+    state.locked = locked || state.demoRunning;
     const buttons = container.querySelectorAll('.lsm-anime-btn');
     const inputs = container.querySelectorAll('input');
-    buttons.forEach(btn => btn.disabled = locked);
-    inputs.forEach(inp => inp.disabled = locked);
+    buttons.forEach(btn => btn.disabled = state.locked);
+    inputs.forEach(inp => inp.disabled = state.locked);
   }
 
+  const isBusy = () => state.isAnimating || state.demoRunning;
+
   function handlePut() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
     const key = container.querySelector('#anime-key').value.trim();
     const value = container.querySelector('#anime-value').value.trim();
     if (!key || !value) { addLog('⚠️ Enter key & value', 'error'); return; }
@@ -535,7 +547,7 @@
   }
 
   function handleGet() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
     const key = container.querySelector('#anime-get-key').value.trim();
     if (!key) { addLog('⚠️ Enter key', 'error'); return; }
     setButtonsLocked(true);
@@ -543,7 +555,7 @@
   }
 
   function handleDelete() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
     const key = container.querySelector('#anime-del-key').value.trim();
     if (!key) { addLog('⚠️ Enter key', 'error'); return; }
     setButtonsLocked(true);
@@ -552,6 +564,7 @@
   }
 
   function handleReset() {
+    if (isBusy()) return;
     state.memtable = [];
     state.wal = [];
     state.levels = [[], [], []];
@@ -567,8 +580,18 @@
   }
 
   async function runDemo() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
+    state.demoRunning = true;
     setButtonsLocked(true);
+    try {
+      await playDemo();
+    } finally {
+      state.demoRunning = false;
+      setButtonsLocked(false);
+    }
+  }
+
+  async function playDemo() {
     addLog('🎬 Demo...', 'highlight');
     const demo = [['user','Ali'],['age','25'],['city','NYC'],['job','Dev'],['lang','Go'],['db','LSM']];
     for (const [k, v] of demo) {
@@ -579,7 +602,6 @@
     }
     if (state.levels[0].length >= 2) { await delay(config.demoDelay); await compact(); }
     addLog('✅ Done!', 'success');
-    setButtonsLocked(false);
   }
 
   async function put(key, value) {
@@ -1054,7 +1076,7 @@
     const logContainer = container ? container.querySelector('#anime-log') : null;
     if (logContainer) {
       logContainer.innerHTML = state.log.slice(0, 6).map(e => 
-        `<div class="lsm-anime-log-entry ${e.type}">${e.message}</div>`
+        `<div class="lsm-anime-log-entry${e.type ? ' is-' + e.type : ''}">${e.message}</div>`
       ).join('');
     }
   }

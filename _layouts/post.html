@@ -21,6 +21,28 @@ script_includes:
       <p class="post-desc fw-light mb-4">{{ post_subtitle }}</p>
     {% endif %}
 
+    {%- comment -%}
+      Series track for posts with `series: <key>` in front matter: the series
+      name (from _data/series.yml) links to its page; numbered boxes link to
+      each part in date order, with the current part filled. Hidden posts are
+      left out.
+    {%- endcomment -%}
+    {% assign series = site.data.series[page.series] %}
+    {% if page.series and series %}
+      {% assign series_posts = site.posts | where: 'series', page.series | where_exp: 'p', 'p.hidden != true' | sort: 'date' %}
+      <nav class="post-series" aria-label="{{ series.name | escape }}">
+        <a class="post-series-name" href="{{ series.url | relative_url }}">{{ series.name }}</a>
+        <ol class="post-series-parts">
+          {% for p in series_posts %}
+            <li>
+              <a href="{{ p.url | relative_url }}" title="Part {{ forloop.index }}: {{ p.title | escape }}"
+                {% if p.url == page.url %}aria-current="page" aria-label="Part {{ forloop.index }} of {{ series_posts.size }} (this post)"{% else %}aria-label="Part {{ forloop.index }}: {{ p.title | escape }}"{% endif %}>{{ forloop.index }}</a>
+            </li>
+          {% endfor %}
+        </ol>
+      </nav>
+    {% endif %}
+
     <div class="post-meta text-muted">
       <!-- published date + read time on same line -->
       <span>
@@ -29,13 +51,7 @@ script_includes:
         · {% include read-time.html content=content prompt=true lang=lang %}
       </span>
 
-      <!-- lastmod date -->
-      {% if page.last_modified_at and page.last_modified_at != page.date %}
-        <span>
-          {{ site.data.locales[lang].post.updated }}
-          {% include datetime.html date=page.last_modified_at tooltip=true lang=lang %}
-        </span>
-      {% endif %}
+      <!-- "Last updated" is shown at the end of the post (post-tail-wrapper). -->
 
       {% if page.image %}
         {% capture src %}src="{{ page.image.path | default: page.image }}"{% endcapture %}
@@ -85,9 +101,7 @@ script_includes:
     <dialog id="toc-popup" class="p-0">
       <div class="header d-flex flex-row align-items-center justify-content-between">
         <div class="label text-truncate py-2 ms-4">{{- page.title -}}</div>
-        <button id="toc-popup-close" type="button" class="btn mx-1 my-1 opacity-75">
-          <i class="fas fa-close"></i>
-        </button>
+        <button id="toc-popup-close" type="button" class="btn-close btn-sm mx-3" aria-label="Close"></button>
       </div>
       <div id="toc-popup-content" class="px-4 py-3 pb-4"></div>
     </dialog>
@@ -95,25 +109,81 @@ script_includes:
 
   <div class="content">
     {% if page.tldr %}
-      <aside class="post-tldr" aria-label="TL;DR">
-        <span class="post-tldr-label">TL;DR</span>
-        {{ page.tldr | markdownify }}
-      </aside>
+      {%- comment -%}
+        "In short": a collapsed index card (native <details>), expanded on click/tap.
+        Optional footer from front matter: release.version, release.code,
+        release.date (defaults to the post date).
+      {%- endcomment -%}
+      <details class="post-tldr">
+        <summary class="post-tldr-summary">
+          <span class="post-tldr-label">In short</span>
+          <span class="post-tldr-hint">the 30-second version</span>
+          <span class="post-tldr-chev" aria-hidden="true"></span>
+        </summary>
+        <div class="post-tldr-body">
+          {{ page.tldr | markdownify }}
+          {% if page.release %}
+            {% assign release_date = page.release.date | default: page.date %}
+            <p class="post-tldr-foot">
+              {% if page.release.version %}<code class="post-tldr-version">{{ page.release.version }}</code>{% endif %}
+              <span>Released {% include datetime.html date=release_date lang=lang %}</span>
+              {% if page.release.code %}<a href="{{ page.release.code }}">Code on GitHub →</a>{% endif %}
+            </p>
+          {% endif %}
+        </div>
+      </details>
     {% endif %}
     {{ content }}
   </div>
 
+  {% if page.tldr %}
+    <script>
+      /* Comments here must be block comments: the production build joins
+         this script onto one line.
+         Print: a closed "In short" card would print only its label, so open
+         it for printing and close it again afterwards. */
+      (function () {
+        var opened = [];
+        window.addEventListener('beforeprint', function () {
+          document.querySelectorAll('details.post-tldr:not([open])').forEach(function (card) {
+            card.open = true;
+            opened.push(card);
+          });
+        });
+        window.addEventListener('afterprint', function () {
+          opened.forEach(function (card) { card.open = false; });
+          opened = [];
+        });
+      })();
+    </script>
+  {% endif %}
+
   <div class="post-tail-wrapper text-muted">
-    <!-- categories -->
-    {% if page.categories.size > 0 %}
-      <div class="post-meta mb-3">
-        <i class="far fa-folder-open fa-fw me-1"></i>
-        {% for category in page.categories %}
-          <a href="{{ site.baseurl }}/categories/{{ category | slugify | url_encode }}/">{{ category }}</a>
-          {%- unless forloop.last -%},{%- endunless -%}
-        {% endfor %}
-      </div>
+    <!-- last updated (only when it falls on a different day than the post date) -->
+    {% if page.last_modified_at %}
+      {% assign posted_day = page.date | date: '%Y-%m-%d' %}
+      {% assign updated_day = page.last_modified_at | date: '%Y-%m-%d' %}
+      {% if updated_day != posted_day %}
+        <p class="post-updated">
+          Last updated {% include datetime.html date=page.last_modified_at tooltip=true lang=lang %}
+        </p>
+      {% endif %}
     {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+      <!-- categories -->
+      {% if page.categories.size > 0 %}
+        <div class="post-meta">
+          <i class="far fa-folder-open fa-fw me-1"></i>
+          {% for category in page.categories %}
+            <a href="{{ site.baseurl }}/categories/{{ category | slugify | url_encode }}/">{{ category }}</a>
+            {%- unless forloop.last -%},{%- endunless -%}
+          {% endfor %}
+        </div>
+      {% endif %}
+      <!-- "Edit this post" link (opt-in: site.actions.edit_post.enabled) -->
+      {% include post-edit.html lang=lang %}
+    </div>
 
     <!-- tags -->
     {% if page.tags.size > 0 %}
@@ -154,4 +224,8 @@ script_includes:
   </div>
   <!-- div.post-tail-wrapper -->
 </article>
+
+{% if page.mermaid %}
+  {% include diagram-zoom.html %}
+{% endif %}
 

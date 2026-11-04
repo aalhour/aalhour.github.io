@@ -1,150 +1,174 @@
-// Beach-paper palette — overrides for Chirpy 7.5.0
-// Must mirror Chirpy's @media + html selector structure to win specificity.
+// Notebook palette — overrides for Chirpy 7.6
+// Engineering computation pad: pale green paper, graphite ink, blue ink for
+// links, red pencil for cautions. One accent; everything else is ink or rule.
+// Must mirror Chirpy's data-bs-theme selector structure to win specificity.
 
 // ─── LIGHT PALETTE ────────────────────────────────────────────────────────────
 
 @mixin light-palette {
   // Chirpy framework vars
-  --main-bg: #FAF6EE;
-  --mask-bg: #F0E9D7;
-  --main-border-color: #E3DDC9;
+  --main-bg: #EDF0E7;
+  --mask-bg: #E4E9DC;
+  --main-border-color: #CBD3C5;
 
   // Text
-  --text-color: #1F1B16;
-  --text-muted-color: #7A6F5F;
-  --heading-color: #1F1B16;
-  --label-color: #5A4F40;
+  --text-color: #1C2421;
+  --text-muted-color: #545F59;
+  --heading-color: #161D1A;
+  --label-color: #3F4A44;
 
-  // Links (terracotta, default palette)
-  --link-color: #C0623A;
-  --link-underline-color: #E3DDC9;
+  // Links (blue ink)
+  --link-color: #1D4F91;
+  --link-underline-color: #B3C0D4;
 
   // Blockquote
-  --blockquote-border-color: #E3DDC9;
-  --blockquote-text-color: #7A6F5F;
+  --blockquote-border-color: #CBD3C5;
+  --blockquote-text-color: #545F59;
 
   // Buttons
-  --button-bg: #FAF6EE;
-  --btn-border-color: #E3DDC9;
-  --btn-backtotop-color: #7A6F5F;
-  --btn-backtotop-border-color: #E3DDC9;
+  --button-bg: #EDF0E7;
+  --btn-border-color: #CBD3C5;
+  --btn-backtotop-color: #545F59;
+  --btn-backtotop-border-color: #CBD3C5;
 
   // Cards
-  --card-bg: #FAF6EE;
-  --card-hover-bg: #F0E9D7;
-  --card-shadow: rgb(100 80 50 / 6%) 0 2px 6px 0,
-    rgb(200 190 170 / 14%) 0 0 0 1px;
+  --card-bg: #EDF0E7;
+  --card-hover-bg: #E4E9DC;
+  --card-shadow: none;
 
   // Tables
-  --tb-odd-bg: #F5F0E4;
-  --tb-border-color: #E3DDC9;
+  --tb-odd-bg: #E6EBDF;
+  --tb-border-color: #CBD3C5;
 
   // Sidebar
-  --sidebar-bg: #F0E9D7;
-  --sidebar-border-color: #E3DDC9;
-  --sidebar-muted-color: #7A6F5F;
-  --sidebar-active-color: #1F1B16;
-  --sidebar-hover-bg: #E8DFC8;
-  --sidebar-btn-bg: #FAF6EE;
-  --sidebar-btn-color: #7A6F5F;
-  --avatar-border-color: #FAF6EE;
-  --site-title-color: #7A6F5F;
-  --site-subtitle-color: #7A6F5F;
+  --sidebar-bg: #E4E9DC;
+  --sidebar-border-color: #CBD3C5;
+  --sidebar-muted-color: #545F59;
+  --sidebar-active-color: #1C2421;
+  --sidebar-hover-bg: #DCE2D3;
+  --sidebar-btn-bg: #EDF0E7;
+  --sidebar-btn-color: #545F59;
+  --avatar-border-color: #EDF0E7;
+  --site-title-color: #1C2421;
+  --site-subtitle-color: #545F59;
 
   // Topbar
-  --topbar-bg: rgb(250 246 238 / 85%);
-  --topbar-text-color: #5A4F40;
-  --search-border-color: #E3DDC9;
-  --search-icon-color: #B0A490;
-  --input-focus-border-color: #C0623A;
+  --topbar-bg: rgb(237 240 231 / 90%);
+  --topbar-text-color: #3F4A44;
+  --search-border-color: #CBD3C5;
+  --search-icon-color: #6F7A72;
+  --input-focus-border-color: #1D4F91;
 
   // Home / post list
-  --post-list-text-color: #5A4F40;
+  --post-list-text-color: #3F4A44;
 
   // TOC
-  --toc-highlight: #C0623A;
-  --toc-popup-border-color: #E3DDC9;
+  --toc-highlight: #1D4F91;
+  --toc-popup-border-color: #CBD3C5;
 
   // Tags / categories
-  --tag-border: #E3DDC9;
-  --tag-shadow: #E3DDC9;
-  --tag-hover: #F0E9D7;
-  --search-tag-bg: #F5F0E4;
-  --categories-border: rgb(200 190 170 / 25%);
-  --categories-hover-bg: #F0E9D7;
-  --categories-icon-hover-color: #1F1B16;
+  --tag-border: #CBD3C5;
+  --tag-shadow: #CBD3C5;
+  --tag-hover: #E4E9DC;
+  --search-tag-bg: #E4E9DC;
+  --categories-border: #CBD3C5;
+  --categories-hover-bg: #E4E9DC;
+  --categories-icon-hover-color: #1C2421;
 
   // Archive
-  --timeline-color: #E3DDC9;
-  --timeline-node-bg: #C0623A;
-  --timeline-year-dot-color: #FAF6EE;
-  --dash-color: #C8BEA8;
+  --timeline-color: #CBD3C5;
+  --timeline-node-bg: #1D4F91;
+  --timeline-year-dot-color: #EDF0E7;
+  --dash-color: #B9C2B3;
 
-  // Prompts / callouts
-  --prompt-text-color: rgb(31 27 22 / 80%);
-  --prompt-tip-bg: rgb(46 126 154 / 10%);
-  --prompt-tip-icon-color: #2E7E9A;
-  --prompt-tip-border: rgb(46 126 154 / 25%);
-  --prompt-info-bg: rgb(30 91 179 / 9%);
-  --prompt-info-icon-color: #1E5BB3;
-  --prompt-info-border: rgb(30 91 179 / 25%);
-  --prompt-warning-bg: rgb(192 98 58 / 12%);
-  --prompt-warning-icon-color: #C0623A;
-  --prompt-warning-border: rgb(192 98 58 / 30%);
-  --prompt-danger-bg: rgb(160 75 38 / 14%);
-  --prompt-danger-icon-color: #A04B26;
-  --prompt-danger-border: rgb(160 75 38 / 30%);
+  // Prompts. Two kinds only: notes (tip, info) in blue ink, cautions
+  // (warning, danger) in red pencil. No fills; see _content.scss.
+  --prompt-text-color: #1C2421;
+  --prompt-tip-bg: transparent;
+  --prompt-tip-icon-color: #1D4F91;
+  --prompt-tip-border: #CBD3C5;
+  --prompt-info-bg: transparent;
+  --prompt-info-icon-color: #1D4F91;
+  --prompt-info-border: #CBD3C5;
+  --prompt-warning-bg: transparent;
+  --prompt-warning-icon-color: #9B2C2C;
+  --prompt-warning-border: #CBD3C5;
+  --prompt-danger-bg: transparent;
+  --prompt-danger-icon-color: #9B2C2C;
+  --prompt-danger-border: #CBD3C5;
 
-  // Code blocks (Beach-tuned One Light — light mode)
-  --language-border-color: #D8CBB0;
-  --highlight-bg-color: #F4ECD8;
-  --highlighter-rouge-color: #3A3028;
-  --highlight-lineno-color: #A89A7E;
-  --inline-code-bg: #E9E1CB;
-  --code-color: #1A1611;
-  --code-header-text-color: #5A4F40;
-  --code-header-muted-color: #B8AA91;
-  --code-header-icon-color: #7A6F5F;
-  --clipboard-checked-color: #2E7E9A;
-  // Code-window chrome (light mode only). Consumed by _sass/addon/_code.scss.
-  --code-window-border-color: #D8CBB0;
-  --code-header-bg: #E9DDC2;
-  --code-header-border-color: #D8CBB0;
+  // Code blocks
+  --language-border-color: #CBD3C5;
+  --highlight-bg-color: #F9FAF6;
+  --highlighter-rouge-color: #1C2421;
+  --highlight-lineno-color: #66706A; // 4.9:1 on the code sheet
+  --inline-code-bg: #DFE5D6;
+  --code-color: #1C2421;
+  --code-header-text-color: #545F59;
+  --code-header-muted-color: #CBD3C5;
+  --code-header-icon-color: #545F59;
+  --clipboard-checked-color: #1D4F91;
+  // Code chrome. Consumed by _sass/addon/_code.scss.
+  --code-window-border-color: #CBD3C5;
+  --code-header-bg: #F9FAF6;
+  --code-header-border-color: #CBD3C5;
+
 
   // KBD
-  --kbd-wrap-color: #C8BEA8;
-  --kbd-text-color: #1F1B16;
-  --kbd-bg-color: #FAF6EE;
+  --kbd-wrap-color: #B9C2B3;
+  --kbd-text-color: #1C2421;
+  --kbd-bg-color: #EDF0E7;
 
   // Footnotes
-  --footnote-target-bg: #D4EDE8;
+  --footnote-target-bg: rgb(29 79 145 / 14%);
 
-  // Our addon custom properties (used by future steps)
-  --link-hover: #A04B26;
-  // Glacier teal — bluer hue (198°) than the original warm teal. Light-mode
-  // only; dark-mode accent stays at #4FB3B4 (already reads as bright teal).
-  --accent-color: #2E7E9A;
-  --accent-soft: #2E7E9A1A;
-  --border-color: #E3DDC9;
-  --selection-bg: #2E7E9A33;
-  --btn-bg: #C0623A;
+  // Addon custom properties
+  --link-hover: #133B70;
+  --accent-color: #1D4F91;
+  --accent-soft: rgb(29 79 145 / 9%);
+  --border-color: #CBD3C5;
+  --selection-bg: rgb(29 79 145 / 20%);
+  --btn-bg: #1D4F91;
   --btn-fg: #FFFFFF;
-  --code-bg: #F4ECD8;
-  --text-muted: #7A6F5F;
+  --code-bg: #F9FAF6;
+  --text-muted: #545F59;
+  --caution-color: #9B2C2C;
 
-  // Body anchor color (light mode only). Cool blue against the warm sand
-  // background, distinct from the warm accent palette.
-  --body-link-color: #1E5BB3;
-  --body-link-hover: #143D78;
+  // Body anchors use the same blue ink as every other link.
+  --body-link-color: var(--link-color);
+  --body-link-hover: var(--link-hover);
 
-  // Per-category accent colors (used by .writings-browse-cat tinted chips).
-  --cat-career-color: #A04B26;
-  --cat-philosophy-color: #6B2D5C;
-  --cat-books-color: #A05B22;
+  // Figures: graph-paper grid and diagram ink.
+  --grid-line: rgb(96 128 96 / 10%); // soft enough to read text on
+  --fig-bg: #F8FAF4; // close to the index-card paper (--card-paper)
 
-  // /writings/ browse-card bg: a smidge above --mask-bg so the card reads
-  // as a contained component without darkening the page.
-  --browse-card-bg: #F5F0E3;
+  // Browse keys on graph paper (/writings/): category keys darker than the
+  // paper, tag keys the paper colour with a border.
+  --key-bg: #E4E9DC;
+  --key-tag-bg: var(--fig-bg);
+  --fig-fill: #F6F8F2;
+  --fig-stroke: #1C2421;
+  --fig-label-bg: #EDF0E7;
+
+  // Index cards (callouts, home banner): off-white card, masking tape, shadow.
+  --card-paper: #F9FAF6;
+  --card-tape: rgb(205 216 190 / 75%);
+  --card-tape-caution: rgb(226 190 182 / 70%);
+  --card-lift: rgb(28 36 33 / 9%);
+
+  // Checkbox (task lists): Chirpy's light default is cyan.
+  --checkbox-color: #9AA595;
+  --checkbox-checked-color: #1D4F91;
+
+  // Image placeholders while loading: paper tones, not white and grey.
+  --img-bg: radial-gradient(circle, #F8FAF4 0%, #E4E9DC 100%);
+  --shimmer-bg: linear-gradient(
+    90deg,
+    rgb(248 250 244 / 0%) 0%,
+    rgb(220 227 212 / 100%) 50%,
+    rgb(248 250 244 / 0%) 100%
+  );
+
 }
 
 // ─── DARK PALETTE ─────────────────────────────────────────────────────────────
@@ -153,178 +177,187 @@
   color-scheme: dark;
 
   // Chirpy framework vars
-  --main-bg: #14110D;
-  --mask-bg: #1B1813;
-  --main-border-color: #2A2620;
+  --main-bg: #1A1816;
+  --mask-bg: #201D1A;
+  --main-border-color: #36322D;
 
   // Text
-  --text-color: #EFE7D6;
-  --text-muted-color: #A89A7E;
-  --heading-color: #EFE7D6;
-  --label-color: #C0B8A8;
+  --text-color: #E9E5DC;
+  --text-muted-color: #B9B2A8;
+  --heading-color: #F0EDE7;
+  --label-color: #CDC8C0;
 
   // Links
-  --link-color: #E68A5C;
-  --link-underline-color: #2A2620;
+  --link-color: #B7CEF6;
+  --link-underline-color: #3A4A63;
 
   // Blockquote
-  --blockquote-border-color: #2A2620;
-  --blockquote-text-color: #A89A7E;
+  --blockquote-border-color: #36322D;
+  --blockquote-text-color: #B9B2A8;
 
   // Buttons
-  --button-bg: #1B1813;
-  --btn-border-color: #2A2620;
-  --btn-backtotop-color: #A89A7E;
-  --btn-backtotop-border-color: #2A2620;
+  --button-bg: #201D1A;
+  --btn-border-color: #36322D;
+  --btn-backtotop-color: #B9B2A8;
+  --btn-backtotop-border-color: #36322D;
 
   // Cards
-  --card-bg: #1B1813;
-  --card-header-bg: #23201A;
-  --card-hover-bg: #23201A;
-  --card-shadow: rgb(10 8 5 / 70%) 0 6px 18px 0,
-    rgb(100 85 60 / 22%) 0 0 0 1px;
+  --card-bg: #1A1816;
+  --card-header-bg: #201D1A;
+  --card-hover-bg: #201D1A;
+  --card-shadow: none;
 
   // Tables
-  --tb-odd-bg: #1B1813;
-  --tb-even-bg: #14110D;
-  --tb-border-color: #2A2620;
+  --tb-odd-bg: #201D1A;
+  --tb-even-bg: #1A1816;
+  --tb-border-color: #36322D;
 
   // Sidebar
-  --sidebar-bg: #1B1813;
-  --sidebar-border-color: #2A2620;
-  --sidebar-muted-color: #A89A7E;
-  --sidebar-active-color: rgb(239 231 214 / 95%);
-  --sidebar-hover-bg: #23201A;
-  --sidebar-btn-bg: #1F1C16;
-  --sidebar-btn-color: #A89A7E;
-  --avatar-border-color: rgb(200 185 160 / 85%);
-  --site-title-color: #A89A7E;
-  --site-subtitle-color: #A89A7E;
+  --sidebar-bg: #201D1A;
+  --sidebar-border-color: #36322D;
+  --sidebar-muted-color: #B9B2A8;
+  --sidebar-active-color: #F0EDE7;
+  --sidebar-hover-bg: #2A2622;
+  --sidebar-btn-bg: #26231F;
+  --sidebar-btn-color: #B9B2A8;
+  --avatar-border-color: #36322D;
+  --site-title-color: #E9E5DC;
+  --site-subtitle-color: #B9B2A8;
 
   // Topbar
-  --topbar-bg: rgb(20 17 13 / 80%);
-  --topbar-text-color: #EFE7D6;
-  --search-border-color: #2A2620;
-  --search-icon-color: #6A6058;
-  --input-focus-border-color: #E68A5C;
+  --topbar-bg: rgb(26 24 22 / 88%);
+  --topbar-text-color: #D6D2CC;
+  --search-border-color: #36322D;
+  --search-icon-color: #938D83;
+  --input-focus-border-color: #94B6F2;
 
   // Home / post list
-  --post-list-text-color: #A89A7E;
+  --post-list-text-color: #CDC8C0;
 
   // TOC
-  --toc-highlight: #E68A5C;
-  --toc-popup-border-color: #2A2620;
+  --toc-highlight: #94B6F2;
+  --toc-popup-border-color: #36322D;
 
   // Tags / categories
-  --tag-border: #2A2620;
-  --tag-shadow: #1B1813;
-  --tag-hover: #23201A;
-  --search-tag-bg: #1F1C16;
-  --categories-border: rgb(60 50 35 / 50%);
-  --categories-hover-bg: #23201A;
-  --categories-icon-hover-color: #EFE7D6;
+  --tag-border: #36322D;
+  --tag-shadow: #201D1A;
+  --tag-hover: #2A2622;
+  --search-tag-bg: #26231F;
+  --categories-border: #36322D;
+  --categories-hover-bg: #26231F;
+  --categories-icon-hover-color: #F0EDE7;
 
   // Archive
-  --timeline-color: #2A2620;
-  --timeline-node-bg: #E68A5C;
-  --timeline-year-dot-color: #2A2620;
-  --dash-color: #3A3328;
+  --timeline-color: #36322D;
+  --timeline-node-bg: #94B6F2;
+  --timeline-year-dot-color: #36322D;
+  --dash-color: #403B35;
 
-  // Prompts / callouts
-  --prompt-text-color: rgb(239 231 214 / 78%);
-  --prompt-tip-bg: rgb(79 179 180 / 12%);
-  --prompt-tip-icon-color: #4FB3B4;
-  --prompt-tip-border: rgb(79 179 180 / 28%);
-  --prompt-info-bg: rgb(125 167 234 / 12%);
-  --prompt-info-icon-color: #7DA7EA;
-  --prompt-info-border: rgb(125 167 234 / 28%);
-  --prompt-warning-bg: rgb(230 138 92 / 14%);
-  --prompt-warning-icon-color: #E68A5C;
-  --prompt-warning-border: rgb(230 138 92 / 32%);
-  --prompt-danger-bg: rgb(240 160 119 / 14%);
-  --prompt-danger-icon-color: #F0A077;
-  --prompt-danger-border: rgb(240 160 119 / 32%);
+  // Prompts
+  --prompt-text-color: #E9E5DC;
+  --prompt-tip-bg: transparent;
+  --prompt-tip-icon-color: #94B6F2;
+  --prompt-tip-border: #36322D;
+  --prompt-info-bg: transparent;
+  --prompt-info-icon-color: #94B6F2;
+  --prompt-info-border: #36322D;
+  --prompt-warning-bg: transparent;
+  --prompt-warning-icon-color: #E8A196;
+  --prompt-warning-border: #36322D;
+  --prompt-danger-bg: transparent;
+  --prompt-danger-icon-color: #E8A196;
+  --prompt-danger-border: #36322D;
 
-  // Code blocks (warm dark)
-  --language-border-color: #2A2620;
-  --highlight-bg-color: #1B1813;
-  --highlighter-rouge-color: #C0B8A8;
-  --highlight-lineno-color: #6A5E50;
-  --inline-code-bg: #23201A;
-  --code-color: #EFE7D6;
-  --code-header-text-color: #C0B8A8;
-  --code-header-muted-color: #4A4034;
-  --code-header-icon-color: #8A7D68;
-  --clipboard-checked-color: #4FB3B4;
-  --filepath-text-color: #C0B8A8;
-  // Code-window chrome. Consumed by _sass/addon/_code.scss.
-  --code-window-border-color: #332D24;
-  --code-header-bg: #242018;
-  --code-header-border-color: #332D24;
+  // Code blocks
+  --language-border-color: #36322D;
+  --highlight-bg-color: #201D1A;
+  --highlighter-rouge-color: #E9E5DC;
+  --highlight-lineno-color: #8B8479; // 4.5:1 on the code pane (non-essential)
+  --inline-code-bg: #2A2622;
+  --code-color: #E9E5DC;
+  --code-header-text-color: #B9B2A8;
+  --code-header-muted-color: #36322D;
+  --code-header-icon-color: #B9B2A8;
+  --clipboard-checked-color: #94B6F2;
+  --filepath-text-color: #CDC8C0;
+  --code-window-border-color: #36322D;
+  --code-header-bg: #201D1A;
+  --code-header-border-color: #36322D;
+
 
   // KBD
-  --kbd-wrap-color: #5A5048;
-  --kbd-text-color: #EFE7D6;
-  --kbd-bg-color: #23201A;
+  --kbd-wrap-color: #45403A;
+  --kbd-text-color: #E9E5DC;
+  --kbd-bg-color: #26231F;
 
   // Footnotes
-  --footnote-target-bg: rgb(45 122 123 / 30%);
+  --footnote-target-bg: rgb(148 182 242 / 18%);
 
   // Checkbox
-  --checkbox-color: #5A5048;
-  --checkbox-checked-color: #E68A5C;
+  --checkbox-color: #45403A;
+  --checkbox-checked-color: #94B6F2;
 
-  // Our addon custom properties
-  --link-hover: #F0A077;
-  --accent-color: #4FB3B4;
-  --accent-soft: #4FB3B433;
-  --border-color: #2A2620;
-  --selection-bg: #4FB3B444;
-  --btn-bg: #E68A5C;
-  --btn-fg: #14110D;
-  --code-bg: #1B1813;
-  --text-muted: #A89A7E;
+  // Addon custom properties
+  --link-hover: #CFDFF9;
+  --accent-color: #94B6F2;
+  --accent-soft: rgb(148 182 242 / 12%);
+  --border-color: #36322D;
+  --selection-bg: rgb(148 182 242 / 26%);
+  --btn-bg: #94B6F2;
+  --btn-fg: #1A1816;
+  --code-bg: #201D1A;
+  --text-muted: #B9B2A8;
+  --caution-color: #E8A196;
 
-  // Body anchor colour stays terracotta in dark; the cool-blue override is
-  // light-mode only. Fall back to --link-color so any rule that references
-  // --body-link-color picks up the warm accent in dark.
   --body-link-color: var(--link-color);
   --body-link-hover: var(--link-hover);
 
-  // Per-category accent colors (warmer/brighter in dark to maintain contrast).
-  --cat-career-color: #E68A5C;
-  --cat-philosophy-color: #C49AC4;
-  --cat-books-color: #CC9156;
+  --grid-line: rgb(200 170 130 / 7%);
+  --fig-bg: #1E1B18;
 
-  // /writings/ browse-card bg: dark keeps the same --mask-bg behaviour as
-  // before this token existed.
-  --browse-card-bg: #1B1813;
+  // Browse keys: darker than the dark graph paper so they stand out.
+  --key-bg: #13110F;
+  --key-tag-bg: #171512;
+  --fig-fill: #24211E;
+  --fig-stroke: #B9B0A3;
+  --fig-label-bg: #1E1B18;
+
+  --card-paper: #24211E;
+  --card-tape: rgb(150 128 100 / 40%);
+  --card-tape-caution: rgb(160 100 92 / 45%);
+  --card-lift: rgb(0 0 0 / 40%);
+
+  // Image placeholders while loading.
+  --img-bg: radial-gradient(circle, #1E1B18 0%, #24211E 100%);
+  --shimmer-bg: linear-gradient(
+    90deg,
+    rgb(36 33 30 / 0%) 0%,
+    rgb(150 128 100 / 22%) 50%,
+    rgb(36 33 30 / 0%) 100%
+  );
+
 }
 
-// ─── Apply with the SAME selector structure Chirpy uses in _sass/base/_base.scss
-// (so same specificity; loading after main CSS = later in cascade = wins)
+// ─── Apply with the SAME selector structure Chirpy 7.6 uses (_sass/base/_base.scss)
+// Chirpy's script sets data-bs-theme on <html> (light/dark, resolved from the
+// stored choice or the OS). Before it runs, :not([data-bs-theme]) follows the
+// OS. Same specificity as Chirpy's rules; this file loads later, so it wins.
 
-@media (prefers-color-scheme: light) {
+:root[data-bs-theme='light'] {
+  @include light-palette;
+}
 
-  html:not([data-mode]),
-  html[data-mode='light'] {
+:root[data-bs-theme='dark'] {
+  @include dark-palette;
+}
+
+:root:not([data-bs-theme]) {
+  @media (prefers-color-scheme: light) {
     @include light-palette;
   }
 
-  html[data-mode='dark'] {
+  @media (prefers-color-scheme: dark) {
     @include dark-palette;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-
-  html:not([data-mode]),
-  html[data-mode='dark'] {
-    @include dark-palette;
-  }
-
-  html[data-mode='light'] {
-    @include light-palette;
   }
 }
 

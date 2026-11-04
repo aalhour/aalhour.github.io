@@ -8,16 +8,14 @@ layout: compress
 
 {% include lang.html %}
 
-{% if site.theme_mode %}
-  {% capture prefer_mode %}data-mode="{{ site.theme_mode }}"{% endcapture %}
-{% endif %}
 
 {%- comment -%}
   Shell selection.
-  - show_panel: post pages (TOC) + /archives/ (trending/updated). Uses Chirpy's
-    natural per-breakpoint container widths.
+  - show_panel: post pages (Contents panel) + /archives/. Sized around a
+    42rem text column plus the 16rem panel, centred (_sass/addon/_shell.scss).
   - shell-reader: everything else (home, /writings/, /talks/, /projects/,
-    /animations/, /about/, /tags/, /categories/). Clamped to ~50rem for reading.
+    /animations/, /about/, /tags/, /categories/). 46rem content column;
+    animation pages (/animations/<slug>/) add shell-wide for 50rem.
 {%- endcomment -%}
 
 {% assign show_archive_widgets = false %}
@@ -40,10 +38,19 @@ layout: compress
 {% endif %}
 
 <!-- `site.alt_lang` can specify a language different from the UI -->
-<html lang="{{ page.lang | default: site.alt_lang | default: site.lang }}" {{ prefer_mode }}>
+<html
+  lang="{{ page.lang | default: site.alt_lang | default: site.lang }}"
+  {%- if site.theme_mode == 'light' or site.theme_mode == 'dark' -%}
+    data-bs-theme="{{ site.theme_mode }}"
+  {%- endif -%}
+>
   {% include head.html lang=lang %}
 
-  <body class="{{ shell_class }}">
+{%- comment -%} Animation detail pages get a wider reader shell for the stage. {%- endcomment -%}
+{% assign shell_wide = false %}
+{% if page.url contains '/animations/' and page.url != '/animations/' %}{% assign shell_wide = true %}{% endif %}
+
+  <body class="{{ shell_class }}{% if shell_wide %} shell-wide{% endif %}">
     {% include topbar.html lang=lang %}
 
     <div id="main-wrapper" class="d-flex justify-content-center">
@@ -53,7 +60,15 @@ layout: compress
           <main aria-label="Main Content"
                 class="col-12 col-lg-11 {% if show_panel %}col-xl-9{% else %}col-xl-12{% endif %} px-md-4 site-main site-main--{{ shell_class | remove: 'shell-' }}">
             {% if layout.layout == 'default' and page.layout != 'home' %}
-              {% include refactor-content.html content=content lang=lang %}
+              {%- comment -%}
+                Chirpy's heading anchors (the # links) have no accessible name;
+                label them and hide the decorative icon from screen readers.
+              {%- endcomment -%}
+              {% capture refactored %}{% include refactor-content.html content=content lang=lang %}{% endcapture %}
+              {{ refactored
+                | replace: '" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>',
+                  '" class="anchor text-muted" aria-label="Link to this section"><i class="fas fa-hashtag" aria-hidden="true"></i></a>'
+              }}
             {% else %}
               {{ content }}
             {% endif %}

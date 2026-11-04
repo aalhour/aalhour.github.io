@@ -1,0 +1,278 @@
+@use 'tokens' as *;
+
+// Figures: Mermaid diagrams drawn in notebook ink on graph paper.
+//
+// Mermaid injects its own theme CSS scoped to the diagram's id (default
+// lavender boxes, purple strokes). Those selectors out-rank ours, so every
+// colour here carries !important. Colours come from the --fig-* and text
+// tokens in _variables.scss, so light and dark both follow the palette.
+
+main .content pre.mermaid {
+  background-color: var(--fig-bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 16px 16px;
+  border: 1px solid var(--main-border-color);
+  border-radius: 3px;
+  padding: 1.25rem 1rem;
+  margin: 1.5rem 0;
+  font-family: $font-body;
+  text-align: center;
+}
+
+// Opt-out: wrap a diagram in <div class="mermaid-native" markdown="1"> … </div>
+// to keep Mermaid's own colours (e.g. when colour carries meaning). The
+// graph-paper frame still applies; fills, strokes and text colours do not.
+.mermaid:not(.mermaid-native .mermaid) svg,
+.diagram-zoom-body:not(.is-native) svg {
+  font-family: $font-body !important;
+  max-width: 100%;
+
+  // Flowchart nodes
+  .node rect,
+  .node polygon,
+  .node circle,
+  .node ellipse,
+  .node path {
+    fill: var(--fig-fill) !important;
+    stroke: var(--fig-stroke) !important;
+    stroke-width: 1px !important;
+  }
+
+  .nodeLabel,
+  .label,
+  .label text,
+  span.edgeLabel,
+  .edgeLabel p {
+    color: var(--text-color) !important;
+    fill: var(--text-color) !important;
+    font-family: $font-body !important;
+  }
+
+  .edgeLabel,
+  .edgeLabel rect,
+  .edgeLabel p,
+  .labelBkg {
+    background-color: var(--fig-label-bg) !important;
+    fill: var(--fig-label-bg) !important;
+  }
+
+  .flowchart-link,
+  .edgePath .path,
+  path.relation {
+    stroke: var(--text-muted) !important;
+  }
+
+  marker path,
+  .arrowheadPath,
+  .arrowMarkerPath,
+  #arrowhead path,
+  #crosshead path,
+  #filled-head path {
+    fill: var(--text-muted) !important;
+    stroke: var(--text-muted) !important;
+  }
+
+  .cluster rect {
+    fill: transparent !important;
+    stroke: var(--main-border-color) !important;
+    stroke-dasharray: 4 3;
+  }
+
+  // Sequence diagrams
+  .actor,
+  rect.actor {
+    fill: var(--fig-fill) !important;
+    stroke: var(--fig-stroke) !important;
+  }
+
+  text.actor,
+  text.actor > tspan,
+  .messageText,
+  .labelText,
+  .labelText > tspan,
+  .loopText,
+  .loopText > tspan,
+  .noteText,
+  .noteText > tspan {
+    fill: var(--text-color) !important;
+    stroke: none !important;
+    font-family: $font-body !important;
+  }
+
+  // Lifelines: ink, not grid colour, so they stay visible on graph paper.
+  .actor-line {
+    stroke: var(--text-muted) !important;
+    stroke-width: 1px !important;
+    stroke-opacity: 0.7;
+  }
+
+  .messageLine0,
+  .messageLine1,
+  .loopLine {
+    stroke: var(--text-muted) !important;
+  }
+
+  .labelBox,
+  .note {
+    fill: var(--fig-label-bg) !important;
+    stroke: var(--text-muted) !important;
+  }
+
+  .activation0,
+  .activation1,
+  .activation2 {
+    fill: var(--mask-bg) !important;
+    stroke: var(--text-muted) !important;
+  }
+
+  .sequenceNumber {
+    fill: var(--fig-bg) !important;
+  }
+
+  #sequencenumber {
+    fill: var(--text-color) !important;
+  }
+}
+
+// ─── Enlarge button (all screen sizes) ──────────────────────────────────────
+// _includes/diagram-zoom.html wraps each diagram in .diagram-frame and adds a
+// magnifier button in its top-right corner. The frame takes over the figure's
+// outer margin so the button can sit inside the graph-paper border.
+
+.diagram-frame {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+main .content .diagram-frame > pre.mermaid {
+  margin: 0;
+}
+
+.diagram-zoom-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--main-border-color);
+  border-radius: 3px;
+  background: var(--main-bg);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: zoom-in;
+  transition: color 0.12s ease, border-color 0.12s ease;
+
+  &:hover {
+    color: var(--text-color);
+    border-color: var(--text-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+}
+
+// ─── Tap to enlarge (phones and tablets) ─────────────────────────────────────
+// Behaviour: _includes/diagram-zoom.html. Below lg the diagram shrinks to fit
+// the column; a hint invites a tap, which opens it full screen at its natural
+// size on the same graph paper.
+
+@media (max-width: $bp-lg-max) {
+  main .content pre.mermaid {
+    cursor: zoom-in;
+
+    &::after {
+      content: 'Tap to enlarge';
+      display: block;
+      margin-top: 0.6rem;
+      text-align: right;
+      font: 0.85rem/1.3 $font-body;
+      color: var(--text-muted);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.diagram-zoom {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--text-color);
+  background-color: var(--fig-bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 16px 16px;
+
+  &::backdrop {
+    background: rgb(0 0 0 / 45%);
+  }
+}
+
+.diagram-zoom-body {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding:
+    calc(3.5rem + env(safe-area-inset-top, 0px))
+    max(1rem, env(safe-area-inset-right, 0px))
+    calc(1.5rem + env(safe-area-inset-bottom, 0px))
+    max(1rem, env(safe-area-inset-left, 0px));
+  display: flex;
+  align-items: flex-start;
+
+  svg {
+    display: block;
+    flex: none;
+    margin: auto;
+    height: auto;
+  }
+}
+
+.diagram-zoom-close {
+  position: fixed;
+  top: calc(0.75rem + env(safe-area-inset-top, 0px));
+  right: calc(0.75rem + env(safe-area-inset-right, 0px));
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--main-border-color);
+  border-radius: 3px;
+  background: var(--main-bg);
+  color: var(--text-color);
+  font: 400 1.5rem/1 $font-body;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+}
+
+// ─── Print ───────────────────────────────────────────────────────────────────
+// Print width is below lg, so the phone hint would print too.
+
+@media print {
+  .diagram-zoom-btn,
+  main .content pre.mermaid::after {
+    display: none !important;
+  }
+}

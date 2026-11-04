@@ -13,13 +13,10 @@ tldr: >-
 date: 2026-01-07
 categories: [Databases]
 tags: [beachdb, databases, storage, lsm-tree]
+series: beachdb
 toc: true
 track: https://soundcloud.com/silent-planet/antimatter?in=exixts/sets/3-ovens
 pin: true        # Featured on homepage hero; swap when BeachDB reflection ships
----
-
-_This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
-
 ---
 
 ## A new rabbit hole

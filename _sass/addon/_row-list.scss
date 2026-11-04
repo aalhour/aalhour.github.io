@@ -3,12 +3,12 @@
 // ─── Row-list primitive ──────────────────────────────────────────────────────
 // Used by /animations/, /talks/, /projects/. Each row:
 //   [meta] left   |   [body] middle   |   [link]? right (optional)
-//   - .row-list-meta: mono uppercase. Wrap the page-specific type in .status
-//     to get teal styling automatically. Optional larger primary text above
+//   - .row-list-meta: small muted serif. Wrap the page-specific type in
+//     .status for the secondary line. Optional larger primary text above
 //     (e.g., date) sits on the parent in muted color.
 //   - .row-list-body: title + optional subtitle + optional .row-list-info
-//     strip (location, "used in", action links — all teal, mono separators).
-//   - .row-list-link: optional terracotta right-side arrow. Omit when meta-line
+//     strip (location, "used in", action links in blue ink).
+//   - .row-list-link: optional right-side link. Omit when meta-line
 //     handles all actions inline.
 //
 // Conventions: keep page-specific overrides out of here. If a page needs a
@@ -57,22 +57,31 @@
 // ─── Left meta column ────────────────────────────────────────────────────────
 
 .row-list-meta {
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
 
   // Page-type label (talk/podcast/training, syscall/data structure, etc.).
-  // Teal in both modes — same treatment as /writings/ categories. Same size
-  // as the parent so a two-word left column (e.g. "2025-10 / TALK") reads
-  // uniform; the colour shift carries the distinction.
+  // Same size as the parent; ink colour carries the distinction.
   .status {
     display: block;
-    font-size: $fs-list-meta;
-    margin-top: 0.2rem;
-    color: var(--accent-color);
-    letter-spacing: 0.06em;
+    font-size: 0.95rem;
+    margin-top: 0.1rem;
+    color: var(--text-color);
+    text-transform: capitalize;
+  }
+
+  // Phones: one line ("Educational · Owned") instead of two stacked labels.
+  @media (max-width: $bp-sm-max) {
+    .status {
+      display: inline;
+      margin-top: 0;
+
+      &::before {
+        content: ' · ';
+        color: var(--text-muted);
+      }
+    }
   }
 
   // Inactive variant (archived, abandoned, past-tense engagement).
@@ -96,7 +105,8 @@
 
   &:hover {
     color: var(--link-color);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: currentColor;
   }
 }
 
@@ -109,14 +119,12 @@
 }
 
 // ─── Info strip (under the subtitle): location · watch → · slides → / etc.
-// Reused across talks, projects, animations. Teal text, mono dot separator,
-// links inside inherit teal and underline on hover.
+// Reused across talks, projects, animations. Muted serif; links in blue ink.
 
 .row-list-info {
-  margin-top: 0.7rem;
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
-  color: var(--accent-color);
+  margin-top: 0.45rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -128,21 +136,21 @@
   display: inline-flex;
   align-items: baseline;
   gap: 0.35rem;
-  color: var(--accent-color);
+  color: var(--text-muted);
 
   i {
-    font-size: 0.85em;
+    display: none;
   }
 }
 
 .row-list-info-sep {
-  color: var(--accent-color);
+  color: var(--text-muted);
   opacity: 0.6;
   margin: 0 0.1rem;
 }
 
 .row-list-info-link {
-  color: var(--accent-color);
+  color: var(--link-color);
   text-decoration: none;
 
   &:hover {
@@ -151,7 +159,7 @@
   }
 }
 
-// Muted variant of the info strip (Inter body, smaller, no teal). Used by the
+// Muted variant of the info strip (plain ink links). Used by the
 // /animations/ "Used in: <posts>" line where the link list is the focus.
 .row-list-info--muted {
   margin-top: 0.5rem;
@@ -189,8 +197,7 @@
 // Used when the row has no inline info strip.
 
 .row-list-link {
-  font-family: $font-mono;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: var(--link-color);
   text-decoration: none;
   white-space: nowrap;
@@ -203,4 +210,20 @@
   @media (max-width: $bp-sm-max) {
     justify-self: start;
   }
+}
+
+// Chirpy underlines every link inside .content with a bottom border; list
+// titles and labels read cleaner without it (hover still underlines).
+// Hover too: Chirpy's hover border would add 1px and shift the row.
+main .content .row-list-title,
+main .content .row-list-info-link {
+  &,
+  &:hover {
+    border-bottom: 0 !important;
+  }
+}
+
+// Data labels arrive in mixed case ("educational", "Owned"); show both alike.
+.row-list-meta {
+  text-transform: capitalize;
 }

@@ -1,10 +1,23 @@
 // Shared addon tokens.
 // Keep cross-cutting constants here so component partials can stay semantic.
 
-$font-body: 'Inter', system-ui, -apple-system, sans-serif;
-$font-display: 'Space Grotesk', system-ui, sans-serif;
-$font-display-bold: 'Space Grotesk Bold', $font-display;
-$font-mono: 'JetBrains Mono', ui-monospace, monospace;
+// Notebook type system: one serif for everything you read, mono only in code.
+// Titles share the body face; weight and optical size set them apart.
+$font-body: 'Source Serif 4', Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+$font-display: $font-body;
+$font-display-bold: $font-body;
+$fw-heading: 600;
+$font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+
+// Post pages (body.shell-panel): the page itself is sized around the text.
+// $measure is the text width (about 75 characters per line at the post body
+// size); the main column adds its 1.5rem side padding; the Contents panel
+// sits beside it from xl up. The top bar matches the combined width.
+$measure: 42rem;
+$post-main-pad: 1.5rem;     // main column side padding (Bootstrap px-md-4)
+$post-article-pad: 0.25rem; // <article class="px-1"> inside it
+$post-main: calc(#{$measure} + 2 * (#{$post-main-pad} + #{$post-article-pad}));
+$post-panel: 16rem;
 
 // ─── Breakpoints ─────────────────────────────────────────────────────────────
 // $bp-sm-max: site-wide "stack to single column" threshold (Bootstrap sm).
@@ -45,9 +58,21 @@ $short-page-shell-min-height: 80vh;
 // ─── Reader Shell ────────────────────────────────────────────────────────────
 // Tight content width for no-panel pages (home, /writings/, /talks/, /projects/,
 // /animations/, /about/, /tags/, /categories/). Matches readability research:
-// 50-75 CPL, max 80 (WCAG 1.4.8). 50rem at 1.03rem Inter ≈ 75-85 CPL.
-$reader-content-max: 50rem;
+// 50-75 CPL, max 80 (WCAG 1.4.8). 46rem at 1.1rem Source Serif ≈ 80 CPL.
+$reader-content-max: 46rem;
 $reader-shell-max: calc(#{$reader-content-max} + 3rem);
+
+// Animation detail pages need room for the interactive stage.
+$reader-wide-content-max: 50rem;
+$reader-wide-shell-max: calc(#{$reader-wide-content-max} + 3rem);
+
+// ─── /writings/ archive columns ──────────────────────────────────────────────
+// Shared by the essay rows and the browse card, whose keys line up with the
+// essay titles. Change them here so both stay aligned.
+$writings-date-col: 6rem;   // date column in each essay row
+$writings-col-gap: 1.25rem; // gap between date and title
+$writings-browse-pad-x: 1.1rem; // browse card side padding
+$writings-browse-gap: 1rem; // gap between browse label and keys
 
 // ─── List Type Scale ─────────────────────────────────────────────────────────
 // Role-based type scale shared across listing pages (home, /writings/,

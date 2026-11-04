@@ -20,7 +20,7 @@
   const { animate, stagger } = anime;
 
   const isDarkMode = () => {
-    const htmlMode = document.documentElement.getAttribute('data-mode');
+    const htmlMode = document.documentElement.getAttribute('data-bs-theme');
     if (htmlMode) return htmlMode === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   };
@@ -177,7 +177,7 @@
     const c = config.colors;
     return `
       <div class="fsync-animation" style="
-        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Source Serif 4', Charter, Georgia, serif;
         background: ${c.bg};
         border: 1px solid ${c.border};
         border-radius: 12px;
@@ -1348,11 +1348,15 @@
     resetBtn.addEventListener('click', resetAnimation);
   }
 
+  // Play and Reset are both locked while the trace runs: Reset mid-run would
+  // let a second run start on top of the first.
   function setButtonsLocked(locked) {
-    const playBtn = container.querySelector('#fsync-play-btn');
-    playBtn.disabled = locked;
-    playBtn.style.opacity = locked ? '0.5' : '1';
-    playBtn.style.cursor = locked ? 'not-allowed' : 'pointer';
+    ['#fsync-play-btn', '#fsync-reset-btn'].forEach(sel => {
+      const btn = container.querySelector(sel);
+      btn.disabled = locked;
+      btn.style.opacity = locked ? '0.5' : '1';
+      btn.style.cursor = locked ? 'not-allowed' : 'pointer';
+    });
   }
 
   function updateStatus(html, borderColor) {
@@ -1740,7 +1744,7 @@
   }
 
   function resetAnimation() {
-    state.isAnimating = false;
+    if (state.isAnimating) return;
     state.hasRun = false;
     setButtonsLocked(false);
     resetHighlights();
@@ -1764,7 +1768,7 @@
   function setupThemeObserver() {
     themeObserver = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'data-mode') {
+        if (mutation.attributeName === 'data-bs-theme' && mutation.oldValue !== mutation.target.getAttribute('data-bs-theme')) {
           rebuildForTheme();
         }
       });
@@ -1772,7 +1776,8 @@
 
     themeObserver.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['data-mode']
+      attributeOldValue: true,
+      attributeFilter: ['data-bs-theme']
     });
   }
 
@@ -1784,6 +1789,7 @@
     svg = container.querySelector('#fsync-svg');
     
     setupControls();
+    setButtonsLocked(wasAnimating);
     renderStaticComponents();
     
     if (!wasAnimating) {

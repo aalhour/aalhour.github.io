@@ -20,7 +20,7 @@
   const { animate, stagger } = anime;
 
   const isDarkMode = () => {
-    const htmlMode = document.documentElement.getAttribute('data-mode');
+    const htmlMode = document.documentElement.getAttribute('data-bs-theme');
     if (htmlMode) return htmlMode === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   };
@@ -133,6 +133,8 @@
     nodes: [],
     maxLevel: 0,
     isAnimating: false,
+    demoRunning: false,   // true for the whole Play run, across its steps
+    locked: false,        // controls locked; re-applied after a theme rebuild
     log: [],
     seqNo: 0,
     spinnerInterval: null,
@@ -157,12 +159,16 @@
     if (!themeObserver) {
       themeObserver = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
-          if (mutation.attributeName === 'data-mode') {
+          if (mutation.attributeName === 'data-bs-theme' && mutation.oldValue !== mutation.target.getAttribute('data-bs-theme')) {
             rebuildForTheme();
           }
         }
       });
-      themeObserver.observe(document.documentElement, { attributes: true });
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: ['data-bs-theme']
+      });
     }
   }
 
@@ -171,6 +177,7 @@
     container.innerHTML = buildHTML();
     svg = container.querySelector('#skiplist-svg');
     setupControls();
+    setButtonsLocked(state.locked);
     render();
   }
 
@@ -181,7 +188,7 @@
     return `
       <style>
         .skiplist-container {
-          font-family: 'Space Grotesk', 'SF Mono', monospace;
+          font-family: 'Source Serif 4', Charter, Georgia, serif;
           background: ${dark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)'};
           border: 1px solid ${c.border};
           border-radius: 12px;
@@ -312,9 +319,9 @@
           font-size: 0.6rem;
         }
         .skiplist-log-entry { padding: 0.1rem 0; color: ${c.textMuted}; }
-        .skiplist-log-entry.highlight { color: ${c.highlight}; }
-        .skiplist-log-entry.success { color: ${c.success}; }
-        .skiplist-log-entry.error { color: ${c.nil}; }
+        .skiplist-log-entry.is-highlight { color: ${c.highlight}; }
+        .skiplist-log-entry.is-success { color: ${c.success}; }
+        .skiplist-log-entry.is-error { color: ${c.nil}; }
         .skiplist-legend {
           display: flex;
           gap: 1rem;
@@ -483,12 +490,17 @@
     });
   }
 
+  // Each operation unlocks the controls when it ends; during a Play run they
+  // stay locked until the whole run is done.
   function setButtonsLocked(locked) {
+    state.locked = locked || state.demoRunning;
     const buttons = container.querySelectorAll('.skiplist-btn');
     const inputs = container.querySelectorAll('input');
-    buttons.forEach(btn => btn.disabled = locked);
-    inputs.forEach(inp => inp.disabled = locked);
+    buttons.forEach(btn => btn.disabled = state.locked);
+    inputs.forEach(inp => inp.disabled = state.locked);
   }
+
+  const isBusy = () => state.isAnimating || state.demoRunning;
 
   function randomLevel(p = config.probability) {
     let level = 1;
@@ -499,7 +511,7 @@
   }
 
   function handleInsert() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
     let key = container.querySelector('#skiplist-key').value.trim();
     if (!key) { addLog('⚠️ Enter a key', 'error'); return; }
     if (key.length > 5) key = key.slice(0, 5);
@@ -514,7 +526,7 @@
   }
 
   function handleSearch() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
     const key = container.querySelector('#skiplist-search-key').value.trim();
     if (!key) { addLog('⚠️ Enter a key', 'error'); return; }
     
@@ -523,7 +535,7 @@
   }
 
   function handleDelete() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
     let key = container.querySelector('#skiplist-delete-key').value.trim();
     if (!key) { addLog('⚠️ Enter a key', 'error'); return; }
     if (key.length > 5) key = key.slice(0, 5);    
@@ -533,6 +545,7 @@
   }
 
   function handleReset() {
+    if (isBusy()) return;
     hideOperationStatus();
     state.nodes = [];
     state.maxLevel = 0;
@@ -548,8 +561,18 @@
   }
 
   async function runDemo() {
-    if (state.isAnimating) return;
+    if (isBusy()) return;
+    state.demoRunning = true;
     setButtonsLocked(true);
+    try {
+      await playDemo();
+    } finally {
+      state.demoRunning = false;
+      setButtonsLocked(false);
+    }
+  }
+
+  async function playDemo() {
     addLog('🎬 Demo starting...', 'highlight');
     
     const demoKeys = ['cat', 'dog', 'ant', 'fox', 'bee', 'owl'];
@@ -562,7 +585,6 @@
       await delay(300);
       await search('fox');
       addLog('✅ Demo complete!', 'success');
-      setButtonsLocked(false);
       return;
     }
     
@@ -581,7 +603,6 @@
     await search('fox');
     
     addLog('✅ Demo complete!', 'success');
-    setButtonsLocked(false);
   }
 
   async function insert(key, { probability } = {}) {
@@ -1057,7 +1078,7 @@
     const logContainer = container ? container.querySelector('#skiplist-log') : null;
     if (logContainer) {
       logContainer.innerHTML = state.log.slice(0, 5).map(e => 
-        `<div class="skiplist-log-entry ${e.type}">${e.message}</div>`
+        `<div class="skiplist-log-entry${e.type ? ' is-' + e.type : ''}">${e.message}</div>`
       ).join('');
     }
   }

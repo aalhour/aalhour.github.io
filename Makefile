@@ -1,4 +1,4 @@
-.PHONY: help install update build build-prod serve serve-drafts css-coverage check-lychee lint-lychee lint-categories clean
+.PHONY: help install update build build-prod serve serve-drafts css-coverage check-lychee lint-lychee lint-categories test-guard clean
 
 CATEGORY_FILE := _data/categories.yaml
 LYCHEE_PORT ?= 4001
@@ -65,6 +65,9 @@ lint-lychee: check-lychee ## Build a temporary local site and run lychee
 		done; \
 		curl -fsS "$(LYCHEE_BASE_URL)/" >/dev/null || { cat "$(LYCHEE_SERVER_LOG)" >&2; exit 1; }; \
 		lychee --base-url "$(LYCHEE_BASE_URL)" "$(LYCHEE_BUILD_DIR)/" $(LYCHEE_EXCLUDES)
+
+test-guard: ## Test the inline-script // comment guard (_plugins/inline-script-guard.rb)
+	ruby tools/test-inline-script-guard.rb
 
 lint-categories: ## Check category front matter against _data/categories.yaml
 	@ruby -ryaml -rdate -e '\

@@ -1,0 +1,11 @@
+# Home page "Current experiment" card (_layouts/home.html).
+# Update last_shipped / next when a release goes out; remove `next` to hide it.
+label: Current experiment
+name: BeachDB
+summary: >-
+  a distributed NoSQL database from scratch, in Go, to see what storage
+  engines actually do when you stop hand-waving them.
+series_url: /tags/beachdb/
+code_url: https://github.com/aalhour/beachdb
+last_shipped: v0.0.4, crash testing
+next: v0.0.5, the manifest

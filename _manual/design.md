@@ -3,6 +3,12 @@
 This file documents the current shipped visual system for aalhour.com: palette,
 typography, layout, page patterns, icon handling, and implementation structure.
 
+> **Status (Nov 2026, branch `theme/notebook`):** typography (sections 4 and 6),
+> row-list fonts and code-block colours describe the "Engineer's Notebook"
+> theme. Palette prose elsewhere (sand, terracotta, teal) still describes the
+> previous theme. Until it is rewritten, the palette mixins in
+> `_sass/addon/_variables.scss` are the source of truth for every colour.
+
 ## 1. Implementation Profile
 
 - The site runs on Jekyll + Chirpy.
@@ -88,7 +94,7 @@ Ownership map:
   top corner radius, header label `font-weight: 500`; container box-shadow
   border; `.highlight` bottom corner radius. Rules live at root scope and
   consume CSS vars from both palette mixins of `_variables.scss` — mode
-  switching falls out of the CSS-var cascade (no `@media` or `[data-mode]`
+  switching falls out of the CSS-var cascade (no `@media` or `[data-bs-theme]`
   gating). Also owns the block-code weight rule
   (`.highlight, .highlight pre, .highlight code, .highlight table pre {
   font-weight: 500 }`) and a defence-in-depth `.gh/.gu/.gs { font-weight: 600 }`
@@ -113,11 +119,16 @@ Source: `_sass/addon/_tokens.scss`.
 Fonts:
 
 ```scss
-$font-body: 'Inter', system-ui, -apple-system, sans-serif;
-$font-display: 'Space Grotesk', system-ui, sans-serif;
-$font-display-bold: 'Space Grotesk Bold', $font-display;
-$font-mono: 'JetBrains Mono', ui-monospace, monospace;
+$font-body: 'Source Serif 4', Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+$font-display: $font-body;
+$font-display-bold: $font-body;
+$fw-heading: 600;
+$font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
 ```
+
+`$font-display` and `$font-display-bold` are kept as aliases of the body face
+so older partials keep compiling; titles differ from text by weight and
+optical size, not by family.
 
 Breakpoints:
 
@@ -301,58 +312,50 @@ actually needs differentiated category colors again.
 
 Source: `_sass/addon/_fonts.scss` and `_sass/addon/_typography.scss`.
 
-Runtime font policy:
+Runtime font policy (the "Engineer's Notebook" theme):
 
-- Inter: body and descriptions.
-- Space Grotesk: navigation, titles, section headings.
-- Space Grotesk Bold alias: actual bold heading face with `font-weight: 400`.
-- JetBrains Mono: code, meta, dates, counters, technical labels.
-- All fonts are self-hosted from `/assets/fonts/*.woff2`.
-- `font-display: swap` for every face.
-- JetBrains Mono ships three weights: 400 (Regular), 500 (Medium), 700 (Bold).
-  Fenced code renders at 500 across the full selector list
-  (`.highlight`, `.highlight pre`, `.highlight code`, `.highlight table pre` —
-  the last covers Rouge's line-numbered table layout). Generic emphasis tokens
-  (`.gh`, `.gs`, `.gu`) render at 600 (synthesized between Medium and Bold) —
-  enforced in both `_rouge.scss` mixins and as a defence-in-depth rule in
-  `_code.scss`. Code header label uses 500. Inline `<code>` in prose is not
-  affected because the weight selector is rooted at `.highlight`. No raw
-  `bold` keyword anywhere in the code stack — numeric weights only.
-
-Important rule: headings should use the `Space Grotesk Bold` family alias
-instead of applying CSS bold to regular Space Grotesk.
+- Source Serif 4: everything you read. Body text, titles, headings,
+  navigation, labels, dates and metadata, the brand `~/aalhour` (700),
+  Mermaid diagram labels and the animation demos.
+- IBM Plex Mono: code only (fenced blocks and inline code), plus the 404 page.
+- No sans-serif face. Inter, Space Grotesk and JetBrains Mono were removed;
+  do not reintroduce them.
+- Self-hosted from `/assets/fonts/*.woff2`, `font-display: swap`.
+  `SourceSerif4-Roman.woff2` is preloaded in `_includes/head.html`.
+- Source Serif 4 ships as one variable file per style (roman, italic) covering
+  weights 200-900 and optical sizes 8-60. `font-optical-sizing: auto` lets
+  headings pick the display cut. Headings use `$fw-heading` (600); use numeric
+  weights only.
+- IBM Plex Mono ships 400 (plus italic), 500 and 600. Fenced code renders at
+  500 across `.highlight`, `.highlight pre`, `.highlight code` and
+  `.highlight table pre` (Rouge's line-numbered layout). Emphasis tokens
+  (`.gh`, `.gs`, `.gu`) render at 600, set in both `_rouge.scss` mixins and
+  again in `_code.scss`. The code header label uses 500. Inline `<code>` in
+  prose is unaffected because the weight selector is rooted at `.highlight`.
+- Italic is reserved for post subtitles, monologue asides, code emphasis and
+  h6. Dates, metadata, labels and small links are upright and muted.
 
 Global content type:
 
 ```scss
-.post-content,
-.page-content {
+html main .content {
   font-family: $font-body;
-  line-height: 1.75;
+  font-size: 1.125rem;
+  line-height: 1.7;
 }
 
-.post-content h2,
-.page-content h2 { font-size: 1.85rem; line-height: 1.3; }
+html main h1 { font-size: 2.3rem; line-height: 1.15; }
 
-.post-content h3,
-.page-content h3 { font-size: 1.55rem; line-height: 1.35; }
-
-.post-content h4,
-.page-content h4 { font-size: 1.35rem; line-height: 1.4; }
-
-.post-content h5,
-.page-content h5 { font-size: 1.2rem; line-height: 1.45; }
-
-.post-content h6,
-.page-content h6 { font-size: 1.1rem; line-height: 1.5; }
+/* Prose headings only (direct children of the content). */
+html main .content > h2 { font-size: 1.6rem;  line-height: 1.25; }
+html main .content > h3 { font-size: 1.32rem; line-height: 1.3; }
+html main .content > h4 { font-size: 1.15rem; line-height: 1.4; }
+html main .content > h5 { font-size: 1.05rem; line-height: 1.45; }
+html main .content > h6 { font-size: 1rem;    line-height: 1.5; font-style: italic; }
 ```
 
-Feature settings:
-
-```scss
-Inter body: "cv01", "cv02", "cv11";
-JetBrains Mono: "calt" 1, "liga" 1;
-```
+Component headings nested deeper (for example `/writings/` entry titles and
+year headings) keep the sizes their own partials declare.
 
 ## 7. Layout Shells And Width
 
@@ -425,12 +428,12 @@ Structure:
 
 Rules:
 
-- Left meta is JetBrains Mono, uppercase, `$fs-list-meta`.
-- `.status` inside meta is teal and same size as the parent.
-- Titles use Space Grotesk at `$fs-list-title`.
-- Subtitles use Inter at `$fs-list-subtitle`.
-- `.row-list-info` is the teal mono strip for locations/actions.
-- `.row-list-info--muted` is Inter/muted for secondary "used in" context.
+- Left meta is Source Serif 4, upright, muted, capitalised, `$fs-list-meta`.
+- `.status` inside meta is muted and same size as the parent.
+- Titles use Source Serif 4 (`$font-display`) at `$fs-list-title`.
+- Subtitles use Source Serif 4 (`$font-body`) at `$fs-list-subtitle`.
+- `.row-list-info` is the muted strip for locations and actions (links in blue ink).
+- `.row-list-info--muted` is body serif, muted, for secondary "used in" context.
 - Mobile collapses to one column below `$bp-sm-max`.
 
 ### Home Lists
@@ -587,7 +590,7 @@ dark share the same component structure; only the chrome surface and border
 hexes differ. Chrome rules live at root scope in `_code.scss` and consume
 `--code-window-border-color`, `--code-header-bg`, `--code-header-border-color`
 defined in both palette mixins of `_variables.scss` — mode switching falls out
-of the CSS-var cascade. No `@media` or `[data-mode]` parent selector inside
+of the CSS-var cascade. No `@media` or `[data-bs-theme]` parent selector inside
 `_code.scss`.
 
 Corner-radius detail: Chirpy's container (`div[class^='language-']`) has
@@ -598,25 +601,26 @@ explicit `border-radius: 10px 10px 0 0` on `.code-header` (top corners) and
 bg and body bg both follow the container's rounded outline. Applies in both
 modes.
 
-Light mode:
+Light mode (near-white sheet on the green paper):
 
-- Container: `var(--code-window-border-color)` `#D8CBB0` 1px box-shadow border,
+- Container: `var(--code-window-border-color)` `#CBD3C5` 1px box-shadow border,
   10px border-radius (Chirpy default).
-- Header (`.code-header`): warm cream bg `#E9DDC2` with 1px bottom border
-  `#D8CBB0` separator. Label uses `font-weight: 500`. Three decorative dots
-  (Chirpy default markup) tint to `#B8AA91`. Lang label `#5A4F40`, icon
-  `#7A6F5F`, clipboard checked accent `#2E7E9A`.
-- Body: `#F4ECD8` surface, `#1A1611` ink, JetBrains Mono Medium (500).
+- Header (`.code-header`): `#F9FAF6` with a 1px `#CBD3C5` bottom border.
+  Label uses `font-weight: 500`, text `#545F59`; decorative dots `#CBD3C5`;
+  clipboard checked accent `#1D4F91`.
+- Body: `#F9FAF6` surface, `#1C2421` ink, IBM Plex Mono Medium (500).
+- Inline code chip: `#DFE5D6`.
 
-Dark mode (warm dark mirror):
+Dark mode:
 
-- Container: `var(--code-window-border-color)` `#332D24` 1px box-shadow border.
-- Header (`.code-header`): warm cocoa bg `#242018` with 1px bottom border
-  `#332D24` separator. Label uses `font-weight: 500`. Decorative dots tint to
-  coffee-grey `#4A4034` (lifts above the near-bg surface). Lang label
-  `#C0B8A8`, copy icon `#8A7D68`, clipboard checked accent `#4FB3B4`.
-- Body: `#1B1813` surface (unchanged), `#EFE7D6` ink (unchanged),
-  JetBrains Mono Medium (500). Dark Rouge token palette ships as-is.
+- Container: `#2B3430` 1px box-shadow border.
+- Header: `#1A201D` with a 1px `#2B3430` bottom border; text `#96A299`;
+  dots `#2B3430`; clipboard checked accent `#94B6F2`.
+- Body: `#1A201D` surface, `#DCE2D8` ink, IBM Plex Mono Medium (500).
+- Inline code chip: `#222A26`.
+
+Values live in the palette mixins of `_sass/addon/_variables.scss`; check
+there before relying on the hexes above.
 
 ## 12. Taxonomy
 

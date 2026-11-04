@@ -73,9 +73,8 @@ html {
 
 .topbar-brand {
   font-family: $font-display;
-  font-weight: 600;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  font-size: 1.1rem;
   color: var(--site-title-color);
   text-decoration: none;
   white-space: nowrap;
@@ -100,8 +99,8 @@ html {
 
   .nav-link {
     font-family: $font-display;
-    font-size: 1.0625rem;
-    font-weight: 500;
+    font-size: 1.05rem;
+    font-weight: 400;
     color: var(--topbar-text-color);
     padding: 0.3rem 0.55rem;
     border-radius: 0.3rem;
@@ -117,7 +116,17 @@ html {
 
     &.active {
       color: var(--link-color);
-      font-weight: 600;
+      font-weight: 400;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
+    }
+
+    // Keyboard focus: same ring as the rest of the site, not Bootstrap's blue glow.
+    &:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+      box-shadow: none;
     }
   }
 }
@@ -160,6 +169,80 @@ html {
     box-shadow: none;
     text-decoration: none;
   }
+
+  // Keyboard focus ring (the rule above removes Bootstrap's).
+  &:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+}
+
+// ─── Theme menu (Chirpy 7.6: Light / Dark / System) ─────────────────────────
+// The toggle shows the icon of the current choice: a persisted light or dark
+// choice sets [data-theme-persisted]; without it the site follows the OS.
+
+#mode-toggle > i {
+  display: none;
+}
+
+:root[data-bs-theme='light'][data-theme-persisted] #mode-toggle > i[data-theme-mode='light'],
+:root[data-bs-theme='dark'][data-theme-persisted] #mode-toggle > i[data-theme-mode='dark'],
+:root:not([data-theme-persisted]) #mode-toggle > i[data-theme-mode='system'] {
+  display: inline-block;
+}
+
+.topbar-theme {
+  position: relative;
+}
+
+.topbar-theme-menu {
+  // Open below the toggle, aligned to its right edge (Chirpy's Bootstrap
+  // bundle lacks the .dropdown-menu-end positioning rule).
+  &[data-bs-popper] {
+    left: auto;
+    right: 0;
+  }
+
+  min-width: 9rem;
+  margin-top: 0.4rem !important;
+  padding: 0.25rem;
+  border: 1px solid var(--main-border-color);
+  border-radius: 3px;
+  background: var(--card-paper);
+  box-shadow: 0 6px 14px var(--card-lift);
+  font-family: $font-body;
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 2px;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    background: transparent;
+
+    i {
+      color: var(--text-muted);
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--accent-soft);
+      color: var(--text-color);
+    }
+
+    &.active,
+    &:active {
+      background: transparent;
+      color: var(--link-color);
+      font-weight: 600;
+
+      i {
+        color: var(--link-color);
+      }
+    }
+  }
 }
 
 #search-trigger {
@@ -168,23 +251,10 @@ html {
   justify-content: center;
 }
 
-// Chirpy shows #topbar-title at <850px via its own media query; suppress it
-// (search UX will be overhauled in Step 10)
+// #topbar-title only exists because Chirpy's search script toggles it; the
+// brand already names the site, so it never shows.
 #topbar-title {
   display: none !important;
-}
-
-// Topbar title (shown by Chirpy JS during search; hidden otherwise)
-.topbar-title-label {
-  display: none;
-  font-family: $font-display;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--topbar-text-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 14rem;
 }
 
 // ─── Inline search ────────────────────────────────────────────────────────────
@@ -226,6 +296,33 @@ html {
 
   &:hover {
     color: var(--text-color);
+  }
+}
+
+// Phones and tablets in search mode (Chirpy adds .d-flex to #search): the
+// theme menu and hamburger make way, and the input takes the space that's
+// left, so Cancel always stays on screen.
+@media (max-width: $bp-lg-max) {
+  .topbar-controls:has(#search.d-flex) {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+
+    .topbar-theme,
+    #hamburger {
+      display: none;
+    }
+  }
+
+  #search.d-flex {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  #search.d-flex #search-input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
   }
 }
 
@@ -325,5 +422,22 @@ html {
       color: var(--link-color);
       font-weight: 600;
     }
+
+    // Keyboard focus: same ring as the rest of the site, not Bootstrap's blue glow.
+    &:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+  }
+}
+// ─── Print ───────────────────────────────────────────────────────────────────
+// The sticky top bar and Contents bar would repeat over the text on every page.
+
+@media print {
+  #topbar-wrapper,
+  #toc-bar,
+  #toc-solo-trigger {
+    display: none !important;
   }
 }

@@ -1,0 +1,31 @@
+<!--
+  Navigation buttons at the bottom of the post. Local copy of Chirpy 7.6's
+  post-nav.html: the "Older"/"Newer" caption moves from aria-label to
+  data-label (shown by _sass/addon/_content.scss), so each link's accessible
+  name is its visible text ("Older" + post title) instead of just "Older".
+-->
+
+<nav class="post-navigation d-flex justify-content-between" aria-label="Post Navigation">
+  {% assign previous = site.data.locales[include.lang].post.button.previous %}
+  {% assign next = site.data.locales[include.lang].post.button.next %}
+
+  {% if page.previous.url %}
+    <a href="{{ site.baseurl }}{{ page.previous.url }}" class="btn btn-outline-primary" data-label="{{ previous }}">
+      <p>{{ page.previous.title }}</p>
+    </a>
+  {% else %}
+    <div class="btn btn-outline-primary disabled" data-label="{{ previous }}">
+      <p>-</p>
+    </div>
+  {% endif %}
+
+  {% if page.next.url %}
+    <a href="{{ site.baseurl }}{{ page.next.url }}" class="btn btn-outline-primary" data-label="{{ next }}">
+      <p>{{ page.next.title }}</p>
+    </a>
+  {% else %}
+    <div class="btn btn-outline-primary disabled" data-label="{{ next }}">
+      <p>-</p>
+    </div>
+  {% endif %}
+</nav>

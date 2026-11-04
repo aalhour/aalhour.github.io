@@ -1,6 +1,11 @@
 ---
 ---
 
+// Chirpy 7.6: pass theme_mode in (named to avoid clashing with addon/variables).
+@use 'abstracts/variables' as chirpy-variables with (
+  $theme: '{{ site.theme_mode }}'
+);
+
 /* prettier-ignore */
 @use 'main
 {%- if jekyll.environment == 'production' -%}
@@ -18,6 +23,7 @@
 @use 'addon/topbar';
 @use 'addon/shell';
 @use 'addon/content';
+@use 'addon/figures';
 @use 'addon/footer';
 @use 'addon/row-list';
 @use 'addon/home';

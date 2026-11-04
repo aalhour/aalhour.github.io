@@ -1,16 +1,24 @@
 @use 'tokens' as *;
 
-// Global type system.
+// Global type system: one serif for reading and headings, mono only in code.
 
 html body {
   font-family: $font-body;
-  font-feature-settings: "cv01", "cv02", "cv11"; // Inter stylistic alternates
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
 }
 
 html .post-content,
-html .page-content {
+html .page-content,
+html main .content {
   font-family: $font-body;
-  line-height: 1.75;
+  line-height: 1.7;
+}
+
+// Serif text sets a touch larger than Chirpy's sans default (1.03-1.08rem).
+html main .content {
+  font-size: 1.125rem;
 }
 
 html h1,
@@ -31,7 +39,7 @@ html #search-results a,
 html .section-num,
 html .panel-heading {
   font-family: $font-display;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 html h1,
@@ -46,57 +54,87 @@ html .card-title,
 html .section-num,
 html .panel-heading {
   font-family: $font-display-bold;
-  font-weight: 400;
+  font-weight: $fw-heading;
+  text-wrap: wrap;
 }
 
 // Chirpy sets this with an ID selector, so match that specificity.
 html #panel-wrapper .panel-heading {
   font-family: $font-display-bold;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: $fw-heading;
+  letter-spacing: 0;
 }
 
-html .post-content h2,
-html .page-content h2 {
-  font-size: 1.85rem;
+html main h1 {
+  font-size: 2.3rem;
+  line-height: 1.15;
+}
+
+// Prose headings only: headings placed directly in a post or page body.
+// Component headings nested deeper (e.g. /writings/ entry titles and year
+// headings) keep the sizes their own stylesheets declare.
+html .post-content > h2,
+html .page-content > h2,
+html main .content > h2 {
+  font-size: 1.6rem;
+  line-height: 1.25;
+}
+
+html .post-content > h3,
+html .page-content > h3,
+html main .content > h3 {
+  font-size: 1.32rem;
   line-height: 1.3;
 }
 
-html .post-content h3,
-html .page-content h3 {
-  font-size: 1.55rem;
-  line-height: 1.35;
-}
-
-html .post-content h4,
-html .page-content h4 {
-  font-size: 1.35rem;
+html .post-content > h4,
+html .page-content > h4,
+html main .content > h4 {
+  font-size: 1.15rem;
   line-height: 1.4;
 }
 
-html .post-content h5,
-html .page-content h5 {
-  font-size: 1.2rem;
+html .post-content > h5,
+html .page-content > h5,
+html main .content > h5 {
+  font-size: 1.05rem;
   line-height: 1.45;
 }
 
-html .post-content h6,
-html .page-content h6 {
-  font-size: 1.1rem;
+html .post-content > h6,
+html .page-content > h6,
+html main .content > h6 {
+  font-size: 1rem;
+  font-style: italic;
   line-height: 1.5;
+}
+
+// Dek under a post or page title: italic, muted.
+html header .post-desc {
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: 1.45;
+  font-weight: 400 !important;
 }
 
 html code,
 html pre,
 html kbd,
-html samp,
-html .pagination,
-html .footnotes,
-html #toc-popup-content,
-html #toc-popup .header .label,
-html #notification .toast-body,
-html #toc-solo-trigger .label,
-html #archives .date.day {
+html samp {
   font-family: $font-mono;
-  font-feature-settings: "calt" 1, "liga" 1; // JetBrains Mono ligatures
+  font-feature-settings: normal;
+}
+
+// Inline code sits slightly smaller so Plex Mono's x-height matches the serif.
+html main .content :not(pre) > code {
+  font-size: 0.86em;
+}
+
+// Post "Contents" button (shown below xl): serif label, notebook corners.
+html #toc-solo-trigger {
+  border-radius: 3px;
+
+  .label {
+    font-family: $font-body;
+  }
 }

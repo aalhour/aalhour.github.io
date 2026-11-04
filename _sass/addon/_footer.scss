@@ -36,15 +36,21 @@
     gap: 0.3rem;
     border-radius: 0.4rem;
     color: var(--text-muted);
-    font-family: $font-mono;
-    font-size: 0.78rem;
-    letter-spacing: 0.02em;
+    font-size: 0.95rem;
     text-decoration: none;
     transition: color 0.15s ease, background 0.15s ease;
 
     i {
       font-size: 0.95rem;
       line-height: 1;
+    }
+
+    // Inline SVG brand icons: same box as a .fa-fw glyph at this size.
+    .footer-icon {
+      flex: none;
+      width: 1.25em;
+      height: 1em;
+      font-size: 0.95rem;
     }
 
     &:hover {
@@ -60,10 +66,8 @@
 }
 
 .footer-copy {
-  font-family: $font-mono;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  letter-spacing: 0.02em;
 
   time {
     font-variant-numeric: tabular-nums;
@@ -78,10 +82,8 @@
 }
 
 .footer-built {
-  font-family: $font-mono;
-  font-size: 0.74rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  letter-spacing: 0.02em;
 
   a {
     color: var(--link-color);

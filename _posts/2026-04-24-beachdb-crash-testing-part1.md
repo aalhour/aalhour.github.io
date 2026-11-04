@@ -8,16 +8,15 @@ tldr: >-
   replayable artifacts, and a tiny `crashhook` layer with failpoints across
   the WAL and flush paths. The goal is simple: stop asking "did it survive?"
   and start asking "what exactly survived, at which boundary, and why?"
-  [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.4).
+release:
+  version: v0.0.4
+  code: https://github.com/aalhour/beachdb/tree/v0.0.4
 date: 2026-04-24
 categories: [Databases]
 tags: [beachdb, databases, testing, crash-testing, fault-injection]
+series: beachdb
 toc: true
 mermaid: true
----
-
-_This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
-
 ---
 
 ## A blunt instrument

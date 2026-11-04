@@ -1,0 +1,105 @@
+<!--
+  /writings/ browse block: each row of category and tag keys shows one line,
+  most-used first, followed by a dashed "+N more" button that expands the row
+  in place ("Fewer" collapses it). Keys are plain links in a <ul>; the button
+  sits outside the list so the list keeps link semantics for screen readers.
+  Without JavaScript the list simply wraps. Styles: _sass/addon/_writings.scss.
+-->
+<script>
+    /* Comments here must be block comments: the production build (compress
+       layout) joins this script onto one line, so a // comment would swallow
+       everything after it. */
+  (function () {
+    var rows = document.querySelectorAll('.writings-browse-keys');
+    if (!rows.length) return;
+
+    function setup(box) {
+      var list = box.querySelector('.writings-browse-list');
+      var items = list ? Array.prototype.slice.call(list.children) : [];
+      if (!items.length) return null;
+
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'wf-more';
+      if (list.id) more.setAttribute('aria-controls', list.id);
+      box.appendChild(more);
+
+      var open = false;
+
+      /* The button names its list for screen readers: "+31 more tags". */
+      var row = box.closest('.writings-browse-row');
+      var rowLabel = row && row.querySelector('.writings-browse-label');
+      var noun = rowLabel ? ' ' + rowLabel.textContent.trim().toLowerCase() : '';
+      function setLabel(text) {
+        more.textContent = text;
+        if (!noun) return;
+        var sr = document.createElement('span');
+        sr.className = 'wf-sr';
+        sr.textContent = noun;
+        more.appendChild(sr);
+      }
+
+      function oneLine() {
+        return items[items.length - 1].offsetTop <= items[0].offsetTop + 2;
+      }
+
+      function fit() {
+        items.forEach(function (li) { li.hidden = false; });
+        box.classList.toggle('is-open', open);
+
+        if (open) {
+          more.hidden = false;
+          setLabel('Fewer');
+          more.setAttribute('aria-expanded', 'true');
+          return;
+        }
+
+        /* Everything fits on one line without the button: no toggle needed. */
+        more.hidden = true;
+        if (oneLine()) return;
+
+        /* Otherwise show the button (at its widest label) and measure once:
+           keep as many keys, most-used first, as fit beside it on one line,
+           then hide the rest in one pass. */
+        more.hidden = false;
+        setLabel('+' + (items.length - 1) + ' more');
+        var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+        var boxGap = parseFloat(getComputedStyle(box).columnGap) || 0;
+        var room = box.clientWidth - more.getBoundingClientRect().width - boxGap;
+        var widths = items.map(function (li) { return li.getBoundingClientRect().width; });
+        var used = 0;
+        var keep = 0;
+        for (var i = 0; i < items.length; i++) {
+          var next = used + (i ? gap : 0) + widths[i];
+          if (next > room + 0.5) break;
+          used = next;
+          keep++;
+        }
+        keep = Math.max(1, Math.min(keep, items.length - 1));
+        for (var j = keep; j < items.length; j++) items[j].hidden = true;
+        setLabel('+' + (items.length - keep) + ' more');
+        more.setAttribute('aria-expanded', 'false');
+      }
+
+      more.addEventListener('click', function () {
+        open = !open;
+        fit();
+      });
+
+      return fit;
+    }
+
+    var fits = Array.prototype.map.call(rows, setup).filter(Boolean);
+    function fitAll() { fits.forEach(function (f) { f(); }); }
+
+    var timer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(timer);
+      timer = setTimeout(fitAll, 100);
+    });
+
+    fitAll();
+    /* Re-measure once the web font has loaded (key widths change). */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+  })();
+</script>

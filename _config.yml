@@ -42,7 +42,7 @@ linkedin:
 theme: jekyll-theme-chirpy
 
 # Avatar (profile image)
-avatar: /assets/images/me-pixel-art.webp
+avatar: /assets/images/me-profile.webp
 
 # Timezone
 timezone: Europe/Berlin
@@ -53,7 +53,9 @@ lang: en
 # Pagination
 paginate: 10
 
-# Theme mode - leave empty to enable toggle (dark default via JS)
+# Theme mode: leave empty so the site follows the reader's OS setting (System)
+# by default, with a Light / Dark / System menu. "light" or "dark" forces one
+# theme and hides the menu.
 theme_mode: 
 
 # CDN endpoint for media resources (optional)

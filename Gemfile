@@ -4,7 +4,7 @@ source "https://rubygems.org"
 gem "jekyll", "~> 4.3"
 
 # Theme
-gem "jekyll-theme-chirpy", "~> 7.0"
+gem "jekyll-theme-chirpy", "~> 7.6.0" # _sass/addon and the copied layouts/includes target 7.6 (data-bs-theme)
 
 # Plugins
 group :jekyll_plugins do

@@ -575,11 +575,10 @@ async function auditScenario({ cdp, baseUrl, pagePath, viewport, theme, waitMs, 
 async function forceTheme(cdp, sessionId, theme) {
   await safeEvaluate(cdp, sessionId, `
     (() => {
-      document.documentElement.setAttribute('data-mode', ${JSON.stringify(theme)});
-      try { localStorage.setItem('mode', ${JSON.stringify(theme)}); } catch (_) {}
-      try { sessionStorage.setItem('mode', ${JSON.stringify(theme)}); } catch (_) {}
-      window.dispatchEvent(new Event('storage'));
-      return document.documentElement.getAttribute('data-mode');
+      document.documentElement.setAttribute('data-bs-theme', ${JSON.stringify(theme)});
+      document.documentElement.toggleAttribute('data-theme-persisted', true);
+      try { localStorage.setItem('theme', ${JSON.stringify(theme)}); } catch (_) {}
+      return document.documentElement.getAttribute('data-bs-theme');
     })()
   `);
 }

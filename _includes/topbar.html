@@ -9,24 +9,24 @@
     <!-- Desktop nav (hidden on mobile via Bootstrap d-none d-lg-flex) -->
     <nav class="topbar-nav" aria-label="Main Navigation">
       <a href="{{ '/writings/' | relative_url }}" class="nav-link{% if page.url == '/writings/' %} active{% endif %}">
-        writings
+        Writings
       </a>
 
       <a href="{{ '/talks/' | relative_url }}" class="nav-link{% if page.url == '/talks/' %} active{% endif %}">
-        talks
+        Talks
       </a>
 
       <a href="{{ '/projects/' | relative_url }}" class="nav-link{% if page.url == '/projects/' %} active{% endif %}">
-        projects
+        Projects
       </a>
 
       <a href="{{ '/animations/' | relative_url }}"
         class="nav-link{% if page.url == '/animations/' %} active{% endif %}">
-        animations
+        Animations
       </a>
 
       <a href="{{ '/about/' | relative_url }}" class="nav-link{% if page.url == '/about/' %} active{% endif %}">
-        about
+        About
       </a>
     </nav>
 
@@ -50,11 +50,49 @@
         <i class="fas fa-search fa-fw"></i>
       </button>
 
-      <!-- Mode toggle (Chirpy JS needs id="mode-toggle") -->
-      {% unless site.theme_mode %}
-      <button type="button" id="mode-toggle" class="btn btn-link topbar-btn" aria-label="Switch Mode">
-        <i class="fas fa-adjust fa-fw"></i>
-      </button>
+      <!-- Theme menu. Chirpy 7.6's script needs #mode-toggle immediately followed
+           by .dropdown-menu with .dropdown-item[data-theme-mode] buttons; it marks
+           the current choice .active and calls Theme.update() on click. The button
+           shows the icon of the current choice (styles in _topbar.scss). -->
+      {% unless site.theme_mode == 'light' or site.theme_mode == 'dark' %}
+      {%- capture icon_light -%}<i class="fa-solid fa-sun fa-fw" data-theme-mode="light" aria-hidden="true"></i>{%- endcapture -%}
+      {%- capture icon_dark -%}<i class="fa-regular fa-moon fa-fw" data-theme-mode="dark" aria-hidden="true"></i>{%- endcapture -%}
+      {%- capture icon_system -%}<i class="fa-solid fa-display fa-fw" data-theme-mode="system" aria-hidden="true"></i>{%- endcapture -%}
+      <div class="dropdown topbar-theme">
+        <button type="button" id="mode-toggle" class="btn btn-link topbar-btn" aria-label="Theme"
+          data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+          {{- icon_light -}}{{- icon_dark -}}{{- icon_system -}}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end topbar-theme-menu">
+          <li><button class="dropdown-item" type="button" data-theme-mode="light" aria-pressed="false">{{ icon_light }}<span>{{ site.data.locales[include.lang].theme.light }}</span></button></li>
+          <li><button class="dropdown-item" type="button" data-theme-mode="dark" aria-pressed="false">{{ icon_dark }}<span>{{ site.data.locales[include.lang].theme.dark }}</span></button></li>
+          <li><button class="dropdown-item" type="button" data-theme-mode="system" aria-pressed="false">{{ icon_system }}<span>{{ site.data.locales[include.lang].theme.system }}</span></button></li>
+        </ul>
+        <script>
+          /* Comments here must be block comments: the production build joins
+             this script onto one line.
+             Chirpy marks the current choice only with the .active class (at
+             startup and on each click). Mirror it into aria-pressed so screen
+             readers hear it, and name the trigger after it ("Theme: Dark"). */
+          (function () {
+            var toggle = document.getElementById('mode-toggle');
+            var menu = toggle && toggle.nextElementSibling;
+            if (!menu) return;
+            var base = toggle.getAttribute('aria-label');
+            function sync() {
+              var current = '';
+              menu.querySelectorAll('.dropdown-item').forEach(function (item) {
+                var on = item.classList.contains('active');
+                item.setAttribute('aria-pressed', on ? 'true' : 'false');
+                if (on) current = item.textContent.trim();
+              });
+              toggle.setAttribute('aria-label', current ? base + ': ' + current : base);
+            }
+            new MutationObserver(sync).observe(menu, { subtree: true, attributes: true, attributeFilter: ['class'] });
+            sync();
+          })();
+        </script>
+      </div>
       {% endunless %}
 
       <!-- Inline search bar (Chirpy JS shows/hides via class) -->
@@ -81,23 +119,23 @@
   <!-- Mobile drawer (anchored below topbar) -->
   <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile Navigation" hidden>
     <a href="{{ '/writings/' | relative_url }}" class="nav-link{% if page.url == '/writings/' %} active{% endif %}">
-      writings
+      Writings
     </a>
 
     <a href="{{ '/talks/' | relative_url }}" class="nav-link{% if page.url == '/talks/' %} active{% endif %}">
-      talks
+      Talks
     </a>
 
     <a href="{{ '/projects/' | relative_url }}" class="nav-link{% if page.url == '/projects/' %} active{% endif %}">
-      projects
+      Projects
     </a>
 
     <a href="{{ '/animations/' | relative_url }}" class="nav-link{% if page.url == '/animations/' %} active{% endif %}">
-      animations
+      Animations
     </a>
 
     <a href="{{ '/about/' | relative_url }}" class="nav-link{% if page.url == '/about/' %} active{% endif %}">
-      about
+      About
     </a>
   </nav>
 </header>

@@ -23,3 +23,10 @@
 }
 
 // Width / clamp / reader-vs-panel sizing rules live in _shell.scss.
+// Chirpy hides page titles below lg because it repeats them in its own top
+// bar title; this site's top bar shows the brand instead, so keep them.
+@media (max-width: $bp-lg-max) {
+  html main h1.dynamic-title {
+    display: block;
+  }
+}

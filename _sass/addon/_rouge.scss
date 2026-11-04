@@ -1,53 +1,53 @@
-// Syntax highlight — Beach-paper palette
+// Syntax highlight: notebook ink palette
 // Single-file home for syntax-highlight tokens + selectors.
 // Mirrors the selector structure from Chirpy's _sass/base/_base.scss so our
 // rules have identical specificity and win via later-in-cascade ordering.
 //
-// Light values: $l-rouge-*  (Beach-tuned One Light)
-// Dark  values: $d-rouge-*  (Beach-paper, unchanged)
+// Light values: $l-rouge-*  (ink on a near-white printout sheet)
+// Dark  values: $d-rouge-*  (unchanged dark pane)
 // To swap a palette: edit values below. Selectors reference these — never literals.
 
-// ─── LIGHT TOKEN VALUES (Beach-tuned One Light) ───────────────────────────────
+// ─── LIGHT TOKEN VALUES (printout: ink on near-white) ─────────────────────────
 
-$l-rouge-bg: #F4ECD8; // block surface (Beach-paper)
-$l-rouge-fg: #1A1611; // base text
-$l-rouge-kw: #8F3D88; // keywords (purple, Beach-tuned)
-$l-rouge-op: #205F60; // kw.const + operators + regex + string-interp (deep teal)
-$l-rouge-str: #4E7333; // strings (olive)
-$l-rouge-cmt: #6F6452; // comments (driftwood)
-$l-rouge-num: #7A5028; // numbers, literals, decorators (bronze)
-$l-rouge-fn: #3D5A8E; // functions / methods (muted blue)
-$l-rouge-cls: #8A6500; // classes, types, namespaces, vars, exceptions (gold)
-$l-rouge-tag: #B5421C; // tags, attributes (terracotta)
-$l-rouge-bi: #8A3A1A; // builtins (deep terra)
-$l-rouge-subhead: #574E40; // generic subheading (.gu) — darker than cmt
-$l-rouge-diff-ins-fg: #205F60;
-$l-rouge-diff-ins-bg: #D9E8DE;
-$l-rouge-diff-del-fg: #8A3A1A;
-$l-rouge-diff-del-bg: #F2DAD0;
-$l-rouge-err-fg: #FAF6EE;
-$l-rouge-err-bg: #8A3A1A;
+$l-rouge-bg: #F9FAF6;
+$l-rouge-fg: #1C2421;
+$l-rouge-kw: #1D4F91;
+$l-rouge-op: #3F4A44;
+$l-rouge-str: #6B4A12;
+$l-rouge-cmt: #5F6A63;
+$l-rouge-num: #6B4A12;
+$l-rouge-fn: #1C2421;
+$l-rouge-cls: #2F5D3A;
+$l-rouge-tag: #1D4F91;
+$l-rouge-bi: #1D4F91;
+$l-rouge-subhead: #3F4A44;
+$l-rouge-diff-ins-fg: #2F6B3A;
+$l-rouge-diff-ins-bg: #DDEBD8;
+$l-rouge-diff-del-fg: #9B2C2C;
+$l-rouge-diff-del-bg: #F3E0DB;
+$l-rouge-err-fg: #F9FAF6;
+$l-rouge-err-bg: #9B2C2C;
 
-// ─── DARK TOKEN VALUES (unchanged from Mk1) ───────────────────────────────────
+// ─── DARK TOKEN VALUES ────────────────────────────────────────────────────────
 
-$d-rouge-bg: #1B1813;
-$d-rouge-fg: #EFE7D6;
-$d-rouge-kw: #E68A5C;
-$d-rouge-op: #4FB3B4;
-$d-rouge-str: #7DC47C;
-$d-rouge-cmt: #A89A7E;
-$d-rouge-num: #D4A857;
-$d-rouge-fn: #B08ED4;
-$d-rouge-cls: #7BA3D4;
-$d-rouge-tag: #88BA6E;
-$d-rouge-bi: #F0A077;
-$d-rouge-subhead: #A89A7E;
-$d-rouge-diff-ins-fg: #7DC47C;
-$d-rouge-diff-ins-bg: #1A2A1A;
-$d-rouge-diff-del-fg: #E68A5C;
-$d-rouge-diff-del-bg: #2A1A12;
-$d-rouge-err-fg: #14110D;
-$d-rouge-err-bg: #C04040;
+$d-rouge-bg: #201D1A;
+$d-rouge-fg: #E9E5DC;
+$d-rouge-kw: #94B6F2;
+$d-rouge-op: #CDC8C0;
+$d-rouge-str: #D9B67A;
+$d-rouge-cmt: #B0ABA2;
+$d-rouge-num: #D9B67A;
+$d-rouge-fn: #F0EDE7;
+$d-rouge-cls: #9CCB9F;
+$d-rouge-tag: #94B6F2;
+$d-rouge-bi: #94B6F2;
+$d-rouge-subhead: #B9B2A8;
+$d-rouge-diff-ins-fg: #9CCB9F;
+$d-rouge-diff-ins-bg: #1F2E22;
+$d-rouge-diff-del-fg: #E8A196;
+$d-rouge-diff-del-bg: #33201D;
+$d-rouge-err-fg: #1A1816;
+$d-rouge-err-bg: #E8A196;
 
 // ─── SHARED TABLE BOILERPLATE ─────────────────────────────────────────────────
 
@@ -385,28 +385,22 @@ $d-rouge-err-bg: #C04040;
   }
 }
 
-// ─── Apply with identical selector structure as Chirpy's _base.scss ───────────
+// ─── Apply with the same selector structure as Chirpy 7.6 (data-bs-theme) ─────
 
-@media (prefers-color-scheme: light) {
-
-  html:not([data-mode]),
-  html[data-mode='light'] {
-    @include rouge-light;
-  }
-
-  html[data-mode='dark'] {
-    @include rouge-dark;
-  }
+:root[data-bs-theme='light'] {
+  @include rouge-light;
 }
 
-@media (prefers-color-scheme: dark) {
+:root[data-bs-theme='dark'] {
+  @include rouge-dark;
+}
 
-  html:not([data-mode]),
-  html[data-mode='dark'] {
-    @include rouge-dark;
+:root:not([data-bs-theme]) {
+  @media (prefers-color-scheme: light) {
+    @include rouge-light;
   }
 
-  html[data-mode='light'] {
-    @include rouge-light;
+  @media (prefers-color-scheme: dark) {
+    @include rouge-dark;
   }
 }

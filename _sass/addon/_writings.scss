@@ -18,7 +18,7 @@
   h2 {
     font-family: $font-display-bold;
     font-size: 1.65rem;
-    font-weight: 400;
+    font-weight: $fw-heading;
     margin: 0;
     color: var(--heading-color);
     letter-spacing: -0.01em;
@@ -26,10 +26,8 @@
 }
 
 .writings-year-count {
-  font-family: $font-mono;
-  font-size: 0.78rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  letter-spacing: 0.06em;
 }
 
 .writings-entries {
@@ -39,8 +37,8 @@
 
 .writings-entry {
   display: grid;
-  grid-template-columns: 6rem 1fr;
-  gap: 1.25rem;
+  grid-template-columns: $writings-date-col 1fr;
+  gap: $writings-col-gap;
   padding: 0.85rem 0;
   border-bottom: 1px solid var(--main-border-color);
   align-items: baseline;
@@ -61,10 +59,10 @@
 }
 
 .writings-entry-date {
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
+  font-size: 0.95rem;
   color: var(--text-muted);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .writings-entry-body {
@@ -88,7 +86,8 @@
 
     &:hover {
       color: var(--link-color);
-      text-decoration: none;
+      text-decoration: underline;
+      text-decoration-color: currentColor;
     }
   }
 }
@@ -104,12 +103,9 @@
 
 .writings-entry-meta {
   grid-area: meta;
-  margin-top: 0.3rem;
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
+  margin-top: 0.1rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -121,11 +117,14 @@
   display: inline-flex;
   align-items: baseline;
   gap: 0.35rem;
-  color: var(--accent-color);
-  text-decoration: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--main-border-color);
+  text-underline-offset: 3px;
 
   i {
     font-size: 0.85em;
+    opacity: 0.8;
   }
 
   &:hover {
@@ -142,142 +141,177 @@
 
 .writings-entry-read {
   color: var(--text-muted);
+
+  // Chirpy's read-time include wraps the minutes in <em>; metadata is upright.
+  em {
+    font-style: normal;
+  }
 }
 
-// ─── Browse card (categories + trending tags) ────────────────────────────────
+// ─── Browse keys (categories + tags) ─────────────────────────────────────────
+// A graph-paper card with one line of keys per row (most-used first) and a
+// "+N more" toggle that expands the row. Keys link to /categories/<slug>/ and
+// /tags/<slug>/; the one-line fit and toggle are _includes/writings-browse.html. Keys are links, so Chirpy's
+// `.content a` rules (bottom border, !important hover colour) are out-ranked.
 
 .writings-browse {
-  border: 1px solid var(--main-border-color);
-  border-radius: 0.5rem;
-  // --browse-card-bg sits a smidge above --mask-bg in light (sand-paper
-  // halfway between main and mask). Dark keeps the existing mask-bg tone.
-  background: var(--browse-card-bg);
-  padding: 1.1rem 1.25rem;
+  display: grid;
+  gap: 0.75rem;
   margin: 0 0 2.25rem;
+  padding: 1rem $writings-browse-pad-x;
+  border: 1px solid var(--main-border-color);
+  border-radius: 3px;
+  background-color: var(--fig-bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
-.writings-browse-section {
+.writings-browse-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: "label items seeall";
-  column-gap: 1rem;
-  row-gap: 0.45rem;
+  // Label column sized so the keys start where essay titles start below:
+  // essay date column + essay gap, minus this card's side padding, the label
+  // gap and the 1px border. All from the shared tokens in _tokens.scss.
+  grid-template-columns:
+    calc(#{$writings-date-col} + #{$writings-col-gap} - #{$writings-browse-pad-x} - #{$writings-browse-gap} - 1px)
+    minmax(0, 1fr);
+  gap: 0.4rem $writings-browse-gap;
   align-items: baseline;
 
-  @media (max-width: $bp-home-stack-max) {
-    grid-template-columns: auto auto;
-    grid-template-areas:
-      "label seeall"
-      "items items";
-    justify-content: space-between;
-    row-gap: 0.5rem;
+  @media (max-width: $bp-sm-max) {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 .writings-browse-label {
-  grid-area: label;
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 500;
-  margin: 0;
 }
 
-.writings-browse-seeall {
-  grid-area: seeall;
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
-  color: var(--link-color);
-  text-decoration: none;
-  white-space: nowrap;
-  justify-self: end;
+// Keys live in a <ul> (link semantics intact); the "+N more" button sits
+// beside the list, outside it. When open, the list takes the full row and the
+// button drops below it.
+.writings-browse-keys {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
 
-  &:hover {
-    color: var(--link-hover);
-    text-decoration: underline;
+  &.is-open {
+    flex-wrap: wrap;
+
+    .writings-browse-list {
+      flex-basis: 100%;
+    }
   }
 }
 
-.writings-browse-divider {
-  border: 0;
-  border-top: 1px dashed var(--main-border-color);
-  margin: 1rem 0;
-}
-
-.writings-browse-items {
-  grid-area: items;
+html main .content .writings-browse-list {
   display: flex;
   flex-wrap: wrap;
-  column-gap: 1.1rem;
-  row-gap: 0.35rem;
-  line-height: 1.7;
+  gap: 0.4rem;
+  flex: 0 1 auto;
   min-width: 0;
-}
+  margin: 0;
+  padding: 0;
+  list-style: none;
 
-.writings-browse-cat {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.3rem;
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  text-decoration: none;
-  color: var(--accent-color);
+  > li {
+    margin: 0;
+    padding: 0;
 
-  i {
-    font-size: 0.85em;
-  }
-
-  &:hover {
-    color: var(--link-color);
-    text-decoration: none;
-  }
-
-  // Per-category color text variations (colors live in _variables.scss).
-  &[data-c='career'] {
-    color: var(--cat-career-color);
-  }
-
-  &[data-c='philosophy'] {
-    color: var(--cat-philosophy-color);
-  }
-
-  &[data-c='books'] {
-    color: var(--cat-books-color);
-  }
-
-  &[data-c='meta'] {
-    color: var(--text-muted);
+    &[hidden] {
+      display: none;
+    }
   }
 }
 
-.writings-browse-cat .writings-browse-count,
-.writings-browse-tag .writings-browse-count {
+// Text for screen readers only (", 6 posts" on keys, the list name on the
+// toggle). Bootstrap's .visually-hidden is purged from Chirpy's build.
+.wf-sr {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// "+N more" / "Fewer" toggle added by _includes/writings-browse.html.
+.wf-more {
+  flex: none;
+  font: 400 0.9rem/1.5 $font-body;
+  padding: 0.12rem 0.55rem;
+  border: 1px dashed var(--main-border-color);
+  border-radius: 3px;
+  background: transparent;
   color: var(--text-muted);
-  font-size: $fs-list-tag;
-  margin-left: 0.2rem;
-  letter-spacing: 0;
-  opacity: 0.8;
-}
-
-.writings-browse-tag {
-  display: inline-flex;
-  align-items: baseline;
-  font-family: $font-mono;
-  font-size: $fs-list-meta;
-  font-weight: 500;
-  text-decoration: none;
-  color: var(--text-color);
+  cursor: pointer;
 
   &:hover {
-    color: var(--link-color);
-    text-decoration: none;
+    color: var(--text-color);
+    border-color: var(--text-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
   }
 }
 
-// Dark mode handled automatically by --cat-*-color custom properties in
-// _variables.scss (warmer/brighter values declared under @mixin dark-palette).
+html main .content a.wf-key {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: $font-body;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 0.12rem 0.55rem 0.12rem 0.6rem;
+  border: 1px solid var(--main-border-color);
+  border-radius: 3px;
+  background: var(--key-bg);
+  box-shadow: 0 1px 0 var(--main-border-color);
+  color: var(--text-color);
+  text-decoration: none;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+
+  small {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Tag keys are lighter than category keys but still opaque on graph paper.
+html main .content a.wf-key--tag {
+  font-size: 0.9rem;
+  background: var(--key-tag-bg);
+}
+
+html main .content a.wf-key:hover {
+  color: var(--text-color) !important;
+  border-color: var(--text-muted) !important;
+}
+
+html main .content a.wf-key:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+// Chirpy underlines every link inside .content with a bottom border; list
+// titles read cleaner without it. The hover state is covered too: Chirpy adds
+// a 1px border on hover, which would make the line taller and nudge the rule
+// below it.
+main .content .writings-entry-title a,
+main .content .writings-entry-cat {
+  &,
+  &:hover {
+    border-bottom: 0 !important;
+  }
+}

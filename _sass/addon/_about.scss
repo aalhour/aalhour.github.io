@@ -18,7 +18,7 @@
   height: 220px;
   border-radius: 0.6rem;
   object-fit: cover;
-  box-shadow: 0 2px 12px rgba(31, 27, 22, 0.1);
+  border: 1px solid var(--main-border-color);
 }
 
 .page-content::after,

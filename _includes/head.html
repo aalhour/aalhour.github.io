@@ -1,9 +1,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1e">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#EDF0E7">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1A1816">
   <meta name="viewport"
     content="width=device-width, user-scalable=no initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
 
@@ -93,9 +91,13 @@
     {%- unless page.layout == 'home' -%}
     {%- capture title -%}
     {%- if page.collection == 'tabs' -%}
-    {%- assign tab_key = page.title | downcase -%}
-    {%- assign tab_label = site.data.locales[include.lang].tabs[tab_key] -%}
-    {{- tab_label | default: page.title | downcase -}}
+    {%- comment -%}
+      Tab pages: the locale label for the tab's slug ("about" -> "About"),
+      else the page title as written ("Writings"). Same lookup as the top bar.
+    {%- endcomment -%}
+    {%- capture tab_key -%}{{ page.url | split: '/' }}{%- endcapture -%}
+    {%- assign tab_label = site.data.locales[include.lang].tabs[tab_key] | default: page.title -%}
+    {{- tab_label -}}
     {%- elsif page.layout == 'tag' -%}
     {{- '#' | append: page.title -}}
     {%- else -%}
@@ -123,6 +125,11 @@
 
   <!-- Bootstrap -->
   {% unless jekyll.environment == 'production' %}
+  {%- comment -%}
+    Dev only (production uses the Bootstrap compiled into Chirpy's CSS). Pinned
+    to the version Chirpy 7.6 bundles (5.3.8); Chirpy's own origin data points
+    at an unpinned bootstrap@5. Bump together with Chirpy.
+  {%- endcomment -%}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
   {% endunless %}
 
@@ -149,55 +156,21 @@
 
   <!-- Scripts -->
 
-  <!-- localStorage bridge: Chirpy uses sessionStorage("mode"), plan locks localStorage persistence -->
   <script>
+    /* Block comments only: the production build joins this script onto one line.
+       Before Chirpy 7.6 this site saved the Light/Dark choice under "mode";
+       7.6 reads "theme". Carry an old choice over once, before theme.min.js runs. */
     (function () {
-      var KEY = 'mode';
-
-      function isMode(value) {
-        return value === 'light' || value === 'dark';
-      }
-
       try {
-        var saved = localStorage.getItem(KEY);
-        if (isMode(saved)) {
-          sessionStorage.setItem(KEY, saved);
-          document.documentElement.setAttribute('data-mode', saved);
+        var old = localStorage.getItem('mode');
+        if (old === null) return;
+        if ((old === 'light' || old === 'dark') && localStorage.getItem('theme') === null) {
+          localStorage.setItem('theme', old);
         }
-
-        var proto = window.Storage && window.Storage.prototype;
-        if (!proto || proto.__modeLocalStorageBridge) return;
-
-        var nativeSet = proto.setItem;
-        var nativeRemove = proto.removeItem;
-
-        Object.defineProperty(proto, '__modeLocalStorageBridge', { value: true });
-
-        Object.defineProperty(proto, 'setItem', {
-          configurable: true,
-          writable: true,
-          value: function (key, value) {
-            nativeSet.call(this, key, value);
-            if (this === sessionStorage && key === KEY && isMode(value)) {
-              nativeSet.call(localStorage, KEY, value);
-            }
-          }
-        });
-
-        Object.defineProperty(proto, 'removeItem', {
-          configurable: true,
-          writable: true,
-          value: function (key) {
-            nativeRemove.call(this, key);
-            if (this === sessionStorage && key === KEY) {
-              nativeRemove.call(localStorage, KEY);
-            }
-          }
-        });
-      } catch (_) {}
+        localStorage.removeItem('mode');
+      } catch (e) { /* storage blocked: nothing to carry over */ }
     })();
   </script>
-
   <script src="{{ '/assets/js/dist/theme.min.js' | relative_url }}"></script>
 
   {% include js-selector.html lang=lang %}

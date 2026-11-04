@@ -9,11 +9,8 @@ tldr: >-
 date: 2026-02-16
 categories: [Databases]
 tags: [beachdb, databases, storage, durability, fsync]
+series: beachdb
 toc: true
----
-
-_This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
-
 ---
 
 ## Our first bug!

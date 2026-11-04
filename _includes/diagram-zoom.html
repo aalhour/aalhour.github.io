@@ -1,0 +1,134 @@
+<!--
+  Enlarge Mermaid diagrams. Each diagram gets a magnifier button in its
+  top-right corner (all screen sizes); on phones and tablets (below 992px)
+  tapping anywhere on the diagram works too. On large screens only the button
+  opens it, so diagram text stays selectable. The full-screen <dialog> shows a
+  copy at natural size on graph paper: scroll, pinch-zoom or rotate to read
+  it; close with ×, a click/tap outside the diagram, or Esc.
+
+  Chirpy renders each diagram into <pre class="mermaid"> (right after a hidden
+  <pre> holding the source) and re-renders it on a light/dark switch by
+  replacing its contents. So the button lives in a wrapper (.diagram-frame)
+  around both <pre>s, never inside pre.mermaid, and the diagram is copied at
+  open time so the copy always matches the current colours.
+  Styles: _sass/addon/_figures.scss.
+-->
+<script>
+    /* Comments here must be block comments: the production build (compress
+       layout) joins this script onto one line, so a // comment would swallow
+       everything after it. */
+  (function () {
+    var small = window.matchMedia('(max-width: 991.98px)');
+    var dialog = null;
+    var body = null;
+    var opener = null;
+
+    function build() {
+      dialog = document.createElement('dialog');
+      dialog.className = 'diagram-zoom';
+      dialog.setAttribute('aria-label', 'Diagram, enlarged');
+
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'diagram-zoom-close';
+      close.setAttribute('aria-label', 'Close diagram');
+      close.textContent = '×';
+      close.addEventListener('click', function () { dialog.close(); });
+
+      /* Not class "mermaid": Chirpy re-renders every .mermaid element on a
+         light/dark switch and would choke on this one. _figures.scss targets
+         .diagram-zoom-body directly for the diagram ink rules. */
+      body = document.createElement('div');
+      body.className = 'diagram-zoom-body';
+
+      dialog.appendChild(close);
+      dialog.appendChild(body);
+      document.body.appendChild(dialog);
+
+      /* A click/tap on the paper around the diagram closes it. */
+      dialog.addEventListener('click', function (ev) {
+        if (ev.target === dialog || ev.target === body) dialog.close();
+      });
+      dialog.addEventListener('close', function () {
+        body.textContent = '';
+        if (opener) opener.focus({ preventScroll: true });
+      });
+    }
+
+    function open(pre, from) {
+      var svg = pre.querySelector('svg');
+      if (!svg) return;
+      if (!dialog) build();
+
+      var copy = svg.cloneNode(true);
+      /* Mermaid caps the diagram with an inline max-width equal to its
+         natural width; show it at that width instead of shrinking to fit. */
+      var natural = parseFloat(svg.style.maxWidth) || svg.getBoundingClientRect().width;
+      copy.style.maxWidth = 'none';
+      copy.style.width = natural + 'px';
+      copy.removeAttribute('height');
+
+      body.textContent = '';
+      /* Diagrams opted out of the ink restyle keep their colours here too. */
+      body.classList.toggle('is-native', !!pre.closest('.mermaid-native'));
+      body.appendChild(copy);
+      opener = from || pre;
+      dialog.showModal();
+      body.scrollLeft = 0;
+      body.scrollTop = 0;
+    }
+
+    /* Wrap each diagram (hidden source <pre> + pre.mermaid) and add the button. */
+    function frame(pre) {
+      if (pre.parentElement && pre.parentElement.classList.contains('diagram-frame')) return;
+      /* Only wrap when the node right before the diagram is Chirpy's hidden
+         source (pre.d-none > code.language-mermaid): Chirpy re-reads that exact
+         neighbour on a theme switch. If its markup ever changes, leave the
+         diagram alone (no magnifier) rather than move unrelated content. */
+      var source = pre.previousSibling;
+      var code = source && source.nodeType === 1 && source.tagName === 'PRE' &&
+        source.classList.contains('d-none') && source.firstElementChild;
+      if (!code || !code.classList.contains('language-mermaid')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'diagram-frame';
+      pre.parentNode.insertBefore(wrap, source);
+      wrap.appendChild(source);
+      wrap.appendChild(pre);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'diagram-zoom-btn';
+      btn.setAttribute('aria-label', 'Enlarge diagram');
+      btn.title = 'Enlarge diagram';
+      btn.innerHTML = '<i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i>';
+      wrap.appendChild(btn);
+    }
+
+    /* The diagram itself stays plain content (no button role), so screen
+       readers can still reach its text; keyboard and screen-reader users open
+       it with the magnifier button. */
+    function prepare() {
+      document.querySelectorAll('.content pre.mermaid').forEach(frame);
+    }
+
+    document.addEventListener('click', function (ev) {
+      var btn = ev.target.closest('.diagram-zoom-btn');
+      if (btn) {
+        var target = btn.parentElement.querySelector('pre.mermaid');
+        if (target) open(target, btn);
+        return;
+      }
+      /* Small screens: tapping the diagram opens it too. Focus goes back to
+         its magnifier button on close. */
+      if (!small.matches) return;
+      var pre = ev.target.closest('.content pre.mermaid');
+      if (!pre) return;
+      var frameEl = pre.parentElement.classList.contains('diagram-frame') ? pre.parentElement : null;
+      open(pre, frameEl && frameEl.querySelector('.diagram-zoom-btn'));
+    });
+
+    /* Diagram containers are created by Chirpy's script; set them up once the
+       page has loaded. */
+    window.addEventListener('load', prepare);
+  })();
+</script>

@@ -7,16 +7,15 @@ tldr: >-
   real. This post walks through how `fsync` actually works with an interactive
   demo (most tutorials skip this), explains the WAL record format, and shows
   how I tested crash recovery by killing the database repeatedly.
-  [Code is here](https://github.com/aalhour/beachdb/tree/v0.0.1).
+release:
+  version: v0.0.1
+  code: https://github.com/aalhour/beachdb/tree/v0.0.1
 date: 2026-02-12
 categories: [Databases]
 tags: [beachdb, databases, storage, durability, wal]
+series: beachdb
 toc: true
 track: https://www.youtube.com/watch?v=lSHVMMfn3Js
----
-
-_This is part of an ongoing series — see all posts tagged [#beachdb](/tags/beachdb/)._
-
 ---
 
 ## It's been a minute!

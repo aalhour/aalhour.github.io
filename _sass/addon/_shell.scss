@@ -7,8 +7,9 @@
 //
 // Two shells are in play:
 //
-//   .shell-panel  → posts + /archives/. Uses Chirpy's per-breakpoint container
-//                   widths and the panel-shell topbar rules in _topbar.scss.
+//   .shell-panel  → posts + /archives/. Sized around the post text: a fixed
+//                   main column ($post-main) plus the Contents panel, centred,
+//                   with the topbar matching their combined width.
 //   .shell-reader → home, /writings/, /talks/, /projects/, /animations/,
 //                   /about/, /tags/, /categories/. Clamped to $reader-shell-max
 //                   for comfortable reading.
@@ -30,6 +31,13 @@
     max-width: $reader-shell-max;
     padding-inline: 1.5rem;
   }
+
+  // Animation detail pages (/animations/<slug>/): wider stage.
+  body.shell-reader.shell-wide .site-main--reader,
+  body.shell-reader.shell-wide .site-tail--reader,
+  body.shell-reader.shell-wide #topbar {
+    max-width: $reader-wide-shell-max;
+  }
 }
 
 // Chirpy ships `main.col-12 { padding-right: 4.5rem !important }` at xxxl.
@@ -42,5 +50,78 @@
   body.shell-reader #tail-wrapper.site-tail--reader {
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
+  }
+}
+
+// ─── Post shell (body.shell-panel) ──────────────────────────────────────────
+// lg: the main column alone, centred (Chirpy hides the panel below xl).
+// xl+: main column + Contents panel side by side, centred. The tail (related
+// posts, footer) lines up with the main column. Below lg nothing changes.
+
+@media (min-width: $bp-lg-min) {
+  body.shell-panel #main-wrapper .row {
+    justify-content: center;
+  }
+
+  // ID in the selector: Chirpy sets `#main-wrapper > .container .col-lg-11`
+  // to 96% between lg and xl.
+  body.shell-panel #main-wrapper .site-main--panel,
+  body.shell-panel #main-wrapper .site-tail--panel {
+    flex: 0 0 auto;
+    width: $post-main;
+    max-width: 100%;
+  }
+
+  // Tail (related posts, footer) has no <article> padding; match it so the
+  // footer lines up with the post text. Overrides Bootstrap's px-md-4.
+  body.shell-panel #main-wrapper .site-tail--panel {
+    padding-inline: calc(#{$post-main-pad} + #{$post-article-pad}) !important;
+  }
+
+  // Brand lines up with the first character of the post text.
+  body.shell-panel #topbar {
+    max-width: $post-main;
+    padding-inline: calc(#{$post-main-pad} + #{$post-article-pad});
+  }
+}
+
+@media (min-width: $bp-xl-min) {
+  body.shell-panel #panel-wrapper {
+    flex: 0 0 $post-panel;
+    width: $post-panel;
+    max-width: $post-panel;
+  }
+
+  // Same total width as the row above, so the tail sits under the main column.
+  body.shell-panel #main-wrapper .site-tail--panel {
+    margin-right: $post-panel;
+  }
+
+  body.shell-panel #topbar {
+    max-width: calc(#{$post-main} + #{$post-panel});
+  }
+}
+
+// Chirpy's xxxl `main.col-12 { padding-right: 4.5rem !important }` would
+// shrink the text column; keep the main column's padding symmetric. The tail
+// keeps the extra article padding so the footer stays aligned with the text.
+@media (min-width: $bp-xxxl-min) {
+  body.shell-panel main.site-main--panel {
+    padding-left: $post-main-pad !important;
+    padding-right: $post-main-pad !important;
+  }
+
+  body.shell-panel #tail-wrapper.site-tail--panel {
+    padding-left: calc(#{$post-main-pad} + #{$post-article-pad}) !important;
+    padding-right: calc(#{$post-main-pad} + #{$post-article-pad}) !important;
+  }
+}
+
+// ─── Print ───────────────────────────────────────────────────────────────────
+
+@media print {
+  #back-to-top,
+  #panel-wrapper {
+    display: none !important;
   }
 }

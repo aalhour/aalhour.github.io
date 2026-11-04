@@ -1,0 +1,6 @@
+# Post series shown as a numbered track under the post title (_layouts/post.html).
+# A post joins a series with `series: <key>` in its front matter; parts are
+# numbered by date. Hidden posts (`hidden: true`) are left out.
+beachdb:
+  name: BeachDB series
+  url: /tags/beachdb/
