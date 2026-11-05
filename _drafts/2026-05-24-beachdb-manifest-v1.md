@@ -3,14 +3,15 @@ title: "My files were correct; my database was still broken"
 subtitle: "A file can survive a crash and still not belong to the database."
 description: "BeachDB manifest internals: CURRENT, VersionEdit, file-set recovery, flush ordering, bytes on disk, manifest_dump, tests, and design decisions."
 tldr: >-
-  BeachDB v0.0.5 ships the manifest: durable metadata for flushed SSTables.
-  `CURRENT` points at `MANIFEST`, startup replays `VersionEdit`s into
-  `Version`, and flushes publish files only after the SSTable is synced.
-  No more trusting directory scans.
+  BeachDB v0.0.5 ships the manifest: a durable record of which SSTables
+  belong to the database. `CURRENT` points at a `MANIFEST`, startup replays
+  its `VersionEdit`s into a `Version`, and a flushed file only counts once
+  its edit is synced. One torn file in the data directory no longer stops
+  the database from opening.
 release:
   version: v0.0.5
   code: https://github.com/aalhour/beachdb/tree/v0.0.5
-date: 2026-05-24
+date: 2026-11-05
 categories: [Databases]
 tags: [beachdb, databases, storage, durability, systems]
 series: beachdb
@@ -18,46 +19,75 @@ toc: true
 mermaid: true
 ---
 
-## My files were correct; my database was still broken
+## Oh, it's been 6 months!
 
-After the SSTable milestone, BeachDB could write real database files.
+The manifest milestone shipped back in May, and it took more out of me than any BeachDB milestone so far. Most of that went into study: reading how LevelDB, RocksDB and Pebble solve the same problem, and working out which crash orderings are safe and which ones only look safe.
 
-A full memtable became an immutable sorted file on disk. The engine could reopen that file. Reads could search through it. That felt like a big step because it was one: the disk plane finally existed.
+Then life happened, the good kind. I joined [Fivetran](https://www.fivetran.com/) as a Senior Staff Software Engineer on the Managed Data Lake product: a cloud-native data system built on Apache Iceberg, Apache Polaris, DuckDB and a pile of open data formats. I've been in the weeds ever since, learning how the whole thing fits together and shipping a lot of cool things I want to write about soon.
 
-But there was still an awkward question hiding under the floorboards:
+Funny enough, a big part of that system runs on manifests too. It's turtles all the way down, again.
 
-> How does the database know which SSTable files count?
-{: .prompt-tip }
+But back to the milestone... :D
 
-Before this milestone, the answer was basically: scan the directory, find every `*.sst` file, sort them by file number, and open them.
+This post covers where manifests come from, the failure that made BeachDB need one, how startup and flushing change in [v0.0.5](https://github.com/aalhour/beachdb/releases/tag/v0.0.5), what the file looks like byte by byte, how `manifest_dump` inspects it, and what this milestone still doesn't do.
 
-That sounds reasonable until you remember that files can exist for reasons other than "this file is part of the current database state."
+## A brief history of manifests
 
-A process can crash after creating an SSTable but before publishing it. A future compaction can leave old files behind until cleanup runs. A human can copy a file into the directory because humans are entropy with keyboards.
+The word comes from shipping. A ship's manifest lists what's on board, so whoever is at the next port can check the cargo against the paperwork instead of opening every crate. Software borrowed the idea early: a Java JAR carries a `MANIFEST.MF`, and package managers keep manifests of what a package contains.
 
-At that point, "there is an `.sst` file on disk" is not enough information. The file might be data. It might be garbage. It might be a half-finished artifact from a failed flush.
+Data systems hit the same question as soon as data lives in many immutable files: **which of these files are the dataset right now?**
 
-The database needs durable metadata that says: these files belong to the current state.
+There are two ways to answer it. You can ask the directory: list the files and treat whatever is there as the data. Or you can keep a separate, durable record of which files belong, and treat everything else as noise.
 
-That metadata is the manifest.
+Listing the directory is the obvious first answer, and it breaks the same way everywhere. Half-written files show up. Deleted files linger. Nothing makes "add these three files, drop those two" happen all at once. Hive-style tables, where a directory *is* the table, ran into this hard on object stores, where listing is slow and, for years, wasn't even consistent.
 
-This post is about the new BeachDB manifest in `v0.0.5`: what problem it solves, how it changes startup and flushing, what the file format looks like byte by byte, how `manifest_dump` inspects it, and why the design looks like a small cousin of LevelDB, RocksDB, and Pebble.
+The fix keeps showing up in the same shape:
 
-The story is useful. The bytes are the point.
+- **LSM storage engines.** LevelDB, open-sourced by Google in 2011, keeps a `MANIFEST` file: a log of edits saying which SSTables were added and removed, plus a tiny `CURRENT` file that names the live manifest.[^8] RocksDB inherited the design and grew it (manifest rotation, column families), and Pebble carries it over to Go.[^6][^7]
+- **Table formats.** Apache Iceberg, which started at Netflix, replaced directory listing with a tree of metadata: a table metadata file points at one manifest list per snapshot, which points at manifest files, which list the data files.[^9] A commit writes new metadata, then swaps a single pointer in a catalog such as Apache Polaris.[^10] Delta Lake does something similar with an ordered log of JSON commits in `_delta_log`.[^11]
 
-## A quick recap
+Different scales, same shape: one small pointer, a log or tree of metadata, and immutable data files that only count once the metadata says so.
 
-[In the SSTable post]({% post_url 2026-04-06-beachdb-sstables-v1 %}), `v0.0.3` made the on-disk state real. BeachDB learned how to flush a memtable into immutable sorted files, reopen those files, and serve reads from disk.
+The following is how the idea looks in an LSM engine like LevelDB, RocksDB or Pebble:
 
-That gave the engine this shape:
+```mermaid
+flowchart TD
+  C1["CURRENT"] --> M1["MANIFEST-000042<br/>log of VersionEdits"]
+  M1 --> S1["000001.sst"]
+  M1 --> S2["000002.sst"]
+  M1 --> S3["..."]
+```
+
+And the following is how the same idea looks in an Apache Iceberg table:
+
+```mermaid
+flowchart TD
+  C2["Catalog pointer<br/>e.g. Apache Polaris"] --> M2["Table metadata file"]
+  M2 --> L2["Manifest list<br/>one per snapshot"]
+  L2 --> F1["Manifest file 1"]
+  L2 --> FX["Manifest file 2"]
+  F1 --> D1["Data file 1<br/>(Parquet, ORC, Avro)"]
+  F1 --> D2["Data file 2<br/>(Parquet, ORC, Avro)"]
+  F1 --> DX["..."]
+  FX --> DY["..."]
+```
+
+BeachDB's version is the first picture, scaled down: `CURRENT` points at `MANIFEST-000001`, which lists the `.sst` files.
+
+> I'm preparing a separate post that digs into this history properly: where the idea came from, how it spread from storage engines to table formats, and what each system changed along the way. This section is the 10,000-ft version.
+{: .prompt-info }
+
+## Where we left off
+
+[In the SSTable post]({% post_url 2026-04-06-beachdb-sstables-v1 %}), `v0.0.3` taught BeachDB to flush a memtable into immutable sorted files, reopen them, and serve reads from disk:
 
 ```text
 WAL -> active memtable -> immutable memtable -> SSTable files
 ```
 
-But the flushed side still had a hole in it. SSTables existed, but the database still did not have a durable inventory of which SSTables belonged to the current database state.
+[Then `v0.0.4`]({% post_url 2026-04-24-beachdb-crash-testing-part1 %}) added a crash harness with failpoints at named engine boundaries. The last three rows of its failpoint table all pointed at the same missing piece: a manifest that defines which files the database owns.
 
-The missing edge looked like this:
+That piece is this milestone. Here's the hole it fills:
 
 ```mermaid
 flowchart LR
@@ -69,30 +99,44 @@ flowchart LR
   CUR["CURRENT"] --> MAN
 ```
 
-This is not compaction yet. All flushed files still land in level 0. But the manifest gives BeachDB the metadata layer that compaction will later mutate.
+> How does the database know which SSTable files count?
+{: .prompt-monologue }
 
-Without it, compaction would have nowhere safe to say: delete these old files, add this new file, and make that transition atomic.
+Before `v0.0.5`, the answer was: scan the directory, open every `*.sst` file, sort them by file number.
 
-## So, what is a manifest?
+## One torn file
 
-A manifest is an append-only log of metadata changes.
+Here's what that answer costs.
 
-The WAL answers a write question:
-
-> Which user writes happened recently and may need to be replayed?
-{: .prompt-info }
-
-The manifest answers a file-set question:
-
-> Which SSTables exist, at which level, with which key ranges, and what are the current counters?
-{: .prompt-info }
-
-Together, they rebuild the database on startup:
+`v0.0.4` writes each SSTable straight to its final filename, so a process that dies halfway through a flush leaves a torn `.sst` behind. I set that up by hand: one good flush, then a copy of that file chopped in half under the next file ID.
 
 ```text
-Manifest -> flushed SSTable state
-WAL      -> unflushed recent writes
+$ ls -l data/
+103  00000000000000000000.sst   # a good flush
+ 51  00000000000000000001.sst   # torn: the next flush died halfway
+ 37  beachdb.wal                # every acknowledged write
 ```
+
+Then I reopened it with `v0.0.4`:
+
+```text
+beachdb: reading SSTable 00000000000000000001.sst: beachdb/sstable: invalid magic number
+```
+
+The WAL still had every acknowledged write. File `0` was fine. Every file the database needed was correct, and the database still refused to open, because of one file nobody asked for.
+
+A stray file does the same thing. `v0.0.4` also refused to start if someone dropped a `backup.sst` into the data directory, because the scan tried to parse every `.sst` filename as a number. Humans are entropy with keyboards.
+
+The directory scan can't tell data from debris. Only metadata the database writes and syncs itself can make that call, and that metadata is the manifest. With `v0.0.5`, the same directory opens, `Get("apple")` returns `"red"`, and the torn file gets deleted on the way in.
+
+## So, what is a BeachDB manifest?
+
+A manifest is an append-only log of metadata changes. BeachDB now rebuilds itself on startup from two logs that answer different questions:
+
+| Log | Question it answers |
+|-----|---------------------|
+| WAL | Which user writes happened, and in what order? |
+| MANIFEST | Which SSTables exist, at which level, with which key ranges, and what are the current counters? |
 
 BeachDB's manifest has three pieces:
 
@@ -118,28 +162,21 @@ data/
 MANIFEST-000001
 ```
 
-That indirection is not decoration. In the future, BeachDB can rotate the manifest by writing a fresh compacted manifest file and atomically swinging `CURRENT` to point at it. `v1` does not rotate yet, but the recovery path starts through `CURRENT` from day one.
-
-Retrofitting that later would be exactly the sort of metadata migration that ruins a weekend.
+The indirection pays off later. Rotating the manifest means writing a fresh, compacted manifest and atomically swinging `CURRENT` to point at it. `v0.0.5` doesn't rotate yet, but recovery already starts at `CURRENT`, so the boot path won't change on the day rotation lands. Retrofitting a pointer file into existing databases is exactly the kind of metadata migration I'd rather never write.
 
 ## What changed in BeachDB
 
-The public API did not change.
+The public API didn't change. `Put`, `Get`, `Delete` and `Flush` mean what they meant before. Nobody calls "add this SSTable to the manifest"; the engine owns that.
 
-`Put`, `Get`, `Delete`, and `Flush` still mean what they meant before. A user does not call "add this SSTable to the manifest." The engine owns that.
+The internals did:
 
-The internal path changed:
-
-- `internal/manifest` now owns `CURRENT`, `MANIFEST`, `VersionEdit`, `Version`, `Reader`, and `Writer`.[^2]
+- `internal/manifest` now owns `CURRENT`, `MANIFEST`, `VersionEdit`, `Version`, `Reader` and `Writer`.[^2]
 - `engine.Open` no longer discovers SSTables by scanning the directory.
 - `Flush` no longer publishes an SSTable just because the file exists.
-- `db.seqno` and `db.nextSSTID` are restored from manifest counters instead of being guessed from files on disk.
+- `db.seqno` and `db.nextSSTID` come back from manifest counters instead of being guessed from files on disk.
+- The WAL and the manifest now share one record format in `internal/record`, which changed the WAL's on-disk header (more on that in the [design notes](#reuse-the-record-layer)).
 
-That last bit is easy to under-appreciate.
-
-Sequence numbers are part of read correctness. File IDs are part of file naming and cleanup correctness. If either one moves backward after restart, the database can produce bugs that look polite at first and then ruin your afternoon.
-
-The manifest checkpoints both:
+The counters are easy to under-appreciate. Sequence numbers are part of read correctness: "newest wins" only works if newest never moves backward. File IDs are part of naming and cleanup: reuse one by accident and a flush can overwrite a file the database still needs. The manifest checkpoints both:
 
 ```text
 NextFileID   -> next SSTable file number to allocate
@@ -147,9 +184,9 @@ LastSequence -> highest database sequence number seen so far
 LogNumber    -> WAL number associated with the edit
 ```
 
-`LogNumber` is boring in `v1` because BeachDB still has one WAL file. It is still in the format because the manifest is where log lifecycle metadata belongs once WAL rotation exists.
+`LogNumber` is always `0` in `v0.0.5`, because BeachDB still has exactly one WAL file. It's in the format anyway, because the manifest is where WAL lifecycle metadata belongs once the WAL starts rotating. That turns out to matter more than I expected; see [what v0.0.5 doesn't do yet](#what-v005-doesnt-do-yet).
 
-The important architecture change is this:
+Here's the architecture change, before and after:
 
 ```text
 Before:
@@ -159,15 +196,11 @@ After:
   CURRENT -> MANIFEST -> Version -> open referenced SSTables
 ```
 
-The directory can now contain debris. The database state is not "whatever files happen to be nearby." It is the manifest plus the WAL.
-
-That is the whole upgrade in one sentence.
+The directory can contain debris now. The database state is the manifest plus the WAL, not whatever filenames happen to be nearby.
 
 ## The write path: making a file count
 
-Now let's follow the path that makes the manifest matter at runtime.
-
-When a memtable flush completes, BeachDB has a new SSTable reader plus the metadata needed to describe the file:
+When a memtable flush finishes writing, BeachDB has a new SSTable reader plus the metadata that describes the file:
 
 - file ID
 - file size
@@ -187,29 +220,26 @@ apply edit to in-memory Version
 install SSTable reader
 ```
 
-Never reverse the SSTable sync and the manifest sync.
+The one rule: never sync the manifest edit before the SSTable.
 
-If the manifest is synced first, it can promise a file that may not be durable. That is the bad failure mode: recovery expects a file that may have never made it to stable storage.
+If the manifest goes first, it can promise a file that never made it to stable storage, and recovery will go looking for a file that isn't there. If the SSTable goes first and the process dies before the edit lands, the file is an orphan: wasted disk, nothing lost, and the next `Open` deletes it.
 
-If the SSTable is synced first and the process dies before the manifest edit, the file becomes an orphan. That is safe. Wasteful, but safe.
+Here's what recovery finds if the process dies inside each step, along with the crash points wired into each window:
 
 ```mermaid
-sequenceDiagram
-  participant FL as flush path
-  participant SST as SSTable writer
-  participant FS as filesystem
-  participant MW as manifest.Writer
-  participant V as Version
+flowchart TD
+  A["1. Write SSTable 7"] --> B["2. fsync SSTable + data directory"]
+  B --> C["3. Append VersionEdit + fsync MANIFEST"]
+  C --> D["4. Apply edit to in-memory Version"]
+  D --> E["5. Install SSTable reader"]
 
-  FL->>SST: write sorted memtable entries
-  SST->>FS: create 00000000000000000007.sst
-  FL->>FS: fsync(SSTable)
-  FL->>FS: fsync(data directory)
-  FL->>MW: Append(AddFile + counters)
-  MW->>FS: fsync(MANIFEST-000001)
-  FL->>V: version = version.Apply(edit)
-  FL->>FL: publish SSTable reader
+  A -. "crash" .-> X1["Torn file 7, not in MANIFEST<br/>orphan: deleted on next Open"]
+  B -. "crash: flush_after_file_sync<br/>or manifest_after_sst_sync" .-> X2["Complete file 7, not in MANIFEST<br/>orphan: deleted, writes come back from the WAL"]
+  C -. "crash: manifest_after_append" .-> X3["File 7 is in MANIFEST<br/>opened on next Open"]
+  E -. "crash: flush_after_publish" .-> X3
 ```
+
+Every crash before the manifest edit is synced leaves an orphan. Every crash after it leaves a file that counts. There's no window where the manifest names a file that isn't durable.
 
 The manifest edit for a successful flush looks conceptually like this:
 
@@ -225,45 +255,35 @@ VersionEdit{
 }
 ```
 
-The SSTable file is already durable before this edit is appended. `manifest.Writer.Append` writes the record and syncs the manifest file. Only after that does BeachDB apply the edit to the in-memory `Version` and publish the reader to the read path.
+`manifest.Writer.Append` writes the record and fsyncs the manifest. Only then does BeachDB apply the edit to the in-memory `Version` and hand the reader to the read path. If the append fails, the flush returns an error, the reader gets closed, and the file stays behind as an orphan; `nextSSTID` doesn't advance, so the ID is reused once the next `Open` cleans the orphan up.
 
-`Version.Apply` is immutable. It returns a new `Version` instead of mutating the old one in place.
-
-That is more machinery than BeachDB strictly needs today, but it is the right foundation for the next milestones. Once iterators and snapshots exist, a reader may need to hold a stable view of "which files existed when I started." If a flush mutates that version under the reader, congratulations, you have invented a subtle bug with a long tail and terrible manners.
-
-Immutable versions make the future read path less weird.
+`Version.Apply` returns a new `Version` instead of mutating the old one. BeachDB doesn't strictly need that today, but iterators and snapshots will: a reader that started before a flush needs a stable view of which files existed when it started. Mutate that view underneath it and you get the kind of bug that only shows up under load, months later.
 
 ## Recovery: rebuilding the file set
 
-Startup now has two jobs:
-
-1. Rebuild the flushed SSTable state from the manifest.
-2. Replay the WAL on top for recent unflushed writes.
-
-The order matters.
+Startup has two jobs, in this order: rebuild the SSTable file set from the manifest, then replay the WAL into the memtable. The whole decision tree fits in one picture:
 
 ```mermaid
-sequenceDiagram
-  participant DB as engine.Open
-  participant CUR as CURRENT
-  participant MAN as MANIFEST
-  participant VER as Version
-  participant SST as SSTables
-  participant WAL as WAL
-
-  DB->>CUR: read live manifest name
-  DB->>MAN: read VersionEdit records
-  loop complete manifest records
-    MAN-->>DB: encoded VersionEdit
-    DB->>VER: Apply(edit) -> new Version
-  end
-  DB->>SST: open exactly referenced files
-  DB->>WAL: replay unflushed writes on top
+flowchart TD
+  O["engine.Open(dir)"] --> R{"Read CURRENT"}
+  R -- "missing" --> B["Bootstrap a fresh MANIFEST"]
+  R -- "empty, or contains a path" --> ERR["Hard error"]
+  R -- "names MANIFEST-N" --> M{"Replay MANIFEST-N"}
+  M -- "file missing" --> ERR
+  M -- "bad magic, bad checksum,<br/>unknown tag, duplicate AddFile" --> ERR
+  M -- "torn last record" --> T["Truncate to the last valid record"]
+  M -- "clean end" --> V["Version + counters"]
+  T --> V
+  V --> CL["Delete orphan SSTables"]
+  CL --> S{"Open every referenced SSTable"}
+  S -- "one is missing" --> ERR
+  S -- "all present" --> W["Replay the WAL into the memtable"]
+  B --> W
 ```
 
-On a fresh database, there is no `CURRENT`. That means no manifest has been committed yet, so BeachDB bootstraps one.
+### Fresh databases
 
-The fresh path is:
+No `CURRENT` means no manifest was ever committed, so BeachDB bootstraps one:
 
 1. Create an empty in-memory `Version`.
 2. Pick the next available manifest filename, usually `MANIFEST-000001`.
@@ -271,7 +291,7 @@ The fresh path is:
 4. Sync the manifest file.
 5. Atomically install `CURRENT`.
 
-The `CURRENT` install uses the usual crash-safe dance:
+`CURRENT` goes in with the usual crash-safe dance:
 
 ```text
 write CURRENT.tmp
@@ -280,7 +300,7 @@ rename CURRENT.tmp -> CURRENT
 fsync parent directory
 ```
 
-The rename is atomic. The directory `fsync` makes the rename durable. Without that last syscall, the rename can be visible to the running process but disappear after a crash. I have already been bitten by directory `fsync` once. I am trying not to make it a recurring character.
+The rename is atomic. The directory `fsync` makes it durable: without it, the rename is visible to the running process and can vanish after a crash. I've already been bitten by directory `fsync` [once]({% post_url 2026-02-16-beachdb-the-syscall-i-forgot %}). I'm trying not to make it a recurring character.
 
 ```mermaid
 sequenceDiagram
@@ -288,66 +308,41 @@ sequenceDiagram
   participant MW as manifest.Writer
   participant FS as filesystem
 
+  DB->>MW: create MANIFEST-000001
+  MW->>FS: fsync(data directory)
   DB->>MW: Append(initial VersionEdit)
-  MW->>FS: write MANIFEST-000001
-  MW->>FS: fsync(MANIFEST-000001)
+  MW->>FS: write + fsync(MANIFEST-000001)
   DB->>FS: write CURRENT.tmp
   DB->>FS: fsync(CURRENT.tmp)
   DB->>FS: rename CURRENT.tmp to CURRENT
   DB->>FS: fsync(data directory)
 ```
 
-`CURRENT` is the commit point. If the process crashes before `CURRENT` is installed, the directory still looks fresh on the next open. If a half-created `MANIFEST` file is left behind without `CURRENT` pointing to it, BeachDB treats it as an orphan manifest and bootstraps a new one using the next available manifest ID.
+`CURRENT` is the commit point. Crash before it's installed and the directory still looks fresh on the next open. A half-created `MANIFEST` left behind without `CURRENT` pointing at it is an orphan manifest: BeachDB ignores it and bootstraps under the next free manifest ID. Reusing `MANIFEST-000001` in append mode would stitch the orphan's garbage bytes and valid metadata into one cursed file.
 
-That last detail matters. Reusing `MANIFEST-000001` with append mode after a failed bootstrap would be a lovely way to stitch garbage bytes and valid metadata into one cursed file.
+### Existing databases
 
-On an existing database, BeachDB reads `CURRENT`, opens the named manifest, and replays every complete manifest record into a fresh `Version`.
+BeachDB reads `CURRENT`, opens the named manifest, and replays every complete record into a fresh `Version`.
 
-If the manifest ends with a truncated trailing record, recovery treats it as a crash during append. The reader stops at the last valid record and truncates the manifest back to that boundary. That is safe because `manifest.Writer.Append` syncs the file before the edit counts as durable.
+A torn last record means the process died mid-append. The reader stops at the last valid record and truncates the file back to that boundary. That's safe because an edit only counts once `Append` has synced it, and a torn record never got that far.
 
-But not every problem is recoverable:
+Everything else is a hard error: bad magic, unsupported version, checksum mismatch, unknown `VersionEdit` tag, duplicate `AddFile`, or a manifest that references a missing SSTable.
 
-- Bad magic: hard error.
-- Unsupported version: hard error.
-- Checksum mismatch: hard error.
-- Unknown `VersionEdit` tag: hard error.
-- Manifest references a missing SSTable: hard error.
-
-A missing SSTable promised by the manifest is different from a truncated WAL tail. A truncated WAL tail usually means the process died before acknowledging a write. Fine. Discard it.
-
-A missing SSTable promised by the manifest means something broke the database contract. The flush path syncs the SSTable before syncing the manifest edit. If the manifest says the file exists and the file is gone, continuing would hide corruption.
-
-This is one of those rules that feels harsh until the alternative is silently losing data.
+That last one deserves a sentence. A torn WAL tail means the process died before acknowledging a write, so recovery discards it and moves on. A missing SSTable that the manifest promised means something broke the contract, because the flush path syncs the file before the edit. Opening anyway would hide corruption, so BeachDB refuses.
 
 ## Orphans: files outside the manifest
 
-The flip side is an SSTable that exists on disk but is not referenced by the manifest.
+The flip side is an SSTable on disk that the manifest never mentions. The usual way to get one: the flush writes and syncs the SSTable and the directory, then the process dies before the manifest edit is synced.
 
-That file is an orphan.
+After restart, the file exists but nothing promised it, so the database ignores it. `v0.0.5` also deletes it, best-effort, if the name is a canonical SSTable filename (20 digits plus `.sst`) that the recovered `Version` doesn't reference. A `backup.sst` gets left alone, which beats refusing to start.
 
-The most common path is:
-
-1. Flush writes a new SSTable.
-2. Flush syncs the SSTable file.
-3. Flush syncs the parent directory.
-4. Process dies before the manifest edit is appended and synced.
-
-After restart, the file exists, but the manifest never promised it. So the database ignores it. In `v0.0.5`, startup also performs best-effort cleanup for canonical SSTable filenames that are not referenced by the recovered `Version`.
-
-The rule is simple:
-
-> Referenced files are required. Unreferenced files are debris.
-{: .prompt-info }
-
-If a file is referenced by the manifest and missing on disk, startup fails. If a file exists on disk and is not referenced by the manifest, startup can delete it.
-
-This gives BeachDB an actual ownership model. The directory can contain debris. The database state is the manifest plus WAL, not a directory scan of whatever filenames happen to be nearby.
+The rule is simple: referenced files are required, unreferenced files are debris. A referenced file that's missing stops startup. An unreferenced one gets deleted.
 
 ## The manifest file format
 
-Now that the engine path is on the table, let's crack the file open.
+Now let's crack the file open.
 
-A manifest file is a sequence of records. The record envelope is shared with the WAL, but the magic bytes and payload type are different.[^1]
+A manifest file is a sequence of records. The record envelope is shared with the WAL; only the magic bytes and the payload differ.[^1]
 
 ```text
 [magic:8][version:1][type:1][length:4][checksum:4][payload:N]
@@ -364,15 +359,13 @@ The header is 18 bytes total:
 | `checksum` | 4 bytes | CRC32C of payload, big-endian |
 | `payload` | N bytes | encoded `VersionEdit` |
 
-The WAL uses the same envelope with `BEACHWAL` and an encoded `Batch` payload. The manifest uses `BEACHMAN` and an encoded `VersionEdit` payload.
-
-Different magic bytes mean `wal_dump` rejects a manifest file and `manifest_dump` rejects a WAL. That sounds small until you are staring at a corrupted file at 1 AM and need the tool to fail immediately instead of doing interpretive dance with random bytes.
+The WAL uses the same envelope with `BEACHWAL` and an encoded `Batch`. The manifest uses `BEACHMAN` and an encoded `VersionEdit`. Different magic bytes mean `wal_dump` rejects a manifest and `manifest_dump` rejects a WAL, which matters at 1 AM when you've grabbed the wrong file and need the tool to say so instead of decoding garbage.
 
 ### The `VersionEdit` payload
 
 The unit of change in the manifest is a `VersionEdit`.
 
-It is the metadata cousin of a write batch. A batch says: put this key, delete that key. A `VersionEdit` says: add this SSTable, delete that SSTable, advance this counter.
+It's the metadata cousin of a write batch. A batch says: put this key, delete that key. A `VersionEdit` says: add this SSTable, delete that SSTable, advance this counter.
 
 In `v1`, an edit can carry:
 
@@ -382,7 +375,7 @@ In `v1`, an edit can carry:
 - `LastSequence`: the highest database sequence number seen so far
 - `LogNumber`: the WAL number associated with the edit
 
-Every field is optional. That matters because most metadata changes are small. A flush usually adds one file and advances counters. A future compaction will delete a few files and add a few files. There is no reason to rewrite a full manifest snapshot every time one file enters the database.
+Every field is optional, because most metadata changes are small. A flush adds one file and advances counters. A future compaction will delete a few files and add a few. There's no reason to rewrite a full snapshot every time one file joins the database.
 
 The payload is a small tag-value encoding:
 
@@ -404,9 +397,9 @@ Tag values:
   5 = LogNumber:    [value: uint64]
 ```
 
-All integers are big-endian. No padding. No cleverness hiding in the margins.
+All integers are big-endian, with no padding.
 
-`Encode()` writes fields in a deterministic order:
+`Encode()` writes fields in a fixed order:
 
 1. `NextFileID`, if set.
 2. `LastSequence`, if set.
@@ -414,11 +407,9 @@ All integers are big-endian. No padding. No cleverness hiding in the margins.
 4. `DeleteFile` entries, in input order.
 5. `AddFile` entries, in input order.
 
-That means the same `VersionEdit` produces the same bytes every time. Counters come before file deltas, following the same broad convention LevelDB uses.[^4]
+So the same `VersionEdit` always produces the same bytes. Counters come before file deltas, the same convention LevelDB uses.[^4]
 
-The decoder hard-errors on unknown tags in `v1`. Skipping unknown fields sounds nice, but it requires either a length prefix on every tag or a decoder that knows how to skip every future field shape. I do not need that machinery yet.
-
-No silent improvisation. Storage formats should not guess.
+The decoder hard-errors on unknown tags in `v1`. Skipping unknown fields would need either a length prefix on every tag or a decoder that knows the shape of every future field, and there are no future fields to skip yet. Storage formats shouldn't guess.
 
 ### A byte layout example
 
@@ -438,7 +429,7 @@ AddFile{
 
 The key fields store encoded BeachDB internal keys: `[userKey][seqno:8][kind:1]`.
 
-The `VersionEdit` payload is 75 bytes:
+The `VersionEdit` payload is 75 bytes, and I checked it against `Encode()` byte for byte:
 
 ```text
 Offset  Hex                          Meaning
@@ -461,24 +452,18 @@ Offset  Hex                          Meaning
 74      01                           largest kind = Put
 ```
 
-Wrapped by the 18-byte record header, the full on-disk manifest record is 93 bytes.
+Wrapped in the 18-byte record header, the full record on disk is 93 bytes, and the checksum in that header covers exactly these 75.
 
-That is the part I care about. Not "the manifest stores metadata" as a hand-wave. This exact edit becomes this exact byte sequence, inside this exact record envelope, with this exact checksum boundary.
+## `manifest_dump`
 
-Being able to point at bytes is how a file format stops being a bedtime story.
+As usual, I don't trust a format until I can dump it.
 
-## `manifest_dump` is not optional tooling
-
-As usual, I do not trust a format until I can dump it.
-
-`v0.0.5` adds `manifest_dump`, the metadata sibling of `wal_dump` and `sst_dump`.[^3] It reads `CURRENT`, opens the live manifest, prints every `VersionEdit`, applies the edits in order, and then prints the reconstructed `Version`.
-
-Here is sample output:
+`v0.0.5` adds `manifest_dump`, the metadata sibling of `wal_dump` and `sst_dump`.[^3] It reads `CURRENT`, opens the live manifest, prints every `VersionEdit`, applies them in order, and prints the reconstructed `Version`. Two flushes, two files:
 
 ```text
-$ manifest_dump /tmp/beachdb-example-manifest
+$ manifest_dump /tmp/beachdb-manifest-demo
 Manifest: MANIFEST-000001
-Path:     /tmp/beachdb-example-manifest/MANIFEST-000001
+Path:     /tmp/beachdb-manifest-demo/MANIFEST-000001
 
 Edit #0:
   next_file_id:  1
@@ -487,23 +472,36 @@ Edit #0:
 Edit #1:
   next_file_id:  2
   last_sequence: 2
-  add_file:    level=0 id=1 size=170 smallest="apple/1/Put" largest="apricot/2/Put"
+  add_file:    level=0 id=1 size=135 smallest="apple/1/Put" largest="apricot/2/Put"
 Edit #2:
   next_file_id:  3
   last_sequence: 4
-  add_file:    level=0 id=2 size=178 smallest="banana/3/Put" largest="blueberry/4/Put"
-
+  add_file:    level=0 id=2 size=141 smallest="banana/3/Put" largest="blueberry/4/Put"
 Current Version:
-  Level 0: 2 files (348 bytes total)
-    [1] apple..apricot (170 bytes)
-    [2] banana..blueberry (178 bytes)
+  Level 0: 2 files (276 bytes total)
+    [1] apple..apricot (135 bytes)
+    [2] banana..blueberry (141 bytes)
 ```
 
-The useful part is not just the final state. The tool shows how the engine got there: bootstrap counters, add file 1, add file 2, rebuild the current version.
+The edit history is the useful part: you can see how the database got here, not just where it ended up.
 
-If the manifest is corrupt, the tool follows the same policy as the engine: print what was valid, report the edit where replay failed, and exit non-zero.
+Chop the last 10 bytes off that manifest and the tool reports what recovery will do with it (trimmed to the end):
 
-When something goes wrong in a storage engine, "the API returned X" is usually not enough. You want to know:
+```text
+Edit #1:
+  next_file_id:  2
+  last_sequence: 2
+  add_file:    level=0 id=1 size=135 smallest="apple/1/Put" largest="apricot/2/Put"
+Edit #2: incomplete trailing record (crash mid-append, recoverable)
+
+Current Version:
+  Level 0: 1 files (135 bytes total)
+    [1] apple..apricot (135 bytes)
+```
+
+A corrupt record in the middle (bad checksum, unknown tag) gets the same policy as the engine: print what was valid, name the edit where replay failed, exit non-zero.
+
+When a storage engine misbehaves, "the API returned X" isn't enough. You want to know:
 
 - did the manifest record get written?
 - did the checksum pass?
@@ -513,51 +511,17 @@ When something goes wrong in a storage engine, "the API returned X" is usually n
 
 The last one is only half a joke.
 
-## Testing, or how I convinced myself this is not lying
+## Testing
 
-This milestone touched startup, flushing, file naming, binary encoding, truncation recovery, corruption handling, and cleanup. So the tests had to cover a few layers.
+This milestone touched startup, flushing, file naming, binary encoding, truncation recovery, corruption handling and cleanup, so the tests come in three layers.
 
-At the format layer:
+**The format.** `VersionEdit`s round-trip with all fields set, some fields set, and none. Encoding is deterministic. Unknown tags, truncated fields and oversized length prefixes are rejected, and a fuzz target (`FuzzVersionEditDecode`) checks that random bytes never panic the decoder.
 
-- `VersionEdit` round-trips with all fields set
-- partial edits round-trip with only some fields set
-- empty edits encode and decode cleanly
-- multiple added and deleted files work in one edit
-- unknown tags hard-error
-- truncated fields hard-error
-- oversized length-prefixed key fields are rejected
-- random decode inputs do not panic
+**The log.** The writer appends and syncs. The reader yields edits in order. A torn tail is recoverable; checksum corruption and bad magic are fatal.
 
-At the manifest log layer:
+**The engine.** Does a fresh `Open` create `CURRENT` and `MANIFEST-000001`, and does the next one take the replay path? Is a `CURRENT` that's empty, names a missing manifest, or contains a path rejected? Are orphan manifests ignored? Is a manifest with no `NextFileID`, a missing promised SSTable, or a duplicate `AddFile` fatal, while a `DeleteFile` for an unknown file is tolerated? Do `NextFileID` and `LastSequence` survive restart? Does data survive from SSTables alone with the WAL deleted, and from SSTables plus the WAL together?
 
-- writer appends records and syncs
-- reader yields edits in order
-- an existing manifest with no `NextFileID` counter is rejected as corrupt
-- truncated tails are recoverable
-- checksum corruption is fatal
-- bad magic is fatal
-
-At the engine layer:
-
-- fresh open creates `CURRENT` and `MANIFEST-000001`
-- existing open replays the manifest
-- empty `CURRENT` is fatal
-- `CURRENT` pointing at a missing manifest is fatal
-- path traversal in `CURRENT` is rejected
-- orphan manifests are ignored unless `CURRENT` points at them
-- missing SSTable promised by the manifest is fatal
-- duplicate `AddFile` is fatal
-- orphan `DeleteFile` is tolerated
-- flush writes a manifest edit
-- `NextFileID` survives restart
-- `LastSequence` survives restart
-- flushed data survives even if the WAL is removed
-- flushed SSTables plus unflushed WAL writes recover together
-- orphan SSTables are removed on reopen
-
-That last one is the new behavior I wanted to lock down carefully.
-
-The test is:
+The test I cared about most is the orphan one:
 
 1. Write a key and flush it to SSTable `1`.
 2. Delete the WAL so recovery must come from manifest plus SSTable.
@@ -567,127 +531,105 @@ The test is:
 6. Verify the key from SSTable `1` still reads correctly.
 7. Flush again and confirm ID `2` can be reused safely.
 
-That is the manifest contract in miniature: referenced files count; orphan files do not.
+The manifest contract, in miniature: referenced files count, orphans don't.
+
+### What isn't tested yet
+
+Two new crash points ship with `v0.0.5`: `manifest_after_sst_sync` (the SSTable is durable, the edit isn't) and `manifest_after_append` (the edit is durable, the in-memory `Version` isn't). They sit on the exact edges in the crash-window diagram above.
+
+They're wired, but nothing exercises them yet. The test meant to cover the SSTable-before-manifest ordering is a `t.Skip` with a TODO, and so are the two bootstrap failure tests (a failing manifest append, a failing `CURRENT` rename).
+
+While writing this post, I pointed the crash harness at those points and found a gap in the harness itself: the worker opens the database without auto-flush and never calls `Flush`, so no flush-path failpoint can fire. The run kills the worker on its timer and reports success anyway. That includes the four flush-path failpoints from the [crash-testing post]({% post_url 2026-04-24-beachdb-crash-testing-part1 %}). So today, the flush and manifest boundaries are covered by in-process tests, not by crash runs. Teaching the worker to flush, and teaching the controller to fail when an armed point never fires, goes on the list.
 
 ## Design notes
 
-Now that the concrete shape is visible, the interesting question is why it looks this way.
-
-The short version: I wanted the LevelDB/RocksDB/Pebble style of metadata log, but scaled down to BeachDB's current shape.[^4][^5][^6][^7]
-
-Not copied wholesale. That would be cosplay. Modeled after the part that matters.
+Now that the shape is on the table, here's why it looks this way. The short version: I wanted the LevelDB / RocksDB / Pebble style of metadata log, scaled down to what BeachDB needs today.[^4][^5][^6][^7]
 
 ### A log of edits, not a full snapshot
 
-The simplest possible manifest would be a full snapshot: serialize the current file set, write it to a temp file, sync it, rename it into place.
+The simplest possible manifest would be a full snapshot: serialize the current file set, write it to a temp file, sync it, rename it into place. Recovery reads one object and it's done.
 
-That is tempting because recovery reads one object and is done.
+I didn't choose that for v1.
 
-I did not choose that for BeachDB v1.
+A log of edits makes each metadata change proportional to the change itself. A flush adds one file, so it writes one `AddFile` edit. A future compaction will delete some files and add some, so it can write one edit containing exactly that transition. It also gives `manifest_dump` an audit trail: not only "here's the current state" but "here's how the database got here."
 
-A log of edits makes each metadata change proportional to the change itself. A flush adds one file, so it writes one `AddFile` edit. A future compaction will delete some files and add some files, so it can write one edit containing exactly that transition.
-
-It also gives `manifest_dump` an audit trail: not just "here is the current state," but "here is how the database got here."
-
-That matched the LevelDB/Pebble-style path better than a snapshot-only format.[^4][^7]
+That matches the LevelDB and Pebble path better than a snapshot-only format.[^4][^7]
 
 ### `CURRENT` exists before rotation does
 
-`v1` never rotates the manifest. It could technically hardcode `MANIFEST-000001` and get away with it for now.
+`v1` never rotates the manifest. It could hardcode `MANIFEST-000001` and get away with it for now.
 
-I still added `CURRENT`.
-
-The reason is that rotation changes the bootstrap problem. Eventually, BeachDB will want to write a compacted manifest and atomically switch from the old one to the new one. A tiny pointer file is the clean atomic object: write `CURRENT.tmp`, sync it, rename it, sync the directory.
-
-If that indirection is part of the format from day one, recovery always starts the same way. If it is retrofitted later, the database has to support two boot protocols for old and new directories.
-
-That sounds like "not today" until it becomes "why is recovery full of archaeology?"
+I added `CURRENT` anyway. Rotation needs one small atomic object to flip from the old manifest to the new one, and a pointer file is exactly that: write `CURRENT.tmp`, sync it, rename it, sync the directory. With the pointer in the format from day one, recovery always starts the same way. Retrofit it later, and recovery has to support two boot protocols: one for old directories and one for new ones.
 
 ### Reuse the record layer
 
-The framing problem is identical for the WAL and the manifest: variable-length payloads with magic bytes, version, record type, payload length, and checksum.
+The framing problem is identical for the WAL and the manifest: variable-length payloads with magic bytes, version, record type, payload length and checksum. Solving it twice would mean two readers, two writers, two sets of truncation tests, and two ways for me to make the same mistake with different variable names.
 
-Solving it twice would mean two readers, two writers, two sets of truncation tests, and two ways for me to make the same mistake with different variable names.
-
-So BeachDB uses a shared `internal/record` package:
+So BeachDB now has a shared `internal/record` package:
 
 | File | Magic | Payload |
 |------|-------|---------|
 | WAL | `BEACHWAL` | encoded `Batch` |
 | MANIFEST | `BEACHMAN` | encoded `VersionEdit` |
 
-The record layer knows how to reject bad magic, unsupported versions, unsupported record types, oversized payloads, truncated records, and checksum mismatches. It does not know what a batch is. It does not know what a `VersionEdit` is.
+The record layer knows how to reject bad magic, unsupported versions, unsupported record types, oversized payloads, truncated records and checksum mismatches. It doesn't know what a batch or a `VersionEdit` is: meaning lives in the payload, safety lives in the envelope.
 
-Semantic meaning lives inside the payload. Record safety lives around it.
+Moving the WAL onto it changed the WAL's header. The [WAL post]({% post_url 2026-02-12-beachdb-wal-v1-milestone %}) describes a 2-byte magic (`0xBEAC`) and a 12-byte header; from `v0.0.5` on, a WAL record starts with the 8-byte ASCII `BEACHWAL` and an 18-byte header, so every BeachDB file announces itself in a hex dump.[^12] The record version byte stayed `0x01`, which means `v0.0.5` opens a `v0.0.4` data directory and fails with `bad magic` on the first WAL record. Loud beats wrong, and BeachDB makes no compatibility promises, but it's a breaking change and I'd rather say so here than have someone discover it from an error message.
 
-LevelDB and RocksDB use their log reader/writer infrastructure for manifest records too. Pebble's explicit shared record package made the idea feel especially natural in Go.[^5][^7]
+LevelDB and RocksDB use their log reader and writer for manifest records too. Pebble's explicit shared `record` package made the idea feel especially natural in Go.[^5][^7]
 
 ### TLV, but no skip-unknown machinery yet
 
-`VersionEdit` uses tag-value encoding because edits are sparse. A flush edit does not need to write empty delete lists or future compaction fields. It writes the fields it actually sets.
+`VersionEdit` uses tag-value encoding because edits are sparse. A flush edit doesn't need to write empty delete lists or future compaction fields; it writes the fields it sets.
 
-But `v1` does not try to skip unknown tags. That would require every tag to be length-delimited, even fixed-width ones, or a decoder that knows how to skip every future field shape.
+But v1 doesn't try to skip unknown tags. That would require every tag to be length-delimited, fixed-width ones included, or a decoder that knows how to skip every future field shape. Building that before there's a single future field would be designing compatibility for a reader that doesn't exist.
 
-That is forward-compatibility theater unless there is a real future field to support.
+So the rule is stricter and simpler: an unknown tag means "this manifest isn't for this reader." The format version byte is the escape hatch.
 
-So the rule is stricter and simpler: unknown tag means "this manifest is not for this reader." The format version byte is the escape hatch.
+### Manifest sync isn't optional
 
-### Manifest sync is not optional
+The WAL has configurable sync behavior because write latency is a user-facing tradeoff. The manifest doesn't get that knob.
 
-The WAL has configurable sync behavior because write latency is a user-facing tradeoff. The manifest does not get that knob.
+Every manifest append is synced. Metadata changes are rare compared to user writes, and the manifest edit is what makes a newly flushed SSTable part of the database. If the SSTable is durable and the edit isn't, recovery can safely ignore the orphan. If the edit is durable and the SSTable isn't, recovery believes in a file that never survived. The flush path pays the metadata sync cost to rule out the second case.
 
-Every manifest append is synced. Metadata changes are infrequent compared to user writes, and the manifest entry is the thing that makes a newly flushed SSTable part of the database state.
+## What v0.0.5 doesn't do yet
 
-If the SSTable is durable but the manifest edit is not, recovery can safely ignore the orphan. If the manifest edit is durable before the SSTable is durable, recovery may believe in a file that never survived.
+- **No manifest rotation.** The manifest grows forever for now. Rotation means writing a compacted replacement, installing it through `CURRENT`, retiring the old file, and testing every crash point in that sequence. That's its own piece of work; the pointer file is already in place for it.
+- **No compaction.** Every flushed file lands in level 0. The manifest already knows how to say "delete these, add this" in one edit, but nothing produces that edit yet.
+- **The WAL is never trimmed.** This one surprised me, so it gets a note.
 
-That is the bad ordering. So the flush path pays the metadata sync cost.
-
-### Missing promised files are corruption
-
-WAL truncation and missing manifest-referenced SSTables are not the same kind of failure.
-
-A truncated WAL tail usually means the process died mid-write. The caller never got success, so recovery can discard the partial record and move on.
-
-A missing SSTable promised by the manifest means something violated the durable file-set contract. The manifest append happens after the SSTable file and parent directory are synced. If that file is gone later, BeachDB should not pretend everything is fine.
-
-It should fail loudly.
-
-### No rotation in v1
-
-Manifest rotation is real work: write a compact replacement, install it safely, decide what to do with old manifests, and test every crash point in that sequence.
-
-For `v0.0.5`, that is too much scope. The manifest can grow for now. The important thing is that the format already has the pointer file that makes future rotation possible.
-
-The v1 rule is enough: one live manifest, append edits, replay on startup.
+> `v0.0.5` never trims the WAL after a flush, and recovery replays all of it on top of the SSTables, with fresh sequence numbers. Reads stay correct, because the WAL holds every write in order. But a restart re-buffers everything ever written, and the next flush writes it to disk again. Two keys flushed, one reopen with zero new writes, one more flush, then `manifest_dump` (trimmed):
+>
+> ```text
+> Edit #1:
+>   add_file:    level=0 id=1 size=133 smallest="apple/1/Put" largest="banana/2/Put"
+> Edit #2:
+>   add_file:    level=0 id=2 size=133 smallest="apple/3/Put" largest="banana/4/Put"
+> ```
+>
+> Same two keys, on disk twice. The fix is to rotate the WAL on flush and record which log is still live, which is the job `LogNumber` is already in the format for.
+{: .prompt-warning }
 
 ## Where this leaves BeachDB
 
-Before this milestone, startup inferred state from the filesystem.
-
-After this milestone, startup replays state from logs:
+Before this milestone, startup inferred state from the filesystem. After it, startup replays state from its own logs:
 
 ```text
 CURRENT -> MANIFEST -> Version -> SSTable readers
 WAL     -> active memtable
 ```
 
-This is a better boundary. The database no longer asks the directory to explain itself. It asks its own metadata.
-
-The manifest is not a flashy milestone. It does not add a new user-facing API. It does not make point reads faster. It does not compact anything.
-
-It makes the engine less naive about its own files.
-
-That is exactly the kind of small, unglamorous metadata layer databases are made of.
+The manifest doesn't add an API, make point reads faster, or compact anything. It makes the engine stop guessing about its own files, and every milestone from here on stands on it.
 
 ## What's next
 
 Next up is the read path: merge iterators across memtables and SSTables, snapshot reads, and range scans.
 
-Right now `Get` can search the active memtable, immutable memtable, and SSTables newest-first. That is enough for point lookups. It is not enough for a real ordered scan across multiple sorted sources, especially once snapshots enter the picture.
+Right now `Get` searches the active memtable, the immutable memtable, and SSTables newest-first. That's enough for point lookups. It isn't enough for an ordered scan across multiple sorted sources, especially once snapshots enter the picture, and that's where the immutable `Version` starts earning its keep.
 
-The manifest gives the read path a stable file set to stand on. Now the read path has to earn it.
+After that: read acceleration (bloom filters, block caching), then compaction. The manifest gets more interesting once compaction starts producing edits that delete old files and add new ones in one atomic step.
 
-After that: read acceleration, bloom filters, block caching, and then compaction. The manifest will become more interesting when compaction starts producing edits that delete old files and add new files in one atomic metadata step.
+Two smaller fixes are on the list too: the WAL learns to rotate, and the crash harness learns to flush.
 
 Until we meet again.
 
@@ -704,3 +646,8 @@ Adios! ✌🏼
 [^5]: LevelDB's manifest and version-set logic lives in [`db/version_set.cc`](https://github.com/google/leveldb/blob/main/db/version_set.cc).
 [^6]: RocksDB's MANIFEST overview: [github.com/facebook/rocksdb/wiki/MANIFEST](https://github.com/facebook/rocksdb/wiki/MANIFEST)
 [^7]: Pebble's manifest implementation is a useful Go reference: [`internal/manifest/version_edit.go`](https://github.com/cockroachdb/pebble/blob/master/internal/manifest/version_edit.go), and its shared record package lives under [`record`](https://github.com/cockroachdb/pebble/tree/master/record).
+[^8]: LevelDB's implementation notes describe `MANIFEST`, `CURRENT`, and how the version-edit log is recovered: [`doc/impl.md`](https://github.com/google/leveldb/blob/main/doc/impl.md).
+[^9]: The Apache Iceberg table spec covers table metadata, snapshots, manifest lists and manifest files: [iceberg.apache.org/spec](https://iceberg.apache.org/spec/).
+[^10]: Apache Polaris is an open-source catalog that implements Iceberg's REST catalog API: [polaris.apache.org](https://polaris.apache.org/).
+[^11]: Delta Lake's transaction log protocol: [`PROTOCOL.md`](https://github.com/delta-io/delta/blob/master/PROTOCOL.md).
+[^12]: BeachDB WAL format specification as of v0.0.5: [`docs/formats/wal.md`](https://github.com/aalhour/beachdb/blob/v0.0.5/docs/formats/wal.md)
