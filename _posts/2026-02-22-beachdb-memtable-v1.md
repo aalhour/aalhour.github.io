@@ -10,7 +10,7 @@ tldr: >-
   and a few diagrams.
 release:
   version: v0.0.2
-  code: https://github.com/aalhour/beachdb/tree/v0.0.2
+  code: https://github.com/aalhour/beachdb/releases/tag/v0.0.2
 date: 2026-02-22
 categories: [Databases]
 tags: [beachdb, databases, storage, memtable, skip-list]

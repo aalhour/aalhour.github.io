@@ -10,7 +10,7 @@ tldr: >-
   and start asking "what exactly survived, at which boundary, and why?"
 release:
   version: v0.0.4
-  code: https://github.com/aalhour/beachdb/tree/v0.0.4
+  code: https://github.com/aalhour/beachdb/releases/tag/v0.0.4
 date: 2026-04-24
 categories: [Databases]
 tags: [beachdb, databases, testing, crash-testing, fault-injection]

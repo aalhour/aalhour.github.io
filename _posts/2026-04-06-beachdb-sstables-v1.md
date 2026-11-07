@@ -10,7 +10,7 @@ tldr: >-
   plane.
 release:
   version: v0.0.3
-  code: https://github.com/aalhour/beachdb/tree/v0.0.3
+  code: https://github.com/aalhour/beachdb/releases/tag/v0.0.3
 date: 2026-04-06
 categories: [Databases]
 tags: [beachdb, databases, storage, sstable, durability]

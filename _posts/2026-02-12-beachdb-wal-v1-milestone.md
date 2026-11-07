@@ -9,7 +9,7 @@ tldr: >-
   how I tested crash recovery by killing the database repeatedly.
 release:
   version: v0.0.1
-  code: https://github.com/aalhour/beachdb/tree/v0.0.1
+  code: https://github.com/aalhour/beachdb/releases/tag/v0.0.1
 date: 2026-02-12
 categories: [Databases]
 tags: [beachdb, databases, storage, durability, wal]
