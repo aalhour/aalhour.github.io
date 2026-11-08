@@ -1,12 +1,12 @@
 ---
 title: "Building BeachDB: A Database from Scratch (in Go)"
 subtitle: "The fastest way past hand-waving is to make the machine answer back."
-description: "Building an LSM storage engine from scratch in Go: writes, reads, compaction, and what hand-waving database internals actually hides."
+description: "Building an LSM storage engine from scratch in Go: writes, reads, compaction, and what the textbook diagrams of a database leave out."
 tldr: >-
   I'm building [BeachDB](https://github.com/aalhour/beachdb): a toy,
-  inspectable LSM-based storage engine in Go, to stop hand-waving database
-  internals and learn them by building them end-to-end, in public. This
-  kickoff post explains why I'm going down the stateful-systems rabbit hole,
+  inspectable LSM-based storage engine in Go, to learn database 
+  internals by building them end-to-end, in public. This kickoff post 
+  explains why I'm going down the stateful-systems rabbit hole,
   lays out goals/non-goals + the "engine → server → Raft cluster"
   architecture, and includes an interactive LSM-tree visualization to make
   the write/read/compaction flow concrete.
@@ -100,7 +100,7 @@ Given that we don't have a storage engine yet, it's appropriate to start there a
 > - **Ingestion pipelines**: checkpoints, offsets, and “what did I process last?” state (the kind of glue code that *really* wants to survive restarts).
 > - **Append-heavy workloads**: audit logs, event-ish data, write-heavy streams where sequential writes + durability matter.
 > - **Time-ish data**: storing things in time buckets (per user/device/service) becomes much nicer once I add iteration/range scans and lock down compaction semantics.
-> - **Domain-wise (bio/finance/etc.)**: not tailored to any vertical, but the same pattern shows up everywhere — pipeline metadata in bioinformatics, order/workflow state in finance, carts/sessions in e-commerce, and so on.
+> - **Domain-wise (bio/finance/etc.)**: not tailored to any vertical, but the same pattern shows up everywhere: pipeline metadata in bioinformatics, order/workflow state in finance, carts/sessions in e-commerce, and so on.
 > 
 > If you can model your problem as “key → bytes,” you can usually make it fit.
 > 

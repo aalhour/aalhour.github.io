@@ -160,6 +160,7 @@ script_includes:
 
   <div class="post-tail-wrapper text-muted">
     <!-- last updated (only when it falls on a different day than the post date) -->
+    {% comment %}
     {% if page.last_modified_at %}
       {% assign posted_day = page.date | date: '%Y-%m-%d' %}
       {% assign updated_day = page.last_modified_at | date: '%Y-%m-%d' %}
@@ -169,6 +170,7 @@ script_includes:
         </p>
       {% endif %}
     {% endif %}
+    {% endcomment %}
 
     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
       <!-- categories -->

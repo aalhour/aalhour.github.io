@@ -20,7 +20,7 @@ tags: [stoicism, reflections, life-lessons]
 
 7. Focus on the space between the stimulus and the response. That is where your choice lies. That is where your growth lies. That is where your freedom lies.
 
-8. The more things we desire and the more we have to do to earn or achieve those accomplishments, the less we actually enjoy our lives—and the less free we become.
+8. The more things we desire and the more we have to do to earn or achieve those accomplishments, the less we actually enjoy our lives, and the less free we become.
 
 9. There are three areas of training: a) desires and aversions, b) impulses to act and impulses not to act, and the broad range of duty, c) freedom from deception and composure, and the broad range of judgment. Desires and aversions control our impulses and actions just as judgment does. Judge based on logic and reason, desire what is right and good, and act accordingly.
 
@@ -32,15 +32,15 @@ tags: [stoicism, reflections, life-lessons]
 
 13. The event is not your impression of it. The territory is not your map of it. What actually happened (descriptive/factual) is not how you feel about it.
 
-14. Observe your automatic thoughts—how do they occur? Why do they occur? Are they right, logical, rational, and just? Or do they occur because you have never stopped to think about them?
+14. Observe your automatic thoughts: how do they occur? Why do they occur? Are they right, logical, rational, and just? Or do they occur because you have never stopped to think about them?
 
 15. You don't have to stay on top of everything. You don't have to know everything.
 
 16. How much more time, energy, and pure brainpower would you have available if you significantly reduced your media consumption?
 
-17. Do not give in to anger or rage. A calm mind is a sign of strength. Remember this when you find yourself getting angry. Anger is not impressive or tough—it's a mistake. It's weakness.
+17. Do not give in to anger or rage. A calm mind is a sign of strength. Remember this when you find yourself getting angry. Anger is not impressive or tough; it's a mistake. It's weakness.
 
-18. Strength is the ability to maintain self-control. It means being the person who never gets angry, who cannot be rattled, because they are in control of their emotions—rather than being controlled by their emotions.
+18. Strength is the ability to maintain self-control. It means being the person who never gets angry, who cannot be rattled, because they are in control of their emotions, rather than being controlled by them.
 
 19. Establish the right frame of mind. Control your emotions. Control your impulses. Accept the present and what we cannot change. Embrace your choices. Keep a calm mind and act wisely.
 

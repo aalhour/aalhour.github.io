@@ -3,11 +3,11 @@ title: "Making the on-disk state real: Sorted-String Tables (SSTables)"
 subtitle: "Files are easy; files you can trust, inspect, and recover from are the real step."
 description: "SSTables in Go: immutable sorted files on disk, sparse indexes, memtable flush paths, and an sst_dump tool for inspecting BeachDB's bytes."
 tldr: >-
-  BeachDB v0.0.3 ships SSTables v1: immutable sorted files on disk, a real
-  memtable flush path, on-disk reads, and an `sst_dump` tool so I can inspect
-  the bytes instead of trusting vibes. This is the milestone where BeachDB
-  stops being an in-memory engine with a WAL and starts having a real disk
-  plane.
+  BeachDB `v0.0.3` ships SSTables v1: immutable sorted files on disk, a
+  memtable flush path, on-disk reads, and an `sst_dump` CLI tool so I can 
+  inspect the bytes instead of trusting vibes. This is the milestone where 
+  BeachDB stops being an in-memory engine with a WAL and starts writing data 
+  to disk.
 release:
   version: v0.0.3
   code: https://github.com/aalhour/beachdb/releases/tag/v0.0.3
@@ -19,7 +19,7 @@ toc: true
 mermaid: true
 ---
 
-## The disk plane finally gets real
+## The disk plane is finally real!
 
 It has been a while since the last milestone, and most of that time disappeared into the unglamorous but important question of what kind of file format I wanted to commit to. It felt like the moment I moved from memory to disk, every casual design choice started feeling a lot less casual.
 
@@ -55,7 +55,7 @@ flowchart LR
   R -. "3) check sstables on disk" .-> SST
 ```
 
-Those memtable -> SSTable paths are what this milestone makes real.
+Those memtable -> SSTable paths are what this milestone adds.
 
 The public API did not change. `Put`, `Get`, and `Delete` are the same. What changed is the journey that the data takes after it enters the engine:
 
@@ -63,11 +63,7 @@ The public API did not change. `Put`, `Get`, and `Delete` are the same. What cha
 WAL -> active memtable -> immutable memtable -> SSTable(s)
 ```
 
-Before v0.0.3, the memtable was the destination. After v0.0.3, it becomes what it was always supposed to be: a staging area.
-
-If [`v0.0.1`](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) made durability real and [`v0.0.2`](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) made the in-memory shape real, then [`v0.0.3`](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) makes the on-disk state real.
-
-This is point-lookups-through-SSTables, not yet full version-set or compaction machinery. Those parts are still later.
+Before `v0.0.3`, the memtable was the destination for data. After `v0.0.3`, it becomes what it was always supposed to be: a staging area, until data is flushed to disk.
 
 ---
 
@@ -142,7 +138,7 @@ That is the part I think is easiest to miss when people hear "simple key-value s
 
 In BeachDB, <mark>a new SSTable appears when the active memtable fills up, gets frozen, and is flushed in the background into the next `.sst` file</mark>.
 
-We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format) — including a real file inspected byte by byte — and close with [why the format looks the way it does](#why-beachdbs-sstable-v1-looks-like-this).
+We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format) (including one file inspected byte by byte) and close with [why the format looks the way it does](#why-beachdbs-sstable-v1-looks-like-this).
 
 ## Write path: same API, different destination
 
@@ -161,7 +157,7 @@ Suppose the DB directory already has:
 000001.sst
 ```
 
-Once the active memtable crosses the flush threshold, the next flush creates `000002.sst`. That is the first real answer to "how are SSTables written?" They are not produced by a separate API. They are produced when a full memtable graduates to disk.
+Once the active memtable crosses the flush threshold, the next flush creates `000002.sst`. That is the first concrete answer to "how are SSTables written?" They are not produced by a separate API. They are produced when a full memtable graduates to disk.
 
 Here is the write path now:
 
@@ -234,11 +230,11 @@ Suppose the DB directory already contains `000000.sst` and `000001.sst`. The act
 
 In terms of code, that is why [`immMem` on the `DB` struct](https://github.com/aalhour/beachdb/blob/6c48d44b10c00c7a478095a141e1c082ee374f1a/engine/db.go#L47-L48) exists. It is not just a convenience variable. It is how BeachDB keeps old state visible during a flush without blocking the whole write path.
 
-There is one catch: BeachDB only has one immutable slot right now. If another flush threshold is hit before the first flush finishes, writers wait on a `sync.Cond` until the slot clears. That is deliberate. Small story, real behavior.
+There is one catch: BeachDB only has one immutable slot right now. If another flush threshold is hit before the first flush finishes, writers wait on a `sync.Cond` until the slot clears. That is deliberate.
 
 ### Why not flush inline?
 
-Because a flush is real I/O, it constitutes the follwoing:
+Because a flush does disk I/O, the engine:
 
 - creates a new SSTable file
 - iterates over the frozen memtable
@@ -390,7 +386,7 @@ That second rule is the important one for the read path. The index is sparse: on
 
 So the index is small, the lookup is logarithmic over blocks, and the on-disk scan stays local. That is the efficiency story in one paragraph.
 
-### A human-reable file example
+### A human-readable file example
 
 Suppose the engine writes five entries into a single SSTable with a 60-byte target block size. The entries arrive pre-sorted from the memtable:
 
@@ -446,7 +442,7 @@ The writer fills each block until the next entry would push it past 60 bytes, th
   checksum         = <crc32c of above 36 bytes>
 ```
 
-The index records one entry per flushed block — the last internal key of that block plus the block's file offset and size. That is all the reader needs for a binary search.
+The index records one entry per flushed block: the last internal key of that block plus the block's file offset and size. That is all the reader needs for a binary search.
 
 To look up the key `"cherry"` in this file, the reader constructs a synthetic maximum key `cherry@MaxUint64` and binary-searches those three last-key upper bounds:
 
@@ -650,7 +646,7 @@ I ended up convincing myself in three layers.
 
 **First:** package-level tests around the SSTable writer, reader, and iterator. Can one file be written, reopened, iterated, and rejected when blocks, index entries, or the footer are corrupt?
 
-**Second:** engine-level tests around the actual milestone behavior. Does a full memtable flush into a real SSTable? Does reopen find that file again? Do newer tables shadow older ones correctly? Do tombstones survive the trip to disk? Does `Close()` wait for the background flush to finish instead of quietly sawing off the branch it is sitting on?
+**Second:** engine-level tests around the actual milestone behavior. Does a full memtable flush into an SSTable? Does reopen find that file again? Do newer tables shadow older ones correctly? Do tombstones survive the trip to disk? Does `Close()` wait for the background flush to finish instead of quietly sawing off the branch it is sitting on?
 
 **Third:** outside-the-engine inspection. `sst_dump` and the hex dump above are not replacements for tests, but they are a very good way to cross-check that the bytes on disk agree with the code and the mental model.
 

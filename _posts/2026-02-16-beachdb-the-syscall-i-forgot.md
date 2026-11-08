@@ -32,13 +32,13 @@ It was right there the whole time.
 When you create a new file, two things happen at the filesystem level:
 
 1. The file's **inode** is allocated (its metadata, data blocks, etc.)
-2. A **directory entry** is added to the parent directory's inode — a mapping from filename to inode number
+2. A **directory entry** is added to the parent directory's inode: a mapping from filename to inode number
 
-These are two separate mutations, and they live independently in the kernel's page cache. Calling `fsync` on the WAL file flushes the file's data and metadata to disk — but the directory entry? That's the *directory's* metadata. It sits in the page cache until the kernel gets around to flushing it, or until someone fsyncs the directory itself.
+These are two separate mutations, and they live independently in the kernel's page cache. Calling `fsync` on the WAL file flushes the file's data and metadata to disk. What about the directory entry? That's the *directory's* metadata. It sits in the page cache until the kernel gets around to flushing it, or until someone fsyncs the directory itself.
 
 So my WAL data was on disk. My WAL file's inode was on disk. But the directory might not know the file exists.
 
-A crash at the wrong moment, and the WAL becomes an orphan: data blocks on disk with no name, left orphaned until repair (or cleaned up by `fsck`). The database opens, sees no WAL, starts fresh. All your data, gone — despite every single `fsync` call succeeding.
+A crash at the wrong moment, and the WAL becomes an orphan: data blocks on disk with no name, left orphaned until repair (or cleaned up by `fsck`). The database opens, sees no WAL, starts fresh. All your data? Ciao bello, it's gone! Despite every single `fsync` call succeeding.
 
 ## When would this actually happen?
 
@@ -76,7 +76,7 @@ You only need to sync the directory when its metadata changes: file creation, re
 
 ## I'm not the first to miss this
 
-LevelDB has a function called [`SyncDirIfManifest()`](https://github.com/google/leveldb/blob/main/util/env_posix.cc) that does exactly this — opens the parent directory with `O_RDONLY` and fsyncs it whenever a new MANIFEST file is created. RocksDB has an [`FSDirectory`](https://github.com/facebook/rocksdb/pull/10460) abstraction to fsync directories, and they’ve had bugs where directory fsync was accidentally skipped due to lifecycle/close issues. If the RocksDB team can get this wrong, I don't feel too bad.
+LevelDB has a function called [`SyncDirIfManifest()`](https://github.com/google/leveldb/blob/main/util/env_posix.cc) that does exactly this: opens the parent directory with `O_RDONLY` and fsyncs it whenever a new MANIFEST file is created. RocksDB has an [`FSDirectory`](https://github.com/facebook/rocksdb/pull/10460) abstraction to fsync directories, and they’ve had bugs where directory fsync was accidentally skipped due to lifecycle/close issues. If the RocksDB team can get this wrong, I don't feel too bad.
 
 Jeff Moyer's LWN article [*"Ensuring data reaches disk"*](https://lwn.net/Articles/457667/) spells this out clearly:
 

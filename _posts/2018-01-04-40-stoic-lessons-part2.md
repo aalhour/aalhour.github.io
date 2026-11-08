@@ -10,11 +10,11 @@ tags: [stoicism, reflections]
 
 2. If you find yourself in a state of panic or rage, simply ask yourself: "Is this improving my well-being? Is it alleviating any of the symptoms I wish to be rid of?"
 
-3. Practice being impartial towards things. Cultivate the ability to have no thoughts or opinions about something—pretend as if it never happened.
+3. Practice being impartial towards things. Cultivate the ability to have no thoughts or opinions about something. Pretend as if it never happened.
 
 4. Recognize that yearning for more, better, or someday in the future, and acknowledge it as the enemy of your contentment. Choose between it and your happiness, as Epictetus states, for they are incompatible.
 
-5. "To desire nothing makes one invincible—because nothing lies outside of your control."
+5. "To desire nothing makes one invincible, because nothing lies outside of your control."
 
 6. Circumstances are indifferent to your feelings, anxiety, or excitement. They do not care about your reaction. They are not sentient beings.
 
@@ -44,4 +44,4 @@ tags: [stoicism, reflections]
 
 19. Always pay attention to and reflect upon your range of impulses. What triggers them? What causes them?
 
-20. Do the events that occur to me benefit or harm me? It all depends, as the Stoics assert, on my values. They would further remind me that my values are entirely under my control. Therefore, if something external harms me, it is my own fault—I should have adopted different values.
+20. Do the events that occur to me benefit or harm me? It all depends, as the Stoics assert, on my values. They would further remind me that my values are entirely under my control. Therefore, if something external harms me, it is my own fault: I should have adopted different values.

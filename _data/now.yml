@@ -3,8 +3,8 @@
 label: Current experiment
 name: BeachDB
 summary: >-
-  a distributed NoSQL database from scratch, in Go, to see what storage
-  engines actually do when you stop hand-waving them.
+  a distributed NoSQL database from scratch, in Go, to learn 
+  database internals by building them end-to-end, in public.
 series_url: /tags/beachdb/
 code_url: https://github.com/aalhour/beachdb
 last_shipped: v0.0.4, crash testing

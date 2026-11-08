@@ -3,7 +3,7 @@ title: "Durability is a promise you can't hand-wave: Write-Ahead Log (WAL)"
 subtitle: "Once bytes leave your process, the comforting story gets complicated."
 description: "Write-ahead log internals in Go: fsync vs fdatasync, WAL record format, crash recovery, and how BeachDB tests durability."
 tldr: >-
-  BeachDB v0.0.1 ships the Write-Ahead Log, the thing that makes durability
+  BeachDB `v0.0.1` ships the Write-Ahead Log, the thing that makes durability
   real. This post walks through how `fsync` actually works with an interactive
   demo (most tutorials skip this), explains the WAL record format, and shows
   how I tested crash recovery by killing the database repeatedly.
@@ -34,7 +34,7 @@ This post walks through what I built, why I made certain design decisions, and h
 
 A <mark>WAL is a log that a database promising durability uses in order to track evidence of data mutations (create, update, delete)</mark>. The concept is old and most serious databases, such as: PostgreSQL and SQLite, use one. In the LSM-tree world, LevelDB[^1] and RocksDB[^2] both have well-documented WAL implementations that BeachDB draws inspiration from.
 
-When a new `db.Put(key, value)` or `db.Delete(key)` comes in, the first thing that the database would do is to append an entry to the WAL documenting the action before actually doing anything with it — which varies from one database to another. Some databases modify the filesystem as a part of the critical path for serving writes, some just cache them in-memory (in addition to appending the WAL entry).
+When a new `db.Put(key, value)` or `db.Delete(key)` comes in, the first thing that the database would do is to append an entry to the WAL documenting the action before actually doing anything with it. What happens after that varies by database. Some databases modify the filesystem as a part of the critical path for serving writes, some just cache them in-memory (in addition to appending the WAL entry).
 
 Before writing any code, I needed to define what durability means for BeachDB. Here's the contract:
 
@@ -42,7 +42,7 @@ Before writing any code, I needed to define what durability means for BeachDB. H
 - **Acknowledged = durable**: If `db.Put()` or `db.Write()` returns success, the data survives restart.
 - **Crash before fsync**: The write is lost, but the caller never saw success.
 
-This is the rule that matters. If the database says "OK, I saved your data," then that data must survive power loss, SIGKILL, kernel panics — anything short of physical disk destruction.
+This is the rule that matters. If the database says "OK, I saved your data," then that data must survive power loss, SIGKILL, kernel panics: anything short of physical disk destruction.
 
 > The mental model: if you didn't get a success response, assume it didn't happen. If you did get a success response, the data is safe.
 {: .prompt-tip }
@@ -110,7 +110,7 @@ Physical media (platters, NAND cells)
 
 A `write()` syscall returns successfully as soon as the kernel has copied your data into the page cache. It makes **no guarantee** about the data reaching the disk. If the power goes out one millisecond after `write()` returns, the data is gone.
 
-This is fine for most programs. Log files, temp files, caches — who cares if you lose the last few seconds. But for a database that just told a client "your data is saved," this is a lie.
+This is fine for most programs. For logs, temp files, or caches, losing the last few seconds might be acceptable. But for a database that just told a client "your data is saved," this is a lie.
 
 ### Enter `fsync`
 
@@ -276,7 +276,7 @@ I put the checksum in the header (before the payload) rather than as a trailing 
 2. Know the payload length and expected checksum before reading anything else.
 3. Reject obviously broken headers (bad magic, absurd length) without reading the payload at all.
 
-To be clear: I still have to read the entire payload to compute the checksum and compare it. There's no magic here — CRC32 needs all the bytes. But with everything in the header, I read once (header), know exactly how much to read next (payload), and have the expected checksum ready for comparison. No backtracking, no extra read for a trailer.
+To be clear: I still have to read the entire payload to compute the checksum and compare it. There's no magic here; CRC32 needs all the bytes. But with everything in the header, I read once (header), know exactly how much to read next (payload), and have the expected checksum ready for comparison. No backtracking, no extra read for a trailer.
 
 The tradeoff is that the writer must compute the checksum before writing the header, which means buffering the payload in memory first. For BeachDB's workload (small batches, fsync per batch), this is fine.
 
@@ -372,7 +372,7 @@ Final verification: reopening DB to check 47 keys
 Results: 45 recovered, 2 lost out of 47 total
 ```
 
-Some data loss is acceptable — the writer might claim a key was committed but crash before the `fsync` completed. The important thing is that the database never loses data it said was durable, and it can always recover to a consistent state.
+Some data loss is acceptable: the writer might claim a key was committed but crash before the `fsync` completed. The important thing is that the database never loses data it said was durable, and it can always recover to a consistent state.
 
 ## The `wal_dump` Tool
 
@@ -416,7 +416,7 @@ Record 1: CORRUPTED (checksum mismatch)
 End of WAL (1 complete records, 1 incomplete)
 ```
 
-I've lost count of how many times this tool saved me during development. When a test failed, I could immediately see: did the record get written? Was it truncated? Did the checksum pass? No guessing, no printf debugging — just evidence.
+I've lost count of how many times this tool saved me during development. When a test failed, I could immediately see: did the record get written? Was it truncated? Did the checksum pass? I didn't have to guess, or use printf for debugging - I had evidence.
 
 ## Runnable Examples
 
@@ -473,5 +473,5 @@ Adios! ✌🏼
 [^4]: For more details on the `fsync(fd)` syscall in the Linux kernel, see: [fsync(2)](https://www.man7.org/linux/man-pages/man2/fsync.2.html) man page.
 [^5]: "On the physical device" comes with a caveat: some disk controllers have their own write caches, and `fsync` returning doesn't always mean the data has reached the actual magnetic platters or NAND cells. Enterprise SSDs and battery-backed RAID controllers handle this correctly. Consumer drives may lie. This is a known issue in the database world; see the SQLite documentation on [write-ahead logging](https://www.sqlite.org/wal.html) for a pragmatic discussion.
 [^6]: For more details on the `fdatasync(fd)` syscall in the Linux kernel, see: [fdatasync(2)](https://www.man7.org/linux/man-pages/man2/fdatasync.2.html) man page.
-[^7]: Some databases (like PostgreSQL) default to `fdatasync` on Linux and `fsync` on macOS because macOS's `fcntl(F_FULLFSYNC)` is the only truly reliable flush on Apple hardware — even `fsync` on macOS doesn't guarantee data has hit stable storage. BeachDB doesn't worry about this yet. For RocksDB's handling, see the [WriteOptions::sync](https://github.com/facebook/rocksdb/wiki/Basic-Operations#synchronous-writes) documentation. LevelDB's approach is documented in its [write path implementation](https://github.com/google/leveldb/blob/main/doc/index.md). RocksDB also allows choosing between `fsync` and `fdatasync` via the [`use_fsync`](https://github.com/facebook/rocksdb/wiki/WAL-Performance) option, defaulting to `fdatasync` on Linux for better performance.
+[^7]: Some databases (like PostgreSQL) default to `fdatasync` on Linux and `fsync` on macOS because macOS's `fcntl(F_FULLFSYNC)` is the only truly reliable flush on Apple hardware; even `fsync` on macOS doesn't guarantee data has hit stable storage. BeachDB doesn't worry about this yet. For RocksDB's handling, see the [WriteOptions::sync](https://github.com/facebook/rocksdb/wiki/Basic-Operations#synchronous-writes) documentation. LevelDB's approach is documented in its [write path implementation](https://github.com/google/leveldb/blob/main/doc/index.md). RocksDB also allows choosing between `fsync` and `fdatasync` via the [`use_fsync`](https://github.com/facebook/rocksdb/wiki/WAL-Performance) option, defaulting to `fdatasync` on Linux for better performance.
 [^8]: CRC32C (Castagnoli) is a variant of CRC32 that uses a different polynomial (0x1EDC6F41) with better error detection properties. Modern CPUs have hardware instructions for CRC32C (Intel SSE 4.2, ARM CRC). Go's `hash/crc32` package automatically uses these when available. See: [CRC32C in Go](https://pkg.go.dev/hash/crc32).

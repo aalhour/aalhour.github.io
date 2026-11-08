@@ -3,7 +3,7 @@ title: "The Memtable: where writes go to wait"
 subtitle: "Before the disk gets involved, memory has to learn the rules."
 description: "Skip-list memtables in Go: write buffering, key ordering, tombstone deletes, and how BeachDB's LSM engine sequences in-memory writes."
 tldr: >-
-  BeachDB v0.0.2 ships the memtable, a skip list that replaces the
+  BeachDB `v0.0.2` ships the memtable, a skip list that replaces the
   placeholder map. This post covers why maps don't work for LSM storage,
   how internal key ordering makes "newest version wins" fall out naturally,
   and why deletes are actually writes. Includes two interactive demos 
@@ -21,7 +21,7 @@ mermaid: true
 
 ## Alas, a memory table!
 
-[v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) is out and it's where the green box in the LSM diagram (see: demo below) stops being a hand-wave: the memtable is now a real data structure (a skip list), and the engine uses internal keys + tombstones + an iterator interface that we’ll need later.
+[v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) is out and it's where the green box in the LSM diagram (see: demo below) stops being a placeholder: the memtable is now a real data structure (a skip list), and the engine uses internal keys + tombstones + an iterator interface that we’ll need later.
 
 Before we zoom into the memtable, I think it's worth it to review what was done so far and where BeachDB stands *today*.
 
@@ -67,9 +67,9 @@ At a high level, LSM flow is simple:
 In the diagram above, here’s what’s true *today* in BeachDB:
 
 - **WAL**: implemented (see: [v0.0.1](https://github.com/aalhour/beachdb/releases/tag/v0.0.1), and the [previous post]({% post_url 2026-02-12-beachdb-wal-v1-milestone %}))
-- **Memtable**: implemented ([v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2) — this post)
+- **Memtable**: implemented ([v0.0.2](https://github.com/aalhour/beachdb/releases/tag/v0.0.2), this post)
 
-Everything else in the disk plane is still TODO — intentionally (see: [recap section](#a-quick-recap) above).
+Everything else in the disk plane is intentionally still TODO (see: [recap section](#a-quick-recap) above).
 
 This is exactly why the memtable is the right next milestone: without a sorted memtable, you can’t flush to a sorted SSTable, and the rest of the disk plane doesn’t make sense yet.
 
@@ -85,7 +85,7 @@ It’s doing a few jobs at once:
 - **Read your own writes**: reads must consult it first because it contains the newest state.
 - **Future proofing**: when it fills up, it can be flushed to an on-disk sorted structure (an SSTable) without doing a full sort at flush time.
 
-This isn’t a BeachDB invention — it’s the same “shape” you’ll find in real systems:
+This isn’t a BeachDB invention; it’s the same “shape” you’ll find in real systems:
 
 - **RocksDB** calls it a MemTable, turns full ones into *immutable* memtables, and flushes them to SST files in the background.[^1]
 - **LevelDB** has a `MemTable` that’s literally built on a skip list (`db/skiplist.h`).[^2]
@@ -174,7 +174,7 @@ And the ordering is:
 - \(user\_key\) ascending
 - \(seqno\) **descending** (newest first)
 
-That descending seqno part is the trick. It means “latest version wins” isn’t a special case — it’s just “the first entry for this user key.”
+That descending seqno part is the trick. It means “latest version wins” isn’t a special case; it’s just “the first entry for this user key.”
 
 Example:
 
@@ -330,7 +330,7 @@ Next milestone is the one that makes the “database” part feel real:
 - **Flush to SSTables**
 - and then: merge iterators, on-disk reads, and finally compaction
 
-Until then, BeachDB is basically an in-memory database with a durability log and crash recovery — which is a weirdly honest intermediate state.
+Until then, BeachDB is basically an in-memory database with a durability log and crash recovery, which is a weirdly honest intermediate state.
 
 It’s also (accidentally) a **strongly consistent, in-memory-only** database right now: a single writer, serialized seqnos, and one lock to rule them all. The “disk database” part starts at SSTables.
 
@@ -364,7 +364,7 @@ The gist:
 
 Also: I’m digging Go’s `testing` package more than I expected. `t.Logf` for breadcrumbs, `t.Fatalf` to stop at the first “this makes no sense”, and determinism-by-default makes randomized tests feel… civilized.
 
-If you want the full thing, read `internal/memtable/skiplist_random_test.go` end-to-end — it’s short and pretty self-explanatory.[^9]
+If you want the full thing, read `internal/memtable/skiplist_random_test.go` end-to-end; it’s short and pretty self-explanatory.[^9]
 
 ### B. Iterators: the memtable “sees the truth”
 
