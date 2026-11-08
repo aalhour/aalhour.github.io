@@ -1,116 +1,47 @@
 ---
-title: "The manifest: the smallest metadata system that can survive crashes"
-subtitle: "My files were correct; my database was still broken."
+title: "Teaching the database what it owns: the Manifest"
+subtitle: "A file can survive a crash and still not belong to the database."
 description: "BeachDB manifest internals: CURRENT, VersionEdit, file-set recovery, flush ordering, bytes on disk, manifest_dump, tests, and design decisions."
 tldr: >-
-  BeachDB v0.0.5 ships the manifest: a durable record of which SSTables
-  belong to the database. `CURRENT` points at a `MANIFEST`, startup replays
-  its `VersionEdit`s into a `Version`, and a flushed file only counts once
-  its edit is synced. One torn file in the data directory no longer stops
-  the database from opening.
+  BeachDB `v0.0.5` ships the manifest: a durable record of which SSTables
+  belong to the database, alongside a `manifest_dump` CLI tool to inspect it.
+  One torn file in the data directory no longer stops the database from opening.
 release:
   version: v0.0.5
   code: https://github.com/aalhour/beachdb/releases/tag/v0.0.5
 date: 2026-11-05
 categories: [Databases]
-tags: [beachdb, databases, storage, durability, systems]
+tags: [beachdb, databases, storage, durability, systems, metadata]
 series: beachdb
 toc: true
 mermaid: true
 ---
 
-## Oh, it's been 6 months!
+## The torn-file problem
 
-The manifest milestone shipped back in May, and it took more out of me than any BeachDB milestone so far. Most of that went into study: reading how LevelDB, RocksDB and Pebble solve the same problem, and working out which crash orderings are safe and which ones only look safe.
-
-Then life happened, the good kind. I joined [Fivetran](https://www.fivetran.com/) as a Senior Staff Software Engineer on the Managed Data Lake product: a cloud-native data system built on Apache Iceberg, Apache Polaris, DuckDB and a pile of open data formats. I've been in the weeds ever since, learning how the whole thing fits together and shipping a lot of cool things I want to write about soon.
-
-Funny enough, a big part of that system runs on manifests too. It's turtles all the way down, again.
-
-But back to the milestone... :D
-
-This post covers where manifests come from, the failure that made BeachDB need one, how startup and flushing change in [v0.0.5](https://github.com/aalhour/beachdb/releases/tag/v0.0.5), what the file looks like byte by byte, how `manifest_dump` inspects it, and what this milestone still doesn't do.
-
-## A brief history of manifests
-
-The word comes from shipping. A ship's manifest lists what's on board, so whoever is at the next port can check the cargo against the paperwork instead of opening every crate. Software borrowed the idea early: a Java JAR carries a `MANIFEST.MF`, and package managers keep manifests of what a package contains.
-
-Data systems hit the same question as soon as data lives in many immutable files: **which of these files are the dataset right now?**
-
-There are two ways to answer it. You can ask the directory: list the files and treat whatever is there as the data. Or you can keep a separate, durable record of which files belong, and treat everything else as noise.
-
-Listing the directory is the obvious first answer, and it breaks the same way everywhere. Half-written files show up. Deleted files linger. Nothing makes "add these three files, drop those two" happen all at once. Hive-style tables, where a directory *is* the table, ran into this hard on object stores, where listing is slow and, for years, wasn't even consistent.
-
-The fix keeps showing up in the same shape:
-
-- **LSM storage engines.** LevelDB, open-sourced by Google in 2011, keeps a `MANIFEST` file: a log of edits saying which SSTables were added and removed, plus a tiny `CURRENT` file that names the live manifest.[^8] RocksDB inherited the design and grew it (manifest rotation, column families), and Pebble carries it over to Go.[^6][^7]
-- **Table formats.** Apache Iceberg, which started at Netflix, replaced directory listing with a tree of metadata: a table metadata file points at one manifest list per snapshot, which points at manifest files, which list the data files.[^9] A commit writes new metadata, then swaps a single pointer in a catalog such as Apache Polaris.[^10] Delta Lake does something similar with an ordered log of JSON commits in `_delta_log`.[^11]
-
-Different scales, same shape: one small pointer, a log or tree of metadata, and immutable data files that only count once the metadata says so.
-
-The following is how the idea looks in an LSM engine like LevelDB, RocksDB or Pebble:
-
-```mermaid
-flowchart TD
-  C1["CURRENT"] --> M1["MANIFEST-000042<br/>log of VersionEdits"]
-  M1 --> S1["000001.sst"]
-  M1 --> S2["000002.sst"]
-  M1 --> S3["..."]
-```
-
-And the following is how the same idea looks in an Apache Iceberg table:
-
-```mermaid
-flowchart TD
-  C2["Catalog pointer<br/>e.g. Apache Polaris"] --> M2["Table metadata file"]
-  M2 --> L2["Manifest list<br/>one per snapshot"]
-  L2 --> F1["Manifest file 1"]
-  L2 --> FX["Manifest file 2"]
-  F1 --> D1["Data file 1<br/>(Parquet, ORC, Avro)"]
-  F1 --> D2["Data file 2<br/>(Parquet, ORC, Avro)"]
-  F1 --> DX["..."]
-  FX --> DY["..."]
-```
-
-BeachDB's version is the first picture, scaled down: `CURRENT` points at `MANIFEST-000001`, which lists the `.sst` files.
-
-> I'm preparing a separate post that digs into this history properly: where the idea came from, how it spread from storage engines to table formats, and what each system changed along the way. This section is the 10,000-ft version.
-{: .prompt-info }
-
-## Where we left off
-
-[In the SSTable post]({% post_url 2026-04-06-beachdb-sstables-v1 %}), `v0.0.3` taught BeachDB to flush a memtable into immutable sorted files, reopen them, and serve reads from disk:
-
-```text
-WAL -> active memtable -> immutable memtable -> SSTable files
-```
-
-[Then `v0.0.4`]({% post_url 2026-04-24-beachdb-crash-testing-part1 %}) added a crash harness with failpoints at named engine boundaries. The last three rows of its failpoint table all pointed at the same missing piece: a manifest that defines which files the database owns.
-
-That piece is this milestone. Here's the hole it fills:
+In the previous [SSTable post]({% post_url 2026-04-06-beachdb-sstables-v1 %}), `v0.0.3` taught BeachDB to flush a memtable into immutable sorted files, reopen them, and serve reads from disk:
 
 ```mermaid
 flowchart LR
-  W["Put / Delete"] --> WAL["WAL"]
+  W["Put/Delete"] --> WAL["WAL"]
   W --> MEM["Active Memtable"]
-  MEM --> IMM["Immutable Memtable"]
-  IMM --> SST["SSTable file"]
-  SST -. "v0.0.5 records this" .-> MAN["MANIFEST"]
-  CUR["CURRENT"] --> MAN
+  MEM -. "when full" .-> IMM["Immutable Memtable"]
+  IMM -. "background flush" .-> SST["SSTable (.sst)"]
+
+  R["Get"] -. "1) check active memtable" .-> MEM
+  R -. "2) check frozen memtable, if exists" .-> IMM
+  R -. "3) check sstables on disk" .-> SST
 ```
 
-> How does the database know which SSTable files count?
-{: .prompt-monologue }
+That then begged an important question: <mark>how does the database know which SSTable files belonged to it?</mark>
 
-Before `v0.0.5`, the answer was: scan the directory, open every `*.sst` file, sort them by file number.
+Before the [current `v0.0.5` milestone](](https://github.com/aalhour/beachdb/releases/tag/v0.0.5)), and for the sake of shipping SSTables, I implemented a basic answer: scan the database's directory, open every `*.sst` file, and sort them by file number.
 
-## One torn file
+But that answer came at a cost.
 
-Here's what that answer costs.
+Previously, BeachDB would write each SSTable straight to its final filename, so a process that dies halfway through a flush leaves a torn `.sst` behind. I set that up by hand: one good flush, then a copy of that file chopped in half under the next file ID.
 
-`v0.0.4` writes each SSTable straight to its final filename, so a process that dies halfway through a flush leaves a torn `.sst` behind. I set that up by hand: one good flush, then a copy of that file chopped in half under the next file ID.
-
-```text
+```bash
 $ ls -l data/
 103  00000000000000000000.sst   # a good flush
  51  00000000000000000001.sst   # torn: the next flush died halfway
@@ -119,19 +50,33 @@ $ ls -l data/
 
 Then I reopened it with `v0.0.4`:
 
-```text
+```bash
 beachdb: reading SSTable 00000000000000000001.sst: beachdb/sstable: invalid magic number
 ```
 
-The WAL still had every acknowledged write. File `0` was fine. Every file the database needed was correct, and the database still refused to open, because of one file nobody asked for.
+The WAL still had every acknowledged write. File `0` was fine. Every file the database needed was correct, and the database still refused to open, because of one problematic file nobody asked for.
 
-A stray file does the same thing. `v0.0.4` also refused to start if someone dropped a `backup.sst` into the data directory, because the scan tried to parse every `.sst` filename as a number. Humans are entropy with keyboards.
+A stray file does the same thing. `v0.0.4` also refused to start if someone dropped a `backup.sst` into the data directory, because the scan tried to parse every `.sst` filename as a number.
 
-The directory scan can't tell data from debris. Only metadata the database writes and syncs itself can make that call, and that metadata is the manifest. With `v0.0.5`, the same directory opens, `Get("apple")` returns `"red"`, and the torn file gets deleted on the way in.
+The directory scan hack can't tell data from debris. Only metadata the database writes and syncs itself can make that call, and that metadata is the Manifest. With [`v0.0.5`](https://github.com/aalhour/beachdb/releases/tag/v0.0.5), the same directory opens, `Get("apple")` returns `"red"`, and the torn file gets deleted on the way in.
+
+Here's the hole it fills in teh architecture:
+
+```mermaid
+flowchart LR
+  W["Put / Delete"] --> WAL["WAL"]
+  W --> MEM["Active Memtable"]
+  MEM --> IMM["Immutable Memtable"]
+  IMM --> SST["SSTable file"]
+  SST -. "Record the file (v0.0.5)" .-> MAN["MANIFEST"]
+  CUR["CURRENT"] --> MAN
+```
+
+---
 
 ## So, what is a BeachDB manifest?
 
-A manifest is an append-only log of metadata changes. BeachDB now rebuilds itself on startup from two logs that answer different questions:
+A <mark>manifest is an append-only log of metadata changes</mark>. BeachDB now rebuilds itself on startup from two logs that answer different questions:
 
 | Log | Question it answers |
 |-----|---------------------|
@@ -146,8 +91,9 @@ BeachDB's manifest has three pieces:
 
 On disk, a BeachDB directory now looks like this:
 
-```text
-data/
+```bash
+$ tree data
+.data/
 ├── CURRENT
 ├── MANIFEST-000001
 ├── beachdb.wal
@@ -158,7 +104,8 @@ data/
 
 `CURRENT` contains one line:
 
-```text
+```bash
+$ cat data/CURRENT
 MANIFEST-000001
 ```
 
@@ -460,7 +407,7 @@ As usual, I don't trust a format until I can dump it.
 
 `v0.0.5` adds `manifest_dump`, the metadata sibling of `wal_dump` and `sst_dump`.[^3] It reads `CURRENT`, opens the live manifest, prints every `VersionEdit`, applies them in order, and prints the reconstructed `Version`. Two flushes, two files:
 
-```text
+```bash
 $ manifest_dump /tmp/beachdb-manifest-demo
 Manifest: MANIFEST-000001
 Path:     /tmp/beachdb-manifest-demo/MANIFEST-000001
@@ -541,11 +488,11 @@ They're wired, but nothing exercises them yet. The test meant to cover the SSTab
 
 While writing this post, I pointed the crash harness at those points and found a gap in the harness itself: the worker opens the database without auto-flush and never calls `Flush`, so no flush-path failpoint can fire. The run kills the worker on its timer and reports success anyway. That includes the four flush-path failpoints from the [crash-testing post]({% post_url 2026-04-24-beachdb-crash-testing-part1 %}). So today, the flush and manifest boundaries are covered by in-process tests, not by crash runs. Teaching the worker to flush, and teaching the controller to fail when an armed point never fires, goes on the list.
 
-## Design notes
+## Design decisions
 
 Now that the shape is on the table, here's why it looks this way. The short version: I wanted the LevelDB / RocksDB / Pebble style of metadata log, scaled down to what BeachDB needs today.[^4][^5][^6][^7]
 
-### A log of edits, not a full snapshot
+### Decision #1: A log of edits, not a full snapshot
 
 The simplest possible manifest would be a full snapshot: serialize the current file set, write it to a temp file, sync it, rename it into place. Recovery reads one object and it's done.
 
@@ -555,13 +502,13 @@ A log of edits makes each metadata change proportional to the change itself. A f
 
 That matches the LevelDB and Pebble path better than a snapshot-only format.[^4][^7]
 
-### `CURRENT` exists before rotation does
+### Decision #2: `CURRENT` exists before rotation does
 
 `v1` never rotates the manifest. It could hardcode `MANIFEST-000001` and get away with it for now.
 
 I added `CURRENT` anyway. Rotation needs one small atomic object to flip from the old manifest to the new one, and a pointer file is exactly that: write `CURRENT.tmp`, sync it, rename it, sync the directory. With the pointer in the format from day one, recovery always starts the same way. Retrofit it later, and recovery has to support two boot protocols: one for old directories and one for new ones.
 
-### Reuse the record layer
+### Decision #3: Reuse the record layer
 
 The framing problem is identical for the WAL and the manifest: variable-length payloads with magic bytes, version, record type, payload length and checksum. Solving it twice would mean two readers, two writers, two sets of truncation tests, and two ways for me to make the same mistake with different variable names.
 
@@ -578,7 +525,7 @@ Moving the WAL onto it changed the WAL's header. The [WAL post]({% post_url 2026
 
 LevelDB and RocksDB use their log reader and writer for manifest records too. Pebble's explicit shared `record` package made the idea feel especially natural in Go.[^5][^7]
 
-### TLV, but no skip-unknown machinery yet
+### Decision #4: TLV, but no skip-unknown machinery yet
 
 `VersionEdit` uses tag-value encoding because edits are sparse. A flush edit doesn't need to write empty delete lists or future compaction fields; it writes the fields it sets.
 
@@ -586,7 +533,7 @@ But v1 doesn't try to skip unknown tags. That would require every tag to be leng
 
 So the rule is stricter and simpler: an unknown tag means "this manifest isn't for this reader." The format version byte is the escape hatch.
 
-### Manifest sync isn't optional
+### Decision #5: Manifest sync isn't optional
 
 The WAL has configurable sync behavior because write latency is a user-facing tradeoff. The manifest doesn't get that knob.
 
