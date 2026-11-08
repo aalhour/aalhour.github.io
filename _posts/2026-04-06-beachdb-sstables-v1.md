@@ -23,7 +23,7 @@ mermaid: true
 
 It has been a while since the last milestone, and most of that time disappeared into the unglamorous but important question of what kind of file format I wanted to commit to. It felt like the moment I moved from memory to disk, every casual design choice started feeling a lot less casual.
 
-[BeachDB v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing about data on disk.
+[v0.0.3](https://github.com/aalhour/beachdb/releases/tag/v0.0.3) is the milestone where the LSM diagram stops bluffing about data on disk.
 
 BeachDB can now flush a full memtable into immutable sorted files on disk, reopen those files, and read through them. Those files have sparse indexes and fixed-size footers, so reads can binary-search candidate blocks instead of scanning the whole file. It writes real database files now.
 
@@ -73,12 +73,12 @@ This is point-lookups-through-SSTables, not yet full version-set or compaction m
 
 ## So, what is an SSTable?
 
-The term "SSTable" is short for Sorted String Table. It comes from the Bigtable paper[^1], but the shape escaped into a lot of other systems after that: LevelDB[^3], RocksDB[^4], Pebble[^5], HBase/HFile[^7], Cassandra[^8], and plenty of smaller LSM engines too.
+The term <mark>"SSTable" is short for Sorted String Table</mark>. It comes from the Bigtable paper[^1], but the shape escaped into a lot of other systems after that: LevelDB[^3], RocksDB[^4], Pebble[^5], HBase/HFile[^7], Cassandra[^8], and plenty of smaller LSM engines too.
 
 > SSTables are immutable sorted files that storage engines write to disk once in-memory state graduates out of the memtable. They are how "a bunch of writes in memory" turns into durable, searchable on-disk state.
 {: .prompt-tip }
 
-In BeachDB, an SSTable is an **immutable sorted file of key-value entries** written from a full memtable (a skiplist) to disk.
+In BeachDB, <mark>an SSTable is an *immutable* sorted file of key-value entries written from a full memtable (a skiplist) to disk</mark>.
 
 It is not a table in the SQL sense. It is not a schema object. It is just a storage-engine file with one job:
 
@@ -140,7 +140,7 @@ So:
 
 That is the part I think is easiest to miss when people hear "simple key-value store." Even a tiny LSM-ish engine stops being "one map on disk" pretty quickly. It becomes a few sorted files, ordered newest-to-oldest, plus a couple of rules about shadowing and tombstones.
 
-In BeachDB, a new SSTable appears when the active memtable fills up, gets frozen, and is flushed in the background into the next `.sst` file.
+In BeachDB, <mark>a new SSTable appears when the active memtable fills up, gets frozen, and is flushed in the background into the next `.sst` file</mark>.
 
 We'll follow that engine path first, then crack the file open in [The SSTable format](#the-sstable-format) — including a real file inspected byte by byte — and close with [why the format looks the way it does](#why-beachdbs-sstable-v1-looks-like-this).
 
@@ -291,7 +291,7 @@ Now assume that the two files are slightly different, the older one has a `Put` 
 
 `Get("banana")` returns not found because the newer tombstone (on-disk) wins.
 
-That is the whole rule: **newest visible fact wins, and reads now know how to reach disk.**
+That is the whole rule: <mark>newest visible fact wins, and reads now know how to reach disk.</mark>
 
 ```mermaid
 sequenceDiagram
@@ -333,7 +333,7 @@ The search order is:
 2. immutable memtable, if a flush is in progress
 3. SSTables newest-first
 
-That newest-first rule is load-bearing. Newer state shadows older state. Tombstones shadow older puts. The engine stops as soon as it finds the first visible answer.
+That newest-first rule needs a bit of clarification: Newer state shadows older state (in terms of writes). Tombstones shadow older puts. The engine stops as soon as it finds the first visible answer.
 
 If you want the inside of one SSTable, the next stop is [The SSTable format](#the-sstable-format).
 
@@ -547,7 +547,7 @@ $ xxd -g 1 /tmp/beachdb-sst-post-demo/000000.sst
 
 Working through it region by region:
 
-**Data block 0** — bytes `0x00`–`0x39` (apple, banana):
+**Data block 0**, bytes `0x00`–`0x39` (apple, banana):
 
 | Bytes | Field | Value |
 |-------|-------|-------|
@@ -560,7 +560,7 @@ Working through it region by region:
 | | _(banana entry follows in the same layout)_ | |
 | `33 be 3f 14` | CRC32C checksum | block 0 |
 
-**Data block 1** — bytes `0x3a`–`0x71` (cherry, date):
+**Data block 1**, bytes `0x3a`–`0x71` (cherry, date):
 
 | Bytes | Field | Value |
 |-------|-------|-------|
@@ -577,7 +577,7 @@ Working through it region by region:
 | `00 00 00 00` | value length | 0 (tombstone) |
 | `29 c2 3a 9a` | CRC32C checksum | block 1 |
 
-**Data block 2** — bytes `0x72`–`0x94` (elderberry):
+**Data block 2**, bytes `0x72`–`0x94` (elderberry):
 
 | Bytes | Field | Value |
 |-------|-------|-------|
@@ -589,7 +589,7 @@ Working through it region by region:
 | `62 6c 75 65` | value | `"blue"` |
 | `2b 43 19 5f` | CRC32C checksum | block 2 |
 
-**Index block** — bytes `0x95`–`0xf7`:
+**Index block**, bytes `0x95`–`0xf7`:
 
 | Bytes | Field | Value |
 |-------|-------|-------|
@@ -600,7 +600,7 @@ Working through it region by region:
 | | _(date and elderberry index entries follow in the same layout)_ | |
 | `08 ee 71 23` | CRC32C checksum | index block |
 
-**Footer** — bytes `0xf8`–`0x11f`:
+**Footer**, bytes `0xf8`–`0x11f`:
 
 | Bytes | Field | Value |
 |-------|-------|-------|

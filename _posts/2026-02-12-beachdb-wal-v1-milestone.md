@@ -24,7 +24,7 @@ In my [last post]({% post_url 2026-01-07-building-beachdb %}), I introduced [Bea
 
 Now it's time to show real code.
 
-[BeachDB v0.0.1](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) is the first tagged release, and it ships the Write-Ahead Log (WAL). The WAL is the durability spine of the database. Every write lands here before it's acknowledged. If the process crashes and restarts, the WAL is how we recover state.
+[v0.0.1](https://github.com/aalhour/beachdb/releases/tag/v0.0.1) is the first tagged release, and it ships the Write-Ahead Log (WAL). The WAL is the durability spine of the database. Every write lands here before it's acknowledged. If the process crashes and restarts, the WAL is how we recover state.
 
 If you want to see runnable examples in Go, head over to: [github.com/aalhour/beachdb/examples/](https://github.com/aalhour/beachdb/tree/main/examples), and play with the code under `engine/`. The [`examples/engine/basic_usage/`](https://github.com/aalhour/beachdb/blob/main/examples/engine/basic_usage/main.go) is a good starting point, as it demonstrates basic API usage of the storage engine, namely: create a new database, and call Put, Get and Delete on it.
 
@@ -32,7 +32,7 @@ This post walks through what I built, why I made certain design decisions, and h
 
 ## What is this thing you call a WAL?
 
-A WAL is a log that a database promising durability uses in order to track evidence of data mutations (create, update, delete). The concept is old and most serious databases, such as: PostgreSQL and SQLite, use one. In the LSM-tree world, LevelDB[^1] and RocksDB[^2] both have well-documented WAL implementations that BeachDB draws inspiration from.
+A <mark>WAL is a log that a database promising durability uses in order to track evidence of data mutations (create, update, delete)</mark>. The concept is old and most serious databases, such as: PostgreSQL and SQLite, use one. In the LSM-tree world, LevelDB[^1] and RocksDB[^2] both have well-documented WAL implementations that BeachDB draws inspiration from.
 
 When a new `db.Put(key, value)` or `db.Delete(key)` comes in, the first thing that the database would do is to append an entry to the WAL documenting the action before actually doing anything with it — which varies from one database to another. Some databases modify the filesystem as a part of the critical path for serving writes, some just cache them in-memory (in addition to appending the WAL entry).
 
@@ -207,7 +207,7 @@ When thinking about the different options to write data to disk one can easily g
 
 ### The lie that `write()` returns success
 
-This is the part that trips people up. `write()` returns the number of bytes written, but "written" here means "copied to kernel memory." The return value tells you nothing about durability. A program that does `write()` → check for error → tell the user "saved!" is making a promise it can't keep.
+This is the part that trips people up. `write()` <mark>returns the number of bytes written, but "written" here means "copied to kernel memory." The return value tells you nothing about durability.</mark> A program that does `write()` → check for error → tell the user "saved!" is making a promise it can't keep.
 
 BeachDB's contract is simple: the [`db.Write()`](https://github.com/aalhour/beachdb/blob/9c78234d73631abe102163c12c1c558c1c6b6055/engine/db.go#L91-L102) method doesn't return until `fsync` completes. If `fsync` fails, the write fails. If the process dies before `fsync`, the write was never acknowledged, so there's no broken promise.
 
@@ -230,7 +230,7 @@ If you want to go even deeper on SSD internals, I recommend checking out the Cod
 
 Now that we have `fsync` and durability primitives under our belts, we can move forward to the WAL record design and format.
 
-A WAL file is a sequence of records. Each record wraps one encoded `Batch` (a group of Put and Delete operations that are applied atomically). There are no Create operations in BeachDB. The `Put` operation means: "update if exists or create".
+A <mark>WAL file is a sequence of records</mark>. Each record wraps one encoded `Batch` (a group of Put and Delete operations that are applied atomically). There are no Create operations in BeachDB. The `Put` operation means: "update if exists or create".
 
 Here's the layout, please note that offset numbers denote indexes in byte arrays and sizes denote numbers of bytes:
 
@@ -268,7 +268,7 @@ To read more about the WAL and Batch formats, I've uploaded the docs to `beachdb
 
 When building the WAL, I had to make several choices. Here's my reasoning.
 
-### Decision #1: Why checksum in the header, not a trailer?
+### <mark>Decision #1: Why checksum in the header, not a trailer?</mark>
 
 I put the checksum in the header (before the payload) rather than as a trailing field. This means the reader can:
 

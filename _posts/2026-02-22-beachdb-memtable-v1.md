@@ -77,7 +77,7 @@ This is exactly why the memtable is the right next milestone: without a sorted m
 
 ## So what is a Memtable really?
 
-In an LSM engine, a memtable is the in-memory structure that holds the newest writes *in sorted order*.
+In an LSM engine, <mark>a memtable is the in-memory structure that holds the newest writes *in sorted order*.</mark>
 
 It’s doing a few jobs at once:
 
@@ -279,7 +279,6 @@ sequenceDiagram
   Note over SST,CMP: Not implemented yet
   DB-->>C: OK
 ```
-<br>
 
 ### Get API flow
 
@@ -301,7 +300,6 @@ sequenceDiagram
     DB-->>C: ErrKeyNotFound
   end
 ```
-<br>
 
 ### Delete API flow
 
@@ -321,7 +319,6 @@ sequenceDiagram
   Note over SST: Future: tombstone must flush + compact to be meaningful on disk
   DB-->>C: OK
 ```
-<br>
 
 ---
 

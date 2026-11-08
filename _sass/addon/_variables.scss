@@ -122,6 +122,9 @@
   // Footnotes
   --footnote-target-bg: rgb(29 79 145 / 14%);
 
+  // Highlighter pen for <mark> (yellow). Consumed by _content.scss.
+  --hl-pen: rgb(247 220 74 / 60%);
+
   // Addon custom properties
   --link-hover: #133B70;
   --accent-color: #1D4F91;
@@ -292,6 +295,9 @@
 
   // Footnotes
   --footnote-target-bg: rgb(148 182 242 / 18%);
+
+  // Highlighter pen: dimmer on dark paper so the text stays readable.
+  --hl-pen: rgb(214 178 60 / 32%);
 
   // Checkbox
   --checkbox-color: #45403A;

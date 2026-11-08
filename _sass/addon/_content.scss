@@ -229,6 +229,38 @@ blockquote.prompt-monologue {
   }
 }
 
+// ─── Highlighter: <mark> as a hand-drawn marker stroke ──────────────────────
+// Uneven corners and lighter ends, like a chisel tip that starts and lifts
+// off. `clone` gives every wrapped line its own stroke. The side padding is
+// cancelled by an equal negative margin, so word spacing and line height stay
+// as they are. Overrides Bootstrap's `mark` padding and background.
+
+html main .content mark {
+  color: inherit;
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--hl-pen) 55%, transparent) 0,
+      var(--hl-pen) 0.45em,
+      var(--hl-pen) calc(100% - 0.6em),
+      color-mix(in srgb, var(--hl-pen) 70%, transparent) 100%
+    );
+  padding: 0.02em 0.3em;
+  margin: 0 -0.3em;
+  border-radius: 0.9em 0.3em 0.75em 0.35em / 0.4em 0.75em 0.35em 0.65em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+
+  // Inline code keeps its mono face and a faint box, but the box is
+  // see-through so the pen runs under it instead of being cut. Bold, italic
+  // and links need nothing: they only change the glyphs.
+  code {
+    background-color: color-mix(in srgb, var(--inline-code-bg) 45%, transparent);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}
+
 // ─── In short (front-matter `tldr`): pinned summary card, collapsible ───────
 // A straight index card taped at both corners (Note/Caution cards are tilted
 // with one strip), collapsed by default to one line: "In short", a hint and a
