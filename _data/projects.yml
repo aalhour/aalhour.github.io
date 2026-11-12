@@ -115,6 +115,16 @@
   maintenance: "archived"
   description: "A 16-bit machine code assembler for the Hack assembly language, built while taking `nand2tetris` ([part 1](https://www.coursera.org/learn/build-a-computer), [part 2](https://www.coursera.org/learn/nand2tetris2#modules)). A fun way to connect computer architecture concepts to real bits."
 
+- title: "bitcask.py"
+  kind: "educational"
+  link_title: "github"
+  link: "https://github.com/aalhour/bitcask.py"
+  hidden: "false"
+  engagement: "owner"
+  activity: "inactive"
+  maintenance: "archived"
+  description: "A teachable, paper-faithful Python 3.12 implementation of the [Bitcask](https://github.com/aalhour/bitcask.py/blob/main/docs/Bitcask%20-%20A%20Log-Structured%20Hash%20Table%20for%20Fast%20Key-Value%20Data.pdf) paper for a log-structured key/value store in workshop format."
+  
 - title: "PyRocks"
   kind: "educational"
   link_title: "github"
